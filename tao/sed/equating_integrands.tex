@@ -1,0 +1,89 @@
+\title{SED Equations}
+\author{
+  Luke Hodkinson \\
+  Center for Astrophysics and Supercomputing \\
+  Swinburne University of Technology \\
+  Melbourne, Hawthorn 32000, \underline{Australia}
+}
+\date{\today}
+
+\documentclass[12pt]{scrartcl}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{listings}
+%% \usepackage[scaled]{beramono}
+%% \renewcommand*\familydefault{\ttdefault}
+%% \usepackage[Tl]{fontenc}
+
+\newcommand{\deriv}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+\newcommand{\sderiv}[2]{\ensuremath{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}}
+\newcommand{\dx}[1]{\ensuremath{\,\mathrm{d}#1}}
+
+%% \lstset{
+%%   language=Python,
+%%   showstringspaces=false,
+%%   formfeed=\newpage,
+%%   tabsize=4,
+%%   basicstyle=\small\ttfamily,
+%%   commentstyle=\color{BrickRed}\itshape,
+%%   keywordstyle=\color{blue},
+%%   stringstyle=\color{OliveGreen},
+%%   morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+%%    zip, with, open}
+%% }
+
+\begin{document}
+\maketitle
+
+\section{Equating Integrands}
+
+In the derivation of the AB magnitudes used in TAO we use the following relationship
+between fluxes in wavelengths and frequency,
+\[ \int_\nu f_\nu \dx{\nu} = \int_\lambda f_\lambda \dx{\lambda} \; , \]
+by transforming the right hand side, giving
+\[ \int_\nu f_\nu \dx{\nu} = -\int_\nu f_\lambda \frac{c}{\nu^2} \dx{\lambda} \; , \]
+and equating the integrands,
+\[ f_\nu = -f_\lambda \frac{c}{\nu^2} \; . \]
+In this article I will be showing that the final step, that is equating the
+integrands of the transformed integrals, is sound.
+
+In the interest of maintaining relevance to the above stated context, we begin
+by defining two equated integrals over different variables,
+\begin{eqnarray*}
+\int^{x_1}_{x_0} f(x) \dx{x} & = & \int^{h(x_1)}_{h(x_0)} g(y) \,\mathrm{d}y \\
+y & = & h(x) \\
+x & = & h^{-1}(y)
+\end{eqnarray*}
+where $f(x)$ and $g(y)$ are arbitrary $C^0$ continuous real-valued functions for $x,y \in \Re$, $x_0$ and $x_1$ are arbitrarily chosen definite integration terminals, $h(x)$ is a real-valued $C^1$ continuous function defining the relationship between $x$ and $y$ and $h^{-1}$ is the inverse of $h$. The first order of business is to transform the RHS to be integrated over the same variable, $x$. We use the derivative of the relationship between $x$ and $y$,
+\begin{eqnarray*}
+\frac{\,\mathrm{d}y}{\dx{x}} & = & \frac{\,\mathrm{d}h}{\dx{x}} \\
+\Rightarrow \,\mathrm{d}y & = & \frac{\,\mathrm{d}h}{\dx{x}} \dx{x}
+\end{eqnarray*}
+to transform the integrals to
+\begin{eqnarray*}
+\int^{x_1}_{x_0} f(x) \dx{x} & = & \int^{h(x_1)}_{h(x_0)} g(y) \,\mathrm{d}y \\
+& = & \int^{h^{-1}(h(x_1))}_{h^{-1}(h(x_0))} g(h(x)) \frac{\,\mathrm{d}h}{\dx{x}} \dx{x} \\
+& = & \int^{x_1}_{x_0} g(h(x)) \frac{\,\mathrm{d}h}{\dx{x}} \dx{x} \\
+& = & \int^{x_1}_{x_0} G(x) \dx{x}
+\end{eqnarray*}
+where we have defined
+\[ G(x) = g(h(x)) \frac{\,\mathrm{d}h}{\dx{x}} \; . \]
+Now that both integrals are over the same variable and the same domain we may bring them together,
+\begin{equation}
+\label{all_lhs}
+\int^{x_1}_{x_0} f(x) - G(x) \dx{x} = 0 \; .
+\end{equation}
+
+We now seek to demonstrate that the above can only by true if
+\[ f(x) = G(x) \; . \]
+To show that $f(x) = G(x)$ we will use a proof by contradiction; we will show that a combination of $f$ and $G$ that are not equal contradict the requirement that
+\[ \int^{x_1}_{x_0} f(x) - G(x) \dx{x} = 0 \; . \]
+If $f(x) \ne G(x)$ then there must exist some value of $x$, say $x_e$, such that $f(x_e) \ne G(x_e)$. Now because both $f$ and $G$ are $C^0$ continuous there exists a positive non-zero real-valued parameter $\epsilon$ such that $f(z) \lt G(z)$ or $f(z) \gt G(z)$ for all $x_e - \epsilon \le z \le x_e + \epsilon$. With $f(z)$ and $G(z)$ not crossing each other at any point in $z$, $f(z) - G(z)$ will be either be all positive or all negative at all points in $z$. Thus,
+\[ \int_{x_e - \epsilon}^{x_e + \epsilon} f(x) - G(x) \dx{x} \ne 0 \; . \]
+But this equation is precisely equation \eqref{all_lhs} with the terminals set to $x_0 = x_e - \epsilon$ and $x_1 = x_e + \epsilon$, yet they both claim opposing conclusions, and therein lay the contradiction. Thus, only when $f(x) = G(x)$ can \eqref{all_lhs} be satisfied for all combinations of $x_0$ and $x_1$.
+
+\end{document}
