@@ -1,0 +1,78 @@
+\documentclass{beamer}
+%% \documentclass[aspectratio=169]{beamer}
+
+\usepackage[latin1]{inputenc}
+
+% Setup the tikz package for pictures.
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+
+% Set Beamer mode.
+\mode<presentation>{
+  \usetheme{Oxygen}
+}
+
+% Uncomment this if you need to eliminate the
+% navigation icons on the bottom right.
+%% \setbeamertemplate{navigation symbols}{}
+
+\title[The Cut and Thrust of CUDA]{The Cut and Thrust of CUDA}
+\author{Luke Hodkinson}
+\institute{
+  Center for Astrophysics and Supercomputing \\
+  Swinburne University of Technology \\
+  Melbourne, Hawthorn 32000, \underline{Australia}
+}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\frame{\frametitle{Table of contents}\tableofcontents}
+
+\section{First Section}
+
+\begin{frame}
+  % Can use \begin{frame}[plain]{...} for plain frames.
+  \frametitle{Considerations}
+  \framesubtitle{Some?}
+  \Large
+  \begin{itemize}
+    \item Must handle large datasets.
+    \item Average request in hours (ideally minutes).
+    \item Scale over large number of distributed cores.
+    \item Use an SQL capable DB.
+  \end{itemize}
+\end{frame}
+
+\section{Second Section}
+
+\begin{frame}
+  \frametitle{Considerations}
+  \framesubtitle{Some?}
+  \Large
+  \begin{itemize}
+    \item Must handle large datasets.
+    \item Average request in hours (ideally minutes).
+    \item Scale over large number of distributed cores.
+    \item Use an SQL capable DB.
+  \end{itemize}
+\end{frame}
+
+\section{Third section}
+
+\begin{frame}
+  \frametitle{Considerations}
+  \framesubtitle{Some?}
+  \Large
+  \begin{itemize}
+    \item Must handle large datasets.
+    \item Average request in hours (ideally minutes).
+    \item Scale over large number of distributed cores.
+    \item Use an SQL capable DB.
+  \end{itemize}
+\end{frame}
+
+\end{document}
