@@ -1,0 +1,189 @@
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Some quotes}
+  \begin{block}{}
+  {\Large Generic programming is a paradigm for developing efficient, reusable
+    software libraries.}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Some quotes}
+  \begin{block}{}
+    {\Large Generic programming is about generalizing software components
+      so that they can be easily reused in a wide variety of situations.}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Some quotes}
+  \begin{block}{}
+    {\Large Generic programming is about generalizing software components
+      so that they can be easily reused in a wide variety of situations.}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Some quotes}
+  \begin{block}{}
+    {\Large Generic programming is a style of computer programming
+      in which algorithms are written in terms of to-be-specified-later
+      types that are then instantiated when needed for specific types
+      provided as parameters.}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Example problem}
+  \begin{example}
+    \begin{lstlisting}
+    // Sum a set of numbers.
+    int sum( int array[], int size ) {
+      int result = 0;
+      for( unsigned ii = 0; ii < size; ++ii )
+        result += array[ii];
+      return result;
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Example problem}
+  What about types other than int? \\
+  Solutions:
+  \begin{itemize}
+  \item Write different versions for each type.
+    \begin{itemize}
+    \item Fast, but unmanageable.
+    \end{itemize}
+  \item Use pointers to generalise type.
+    \begin{itemize}
+    \item mallocs for ints?! Too slow.
+    \end{itemize}
+  \item {\bf Use generic programming.}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Generic Programming?}
+  \framesubtitle{Example problem}
+  What about types other than int? \\
+  Solutions:
+  \begin{itemize}
+  \item Write different versions for each type.
+    \begin{itemize}
+    \item Fast, but unmanageable.
+    \end{itemize}
+  \item Use pointers to generalise type.
+    \begin{itemize}
+    \item mallocs for ints?! Too slow.
+    \item Lose type information.
+    \end{itemize}
+  \item {\bf Use generic programming.}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  Templates are how C++ handles generic programming.
+  \begin{example}
+    \begin{lstlisting}
+    // Sum a set of numbers.
+    template< typename T >
+    T sum( T array[], int size ) {
+      T result = 0;
+      for( unsigned ii = 0; ii < size; ++ii )
+        result += array[ii];
+      return result;
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  Templates are how C++ handles generic programming.
+  \begin{example}
+    \begin{verbatim}
+    // Sum a set of numbers.\end{verbatim}{\color{BrickRed}\begin{verbatim}
+    template< typename T >\end{verbatim}}\begin{verbatim}
+    T sum( T array[], int size ) {
+      T result = 0;
+      for( unsigned ii = 0; ii < size; ++ii )
+        result += array[ii];
+      return result;
+    }
+    \end{verbatim}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      int array_of_ints[10];
+      double array_of_doubles[10];
+      // TODO: Initialise arrays.
+
+      sum<int>( array_of_ints, 10 );
+      sum<double>( array_of_doubles, 10 );
+
+      sum( array_of_ints, 10 );
+      sum( array_of_doubles, 10 );
+
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      int array_of_ints[10];
+      double array_of_doubles[10];
+      // TODO: Initialise arrays.
+
+      sum<int>( array_of_ints, 10 );
+      sum<double>( array_of_doubles, 10 );
+
+      sum( array_of_ints, 10 );
+      sum( array_of_doubles, 10 );
+
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Iterators}
+  What if we have a more complex data type? Say, a linked list?
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Algorithms}
+  Bring together object oriented programming and generic programming.
+  Make objects that perform algorithms and are container agnostic.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  \begin{block}{Summary}
+    \begin{itemize}
+    \item Give functions/objects variable types.
+    \item Very efficient, different code for each type.
+    \item Manageable code.
+    \item Allows separation of data and algorithms.
+    \end{itemize}
+  \end{block}
+\end{frame}
