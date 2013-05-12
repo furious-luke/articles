@@ -1,7 +1,27 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
 \documentclass{beamer}
 %% \documentclass[aspectratio=169]{beamer}
 
 \usepackage[latin1]{inputenc}
+\usepackage{color}
+%% \usepackage[dvipsnames]{xcolor}
+%% \usepackage{amsmath}
+%% \usepackage{amsfonts}
+\usepackage{listings}
+
+\lstset{
+  language=C++,
+  %% numbers=left,
+  showstringspaces=false,
+  formfeed=\newpage,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{BrickRed}\itshape,
+  keywordstyle=\color{blue},
+  stringstyle=\color{OliveGreen}
+  %% morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+  %%  zip, with, open}
+}
 
 % Setup the tikz package for pictures.
 \usepackage{tikz}
@@ -46,19 +66,32 @@
   \begin{itemize}
     \item A parallel algorithms library.
     \item Resembles the C++ Standard Template Library.
-    \item Enhances {\emph productivity}.
+    \item Enhances {\bf productivity}.
   \end{itemize}
+  \hspace{5cm}\includegraphics[width=3cm]{thrust_logo.png}
 \end{frame}
 
 \begin{frame}
   \frametitle{Architectures}
   Thrust is not limited to GPUs...
-  \begin{itemize}
-    \item Multicore CPUs.
-    \item GPUs.
-    \item OpenMP.
-    \item Intel Threading Building Blocks.
-  \end{itemize}
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \begin{itemize}
+      \item Multicore CPUs.
+      \item GPUs.
+      \item CUDA.
+      \item OpenMP.
+      \item Intel Threading Building Blocks.
+      \end{itemize}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \includegraphics[width=.38\textwidth]{cuda_logo.jpg} \\
+      \vspace{.2cm}
+      \includegraphics[width=.38\textwidth]{tbb_logo.png} \\
+      \vspace{.5cm}
+      \includegraphics[width=.38\textwidth]{openmp_logo.jpg}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -69,6 +102,7 @@
     \item Version 1.6.0.
     \item Actively developed.
     \item 240+ active users.
+    \item Now distributed with CUDA toolkit.
   \end{itemize}
 \end{frame}
 
@@ -124,11 +158,9 @@
 \begin{frame}
   \frametitle{Results}
   \framesubtitle{Scaling}
-  \begin{block}{Weak scaling}
-    \centering
-    \vspace{1cm}
-    \vspace{1cm}
-  \end{block}
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{weak.png}
+  \end{center}
 \end{frame}
 
 \begin{frame}
@@ -167,68 +199,227 @@
   \begin{itemize}
     \item allows object-oriented programming,
     \item allows generic programming,
-    \item performs as well, if not more so, than C.
+    \item maintains high performance.
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Why Am I Talking About C++?}
-  Foreign concepts.
+  Often critcized as ``too much rope''...
+  \begin{itemize}
+    \item potentially hidden operations,
+    \item not truly object oriented,
+    \item steep learning curve.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Differences With C}
-  \begin{columns}
-    \column{.5\textwidth}
-    \begin{block}{C}
-    \begin{itemize}
-    \item Procedural.
-    \end{itemize}
-    \end{block}
-
-    \column{.5\textwidth}
-    \begin{block}{C++}
-    \begin{itemize}
-    \item Procedural, object oriented, generic programming.
-    \end{itemize}
-    \end{block}
-  \end{columns}
+  \frametitle{Why Am I Talking About C++?}
+  Fortunately we only need to cover a relatively small
+  amount.
 \end{frame}
 
 \begin{frame}
   \frametitle{Object Oriented Programming}
-  Talk about benefits, give some examples. Explain why
-  we need it for Thrust and how it helps.
+  \framesubtitle{Why do we need it?}
+  OO designs allow us to write customised CUDA kernels
+  in optimised Thrust algorithms without having to
+  actually write a kernel.
 \end{frame}
 
 \begin{frame}
-  \frametitle{Generic Programming}
-  \framesubtitle{What and why?}
-  Explain generally how generics can save us a lot
-  of effort by generalising algorithms to various kinds
-  of data structures. Separation of algorithms and data.
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{What is it?}
+  A programming paradigm characterised by representation of concepts
+  as ``objects'' that have both data and procedures which interact
+  with one another.
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{oop_objects.png}
+  \end{center}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Generic Programming}
-  \framesubtitle{Templates}
-  Achieved in C++ using Templates.
-  As an example, show the conversion from an entirely C
-  implementation of a function to a C++ templated one.
+  \frametitle{Object Oriented Programming}
+  Some definitions:
+  \begin{description}
+    \item[class] A structure to hold data (members) and functions (methods).
+    \item[object] An instantiaion of a class. Much like a struct, a class
+      defines an object, but no allocation is given until instantiation.
+  \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Defining a class:
+  \begin{example}
+    \begin{columns}
+      \begin{column}{.3\textwidth}
+        \begin{lstlisting}
+struct point_type {
+  double x, y;
+};
+        \end{lstlisting}
+      \end{column}
+      \hspace{-10pt}
+      \vrule{}
+      \hspace{8pt}
+      \begin{column}{.5\textwidth}
+        \begin{lstlisting}
+struct point_type {
+  double x, y;
+
+  double norm() {
+    return sqrt(x*x + y*y);
+  }
+};
+        \end{lstlisting}
+      \end{column}
+    \end{columns}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Instantiating a class into an object:
+  \begin{example}
+    \begin{lstlisting}
+int main() {
+
+  // Make an object of type "point_type".
+  point_type point;
+
+  // Call the "norm" method.
+  double value = point.norm();
+
+}
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \begin{itemize}
+    \item Typically use \lstinline|class| instead of \lstinline|struct| (why?).
+    \item Data members are automatically accessible to methods.
+    \item Methods callable from objects using ``.''.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  C++ allows certain operators to be ``overloaded''. \\
+  \vspace{.5cm}
+  \begin{center}
+  \begin{tabular}{c|c}
+    \lstinline|x + y| & \lstinline|point_type& operator+( const point_type& y )| \\
+    \lstinline|x - y| & \lstinline|point_type& operator-( const point_type& y)| \\
+    \lstinline|x*y| & \lstinline|point_type& operator*( const point_type& y )| \\
+    \lstinline|x/y| & \lstinline|point_type& operator/( const point_type& y)| \\
+    \hline
+    \multicolumn{1}{|c|}{\lstinline|x()|} & \multicolumn{1}{c|}{\lstinline|void operator()()|} \\
+    \hline
+  \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  So, we can make function-like objects (functors) with attached data...
+  \begin{example}
+    \begin{lstlisting}
+    struct square_plus {
+      double to_add;
+
+      square_plus( double value )
+        : to_add( value ) {}
+
+      void
+      operator()( double x ) {
+        return x*x + to_add;
+      }
+    };
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      square_plus op( 10 ); // create a "square_plus"
+                            // object with "to_add"
+                            // of 10
+
+      op( 2 ); // call object, returns 40
+
+      square_plus( 10 )( 2 ); // create and call
+
+    }
+    \end{lstlisting}
+  \end{example}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Generic Programming}
-  \framesubtitle{Data Abstraction and the STL}
-  Show examples of a bunch of the STL containers and 
-  algorithms.
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Summary}
+  \begin{block}{Summary}
+  \begin{itemize}
+    \item Bind data with functions using classes/objects.
+    \item Initialize objects with constructors.
+    \item Finalize objects with destructors.
+    \item Create function-like objects with operator overloading.
+  \end{itemize}
+  \end{block}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Generic Programming}
-  \framesubtitle{Iterators}
-  Explain iterators.
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Object oriented concepts we won't be looking at:
+  \begin{itemize}
+    \item inheritance,
+    \item polymorphism,
+    \item encapsulation,
+    \item dynamic dispatch.
+  \end{itemize}
+  \vspace{.5cm}
+  \emph{There's a lot more to it!}
 \end{frame}
+
+\input{generic.tex}
+
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{What and why?}
+%%   Explain generally how generics can save us a lot
+%%   of effort by generalising algorithms to various kinds
+%%   of data structures. Separation of algorithms and data.
+%% \end{frame}
+
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Templates}
+%%   Achieved in C++ using Templates.
+%%   As an example, show the conversion from an entirely C
+%%   implementation of a function to a C++ templated one.
+%% \end{frame}
+
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Data Abstraction and the STL}
+%%   Show examples of a bunch of the STL containers and 
+%%   algorithms.
+%% \end{frame}
+
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Iterators}
+%%   Explain iterators.
+%% \end{frame}
 
 \begin{frame}
   \frametitle{Performance}
@@ -252,33 +443,85 @@
 \section{Thrust}
 
 \begin{frame}
-  \frametitle{What Is It?}
-  A C++ set of algorithms and data structures built like
-  the STL; with generic programming concepts.
-  Give some history.
+  \frametitle{CUDA Generics}
+  We talked about generic algorithms, what if we could drop in
+  replacement algorithms to take advantage of available hardware?
   \begin{itemize}
-    \item History.
-    \item Data structures.
-    \item Algorithms.
-    \item Best practices.
+    \item What here...
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{}
-  A C++ set of algorithms and data structures built like
-  the STL; with generic programming concepts.
-  Give some history.
-  \begin{itemize}
-    \item History.
-    \item Data structures.
-    \item Algorithms.
-    \item Best practices.
-  \end{itemize}
+\begin{frame}[fragile]
+  \frametitle{Thrust Namespace}
+  Just like the STL is declared inside the \\
+  \vspace{.5cm}\hspace{1cm}\lstinline|std|\vspace{.5cm} \\
+  namespace, all thrust symbols are declared inside the \\
+  \vspace{.5cm}\hspace{1cm}\lstinline|thrust|\vspace{.5cm} \\
+  namespace.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Thrust Vectors}
+  Device memory is distinct from host memory. We need a special
+  container class to refer to device memory:
+  \begin{block}{Thrust vector declaration}
+    \begin{lstlisting}
+    template< typename T >
+    class thrust::device_vector<T>;
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Thrust Vectors}
+  Thrust device vectors subscribe to the same semantics as STL
+  vectors:
+  \begin{example}
+    \begin{lstlisting}
+    thrust::device_vector<float> vec;
+    // TODO: Fill vector with values.
+
+    // Iterate over contents.
+    thrust::device_vector<float>::iterator it;
+    it = vec.begin():
+    while( it != vec.end() )
+    {
+      // Do some processing.
+    }
+    \end{lstlisting}
+  \end{example}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Applicability}
+  \frametitle{Thrust Algorithms}
+  What kinds of algorithms can be optimised for multicore hardware?
+  \begin{itemize}
+    \item Transformation,
+    \item reduction,
+    \item sorting,
+    \item and others.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Transformation}
+  Apply a unary operation to each element of a vector and store the
+  result in another (or the same) vector.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Reduction}
+  Apply a binary operation to successive elements of a vector and return
+  the scalar result.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sorting}
+  Apply an ordering to a vector.
+\end{frame}
+
+\begin{frame}
+  \frametitle{M}
   Explain that the general operations, transformation and
   reduce, can be applied to a wide range of algorithms.
   Not all, but a wide range. Talk about how the internals of
@@ -286,7 +529,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Applicability}
+  \frametitle{Examples of Uses}
   List all the different algorithms in the Thrust examples.
 \end{frame}
 
