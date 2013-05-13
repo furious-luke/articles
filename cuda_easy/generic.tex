@@ -123,13 +123,150 @@
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
-  What if we have a more complex data type? Say, a linked list?
+  Currently our summation precludes summation over a subset.
+  But, if we were to use pointers...
+  \begin{example}
+    \begin{lstlisting}
+    // Sum a set of numbers.
+    template< typename T >
+    T sum( T* start, T* finish ) {
+      T result = 0;
+      while( start != finish )
+        result += *start++;
+      return result;
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Templates}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      int array_of_ints[10];
+      double array_of_doubles[10];
+      // TODO: Initialise arrays.
+
+      sum<int>( array_of_ints + 2,
+                array_of_ints + 8 );
+      sum<double>( array_of_doubles,
+                   array_of_doubles + 4 );
+
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Iterators}
+  What if we have a more complex container? Say, a linked list? \\
+  Using the addition operator, \lstinline|++|, would not work. \\
+  However, we can override these operators using C++ objects. \\
+  What if we define a kind of object to represent positions in
+  containers?
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Iterators}
+  Iterators do just that.
+  \begin{example}
+    \begin{lstlisting}
+    // Sum a set of numbers.
+    template< typename Iter >
+    typename Iter::value_type
+    sum( Iter start, Iter finish ) {
+      typename Iter::value_type result = 0;
+      while( start != finish )
+        result += *start++;
+      return result;
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Iterators}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      std::list<int> list;
+      std::set<double> set;
+      // TODO: Fill list and set with elements.
+
+      sum<int>( lise.begin(), list.end() );
+      sum<double>( set.begin(), set.end() );
+
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Iterators}
+  Things to note:
+  \begin{itemize}
+    \item \lstinline|typename Iter::value_type|
+    \item Pointers behave exactly like iterators.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algorithms}
+  C++ STL provides a suite of generic algorithms written in
+  terms of iterators.
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item sort
+      \item copy
+      \item generate
+      \item reverse
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item fill
+      \item find
+      \item count
+      \item search
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Algorithms}
-  Bring together object oriented programming and generic programming.
-  Make objects that perform algorithms and are container agnostic.
+  \begin{example}
+    \begin{lstlisting}
+    template< class ForwardIterator,
+              class Generator >
+    void generate( ForwardIterator first,
+                   ForwardIterator last,
+                   Generator gen )
+    {
+      while (first != last) {
+        *first = gen();
+        ++first;
+      }
+    }
+    \end{lstlisting}
+  \end{example}
+  \visible<2->{
+    \begin{tikzpicture}[remember picture,overlay]
+      \useasboundingbox (0,0);
+      \node at (current page.center){
+        \begin{tikzpicture}[
+            info/.style={draw=thedarkblue,rectangle,rounded corners=1mm,inner sep=1mm,
+              fill=theblue,thick,text=white,text width=3cm,font=\footnotesize}
+          ]
+          \node[info] at (0,0) {accepts any callable object (functor)};
+        \end{tikzpicture}
+      };
+    \end{tikzpicture}
+  }
 \end{frame}
 
 \begin{frame}[fragile]
