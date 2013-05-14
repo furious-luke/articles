@@ -3,15 +3,13 @@
 %% \documentclass[aspectratio=169]{beamer}
 
 \usepackage[latin1]{inputenc}
-\usepackage{tikz}
-\usetikzlibrary{calc}
-\usetikzlibrary{arrows}
+
 \usepackage{color}
 %% \usepackage[dvipsnames]{xcolor}
 %% \usepackage{amsmath}
 %% \usepackage{amsfonts}
-\usepackage{listings}
 
+\usepackage{listings}
 \lstset{
   language=C++,
   %% numbers=left,
@@ -30,10 +28,41 @@
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \usetikzlibrary{arrows}
+\usetikzlibrary{shapes,decorations.pathmorphing}
 \definecolor{theblue}{HTML}{236EAF}
 \definecolor{theorange}{HTML}{F7800A}
 \definecolor{thelightblue}{HTML}{98BBDA}
 \definecolor{thedarkblue}{HTML}{02468F}
+\tikzstyle{info}=[
+  draw=thedarkblue,rectangle,rounded corners=1mm,inner sep=1mm,
+  fill=theblue,ultra thick,text=white,font=\footnotesize
+]
+\tikzstyle{note}=[
+  draw=BrickRed,rectangle,rounded corners=2mm,inner sep=3mm,
+  fill=BrickRed,ultra thick,text=white,font=\footnotesize
+]
+\tikzstyle{noteline}=[
+  draw=BrickRed,ultra thick
+]
+\tikzstyle{infoline}=[
+  ultra thick,->
+]
+\tikzstyle{box}=[
+  ultra thick
+]
+\tikzstyle{wow}=[
+  ellipse,
+  draw=red,
+  ultra thick,
+  fill=yellow,
+  decoration=zigzag,
+  decorate,
+  font=\Huge,
+  text width=0.6\textwidth,
+  align=center,
+  anchor=center,
+  inner sep=1cm
+]
 
 % Set Beamer mode.
 \mode<presentation>{
@@ -66,434 +95,448 @@
   \end{frame}
 }
 
-%% \section{Introduction}
+\section{Introduction}
+
+\begin{frame}
+  \frametitle{Purpose}
+  A review of required C++ fundamentals.
+  An introduction to thrust basics.
+  Two successful case studies.
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Thrust?}
+  \begin{itemize}
+    \item A parallel algorithms library.
+    \item Resembles the C++ Standard Template Library.
+    \item Enhances {\bf productivity}.
+  \end{itemize}
+  \hspace{5cm}\includegraphics[width=3cm]{thrust_logo.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Architectures}
+  Thrust is not limited to GPUs...
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \begin{itemize}
+      \item Multicore CPUs.
+      \item GPUs.
+      \item CUDA.
+      \item OpenMP.
+      \item Intel Threading Building Blocks.
+      \end{itemize}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \includegraphics[width=.38\textwidth]{cuda_logo.jpg} \\
+      \vspace{.2cm}
+      \includegraphics[width=.38\textwidth]{tbb_logo.png} \\
+      \vspace{.5cm}
+      \includegraphics[width=.38\textwidth]{openmp_logo.jpg}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Current Statuts}
+  \begin{itemize}
+    \item Open source.
+    \item Apache License 2.0.
+    \item Version 1.6.0.
+    \item Actively developed.
+    \item 240+ active users.
+    \item Now distributed with CUDA toolkit.
+  \end{itemize}
+\end{frame}
+
+\section{Results}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{The target problem}
+  \begin{itemize}
+    \item Conversion of an MPI parallel selection algorithm.
+    \item Used to find median of large distributed arrays.
+    \item Running with 10,000,000 elements per process.
+    \item Written in C++ using generic algorithms (STL).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Programming effort}
+  \begin{block}{Number of characters modified}
+    \centering
+    \vspace{1cm}
+    {\Huge $24^*$}
+    \vspace{1cm}
+  \end{block}
+  $^*$ {\it Not including build scripts or including headers.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Programming time}
+  \begin{block}{Time spent modifying algorithm}
+    \centering
+    \vspace{1cm}
+    {\Huge $\approx 1$ minute$^*$}
+    \vspace{1cm}
+  \end{block}
+  $^*$ {\it Not including build scripts.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Speedup}
+  \begin{block}{Measured speedup}
+    \centering
+    \vspace{1cm}
+    {\Huge $122x^*$}
+    \vspace{1cm}
+  \end{block}
+  $^*$ {\it Measured on gSTAR.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Scaling}
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{weak.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Metrics}
+  \begin{block}{Metrics}
+    \vspace{1cm}
+    \hspace{0.5cm}{\Huge $x5$ per character changed.} \\
+    \hspace{0.5cm}{\Huge $x2$ per second spent.}
+    \vspace{1cm}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \framesubtitle{Metrics}
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{weak.png}
+  \end{center}
+  \visible<2>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[wow,text width=4cm] at (0,0) {NOT \\REALLY};
+    \end{tikzpicture}
+  }
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  {\Huge Of course...} \\
+  \vspace{.5cm}
+  \begin{itemize}
+    \item results may vary,
+    \item already written in C++,
+  \end{itemize}
+  \vspace{.5cm}
+  which brings us to ...
+\end{frame}
+
+\section{C++ and Generics}
+
+\begin{frame}
+  \frametitle{Why Am I Talking About C++?}
+  Because Thrust is written in C++. \\
+  \vspace{.2cm}
+  \hspace{.5cm}Why? \\
+  \vspace{.2cm}
+  \hspace{1cm}Because C++
+  \vspace{.1cm}
+  \begin{itemize}
+    \item allows object-oriented programming,
+    \item allows generic programming,
+    \item maintains high performance.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why Am I Talking About C++?}
+  Often critcized as ``too much rope''...
+  \begin{itemize}
+    \item potentially hidden operations,
+    \item not truly object oriented,
+    \item steep learning curve.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why Am I Talking About C++?}
+  Fortunately we only need to cover a relatively small
+  amount.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Why do we need it?}
+  OO designs allow us to write customised CUDA kernels
+  in optimised Thrust algorithms without having to
+  actually write a kernel.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{What is it?}
+  A programming paradigm characterised by representation of concepts
+  as ``objects'' that have both data and procedures which interact
+  with one another.
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{oop_objects.png}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Object Oriented Programming}
+  Some definitions:
+  \begin{description}
+    \item[class] A structure to hold data (members) and functions (methods).
+    \item[object] An instantiaion of a class. Much like a struct, a class
+      defines an object, but no allocation is given until instantiation.
+  \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Defining a class:
+  \begin{example}
+    \begin{columns}
+      \begin{column}{.3\textwidth}
+        \begin{lstlisting}
+struct point_type {
+  double x, y;
+};
+        \end{lstlisting}
+      \end{column}
+      \hspace{-10pt}
+      \vrule{}
+      \hspace{8pt}
+      \begin{column}{.5\textwidth}
+        \begin{lstlisting}
+struct point_type {
+  double x, y;
+
+  double norm() {
+    return sqrt(x*x + y*y);
+  }
+};
+        \end{lstlisting}
+      \end{column}
+    \end{columns}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Instantiating a class into an object:
+  \begin{example}
+    \begin{lstlisting}
+int main() {
+
+  // Make an object of type "point_type".
+  point_type point;
+
+  // Call the "norm" method.
+  double value = point.norm();
+
+}
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \begin{itemize}
+    \item Typically use \lstinline|class| instead of \lstinline|struct| (why?).
+    \item Data members are automatically accessible to methods.
+    \item Methods callable from objects using ``.''.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  C++ allows certain operators to be ``overloaded''. \\
+  \vspace{.5cm}
+  \begin{center}
+  \begin{tabular}{c|c}
+    \lstinline|x + y| & \lstinline|point_type& operator+( const point_type& y )| \\
+    \lstinline|x - y| & \lstinline|point_type& operator-( const point_type& y)| \\
+    \lstinline|x*y| & \lstinline|point_type& operator*( const point_type& y )| \\
+    \lstinline|x/y| & \lstinline|point_type& operator/( const point_type& y)| \\
+    \hline
+    \multicolumn{1}{|c|}{\lstinline|x()|} & \multicolumn{1}{c|}{\lstinline|void operator()()|} \\
+    \hline
+  \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  So, we can make function-like objects (functors) with attached data...
+  \begin{example}
+    \begin{lstlisting}
+    struct square_plus {
+      double to_add;
+
+      square_plus( double value )
+        : to_add( value ) {}
+
+      void
+      operator()( double x ) {
+        return x*x + to_add;
+      }
+    };
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Functors}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+
+      square_plus op( 10 ); // create a "square_plus"
+                            // object with "to_add"
+                            // of 10
+
+      op( 2 ); // call object, returns 40
+
+      square_plus( 10 )( 2 ); // create and call
+
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Object Oriented Programming}
+  \framesubtitle{Summary}
+  \begin{block}{Summary}
+  \begin{itemize}
+    \item Bind data with functions using classes/objects.
+    \item Initialize objects with constructors.
+    \item Finalize objects with destructors.
+    \item Create function-like objects with operator overloading.
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Object Oriented Programming}
+  Object oriented concepts we won't be looking at:
+  \begin{itemize}
+    \item inheritance,
+    \item polymorphism,
+    \item encapsulation,
+    \item dynamic dispatch.
+  \end{itemize}
+  \vspace{.5cm}
+  \emph{There's a lot more to it!}
+\end{frame}
+
+\input{generic.tex}
 
 %% \begin{frame}
-%%   \frametitle{Purpose}
-%%   A review of required C++ fundamentals.
-%%   An introduction to thrust basics.
-%%   Two successful case studies.
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{What is Thrust?}
-%%   \begin{itemize}
-%%     \item A parallel algorithms library.
-%%     \item Resembles the C++ Standard Template Library.
-%%     \item Enhances {\bf productivity}.
-%%   \end{itemize}
-%%   \hspace{5cm}\includegraphics[width=3cm]{thrust_logo.png}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Architectures}
-%%   Thrust is not limited to GPUs...
-%%   \begin{columns}
-%%     \begin{column}{.6\textwidth}
-%%       \begin{itemize}
-%%       \item Multicore CPUs.
-%%       \item GPUs.
-%%       \item CUDA.
-%%       \item OpenMP.
-%%       \item Intel Threading Building Blocks.
-%%       \end{itemize}
-%%     \end{column}
-%%     \begin{column}{.4\textwidth}
-%%       \includegraphics[width=.38\textwidth]{cuda_logo.jpg} \\
-%%       \vspace{.2cm}
-%%       \includegraphics[width=.38\textwidth]{tbb_logo.png} \\
-%%       \vspace{.5cm}
-%%       \includegraphics[width=.38\textwidth]{openmp_logo.jpg}
-%%     \end{column}
-%%   \end{columns}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Current Statuts}
-%%   \begin{itemize}
-%%     \item Open source.
-%%     \item Apache License 2.0.
-%%     \item Version 1.6.0.
-%%     \item Actively developed.
-%%     \item 240+ active users.
-%%     \item Now distributed with CUDA toolkit.
-%%   \end{itemize}
-%% \end{frame}
-
-%% \section{Results}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{The target problem}
-%%   \begin{itemize}
-%%     \item Conversion of an MPI parallel selection algorithm.
-%%     \item Used to find median of large distributed arrays.
-%%     \item Running with 10,000,000 elements per process.
-%%     \item Written in C++ using generic algorithms (STL).
-%%   \end{itemize}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{Programming effort}
-%%   \begin{block}{Number of characters modified}
-%%     \centering
-%%     \vspace{1cm}
-%%     {\Huge $24^*$}
-%%     \vspace{1cm}
-%%   \end{block}
-%%   $^*$ {\it Not including build scripts or including headers.}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{Programming time}
-%%   \begin{block}{Time spent modifying algorithm}
-%%     \centering
-%%     \vspace{1cm}
-%%     {\Huge $\approx 1$ minute$^*$}
-%%     \vspace{1cm}
-%%   \end{block}
-%%   $^*$ {\it Not including build scripts.}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{Speedup}
-%%   \begin{block}{Measured speedup}
-%%     \centering
-%%     \vspace{1cm}
-%%     {\Huge $122x^*$}
-%%     \vspace{1cm}
-%%   \end{block}
-%%   $^*$ {\it Measured on gSTAR.}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{Scaling}
-%%   \begin{center}
-%%     \includegraphics[width=.8\textwidth]{weak.png}
-%%   \end{center}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   \framesubtitle{Metrics}
-%%   \begin{block}{Metrics}
-%%     \vspace{1cm}
-%%     \hspace{0.5cm}{\Huge $x5$ per character changed.} \\
-%%     \hspace{0.5cm}{\Huge $x2$ per second spent.}
-%%     \vspace{1cm}
-%%   \end{block}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Results}
-%%   {\Huge Of course...} \\
-%%   \vspace{.5cm}
-%%   \begin{itemize}
-%%     \item results may vary,
-%%     \item already written in C++,
-%%   \end{itemize}
-%%   \vspace{.5cm}
-%%   which brings us to ...
-%% \end{frame}
-
-%% \section{C++ and Generics}
-
-%% \begin{frame}
-%%   \frametitle{Why Am I Talking About C++?}
-%%   Because Thrust is written in C++. \\
-%%   \vspace{.2cm}
-%%   \hspace{.5cm}Why? \\
-%%   \vspace{.2cm}
-%%   \hspace{1cm}Because C++
-%%   \vspace{.1cm}
-%%   \begin{itemize}
-%%     \item allows object-oriented programming,
-%%     \item allows generic programming,
-%%     \item maintains high performance.
-%%   \end{itemize}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Why Am I Talking About C++?}
-%%   Often critcized as ``too much rope''...
-%%   \begin{itemize}
-%%     \item potentially hidden operations,
-%%     \item not truly object oriented,
-%%     \item steep learning curve.
-%%   \end{itemize}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Why Am I Talking About C++?}
-%%   Fortunately we only need to cover a relatively small
-%%   amount.
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{Why do we need it?}
-%%   OO designs allow us to write customised CUDA kernels
-%%   in optimised Thrust algorithms without having to
-%%   actually write a kernel.
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{What is it?}
-%%   A programming paradigm characterised by representation of concepts
-%%   as ``objects'' that have both data and procedures which interact
-%%   with one another.
-%%   \begin{center}
-%%     \includegraphics[width=.7\textwidth]{oop_objects.png}
-%%   \end{center}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Object Oriented Programming}
-%%   Some definitions:
-%%   \begin{description}
-%%     \item[class] A structure to hold data (members) and functions (methods).
-%%     \item[object] An instantiaion of a class. Much like a struct, a class
-%%       defines an object, but no allocation is given until instantiation.
-%%   \end{description}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   Defining a class:
-%%   \begin{example}
-%%     \begin{columns}
-%%       \begin{column}{.3\textwidth}
-%%         \begin{lstlisting}
-%% struct point_type {
-%%   double x, y;
-%% };
-%%         \end{lstlisting}
-%%       \end{column}
-%%       \hspace{-10pt}
-%%       \vrule{}
-%%       \hspace{8pt}
-%%       \begin{column}{.5\textwidth}
-%%         \begin{lstlisting}
-%% struct point_type {
-%%   double x, y;
-
-%%   double norm() {
-%%     return sqrt(x*x + y*y);
-%%   }
-%% };
-%%         \end{lstlisting}
-%%       \end{column}
-%%     \end{columns}
-%%   \end{example}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   Instantiating a class into an object:
-%%   \begin{example}
-%%     \begin{lstlisting}
-%% int main() {
-
-%%   // Make an object of type "point_type".
-%%   point_type point;
-
-%%   // Call the "norm" method.
-%%   double value = point.norm();
-
-%% }
-%%     \end{lstlisting}
-%%   \end{example}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   \begin{itemize}
-%%     \item Typically use \lstinline|class| instead of \lstinline|struct| (why?).
-%%     \item Data members are automatically accessible to methods.
-%%     \item Methods callable from objects using ``.''.
-%%   \end{itemize}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{Functors}
-%%   C++ allows certain operators to be ``overloaded''. \\
-%%   \vspace{.5cm}
-%%   \begin{center}
-%%   \begin{tabular}{c|c}
-%%     \lstinline|x + y| & \lstinline|point_type& operator+( const point_type& y )| \\
-%%     \lstinline|x - y| & \lstinline|point_type& operator-( const point_type& y)| \\
-%%     \lstinline|x*y| & \lstinline|point_type& operator*( const point_type& y )| \\
-%%     \lstinline|x/y| & \lstinline|point_type& operator/( const point_type& y)| \\
-%%     \hline
-%%     \multicolumn{1}{|c|}{\lstinline|x()|} & \multicolumn{1}{c|}{\lstinline|void operator()()|} \\
-%%     \hline
-%%   \end{tabular}
-%%   \end{center}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{Functors}
-%%   So, we can make function-like objects (functors) with attached data...
-%%   \begin{example}
-%%     \begin{lstlisting}
-%%     struct square_plus {
-%%       double to_add;
-
-%%       square_plus( double value )
-%%         : to_add( value ) {}
-
-%%       void
-%%       operator()( double x ) {
-%%         return x*x + to_add;
-%%       }
-%%     };
-%%     \end{lstlisting}
-%%   \end{example}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{Functors}
-%%   \begin{example}
-%%     \begin{lstlisting}
-%%     int main() {
-
-%%       square_plus op( 10 ); // create a "square_plus"
-%%                             // object with "to_add"
-%%                             // of 10
-
-%%       op( 2 ); // call object, returns 40
-
-%%       square_plus( 10 )( 2 ); // create and call
-
-%%     }
-%%     \end{lstlisting}
-%%   \end{example}
-%% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Object Oriented Programming}
-%%   \framesubtitle{Summary}
-%%   \begin{block}{Summary}
-%%   \begin{itemize}
-%%     \item Bind data with functions using classes/objects.
-%%     \item Initialize objects with constructors.
-%%     \item Finalize objects with destructors.
-%%     \item Create function-like objects with operator overloading.
-%%   \end{itemize}
-%%   \end{block}
-%% \end{frame}
-
-%% \begin{frame}[fragile]
-%%   \frametitle{Object Oriented Programming}
-%%   Object oriented concepts we won't be looking at:
-%%   \begin{itemize}
-%%     \item inheritance,
-%%     \item polymorphism,
-%%     \item encapsulation,
-%%     \item dynamic dispatch.
-%%   \end{itemize}
-%%   \vspace{.5cm}
-%%   \emph{There's a lot more to it!}
-%% \end{frame}
-
-%% \input{generic.tex}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Generic Programming}
-%% %%   \framesubtitle{What and why?}
-%% %%   Explain generally how generics can save us a lot
-%% %%   of effort by generalising algorithms to various kinds
-%% %%   of data structures. Separation of algorithms and data.
-%% %% \end{frame}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Generic Programming}
-%% %%   \framesubtitle{Templates}
-%% %%   Achieved in C++ using Templates.
-%% %%   As an example, show the conversion from an entirely C
-%% %%   implementation of a function to a C++ templated one.
-%% %% \end{frame}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Generic Programming}
-%% %%   \framesubtitle{Data Abstraction and the STL}
-%% %%   Show examples of a bunch of the STL containers and 
-%% %%   algorithms.
-%% %% \end{frame}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Generic Programming}
-%% %%   \framesubtitle{Iterators}
-%% %%   Explain iterators.
-%% %% \end{frame}
-
-%% \begin{frame}
-%%   \frametitle{Performance}
-%%   \framesubtitle{Zero-overhead principle}
-%%   {\Huge ``You pay for what you use.''}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{What and why?}
+%%   Explain generally how generics can save us a lot
+%%   of effort by generalising algorithms to various kinds
+%%   of data structures. Separation of algorithms and data.
 %% \end{frame}
 
 %% \begin{frame}
-%%   \frametitle{Performance}
-%%   \framesubtitle{The Poor Compiler}
-%%   Explain that with templates most of the overhead is
-%%   in the compilation phase. The runtime can be faster.
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Templates}
+%%   Achieved in C++ using Templates.
+%%   As an example, show the conversion from an entirely C
+%%   implementation of a function to a C++ templated one.
 %% \end{frame}
 
 %% \begin{frame}
-%%   \frametitle{Performance}
-%%   \framesubtitle{Code Bloat}
-%%   Talk about this concern and how it doesn't exist.
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Data Abstraction and the STL}
+%%   Show examples of a bunch of the STL containers and 
+%%   algorithms.
 %% \end{frame}
+
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   \framesubtitle{Iterators}
+%%   Explain iterators.
+%% \end{frame}
+
+\begin{frame}
+  \frametitle{Performance}
+  \framesubtitle{Zero-overhead principle}
+  {\Huge ``You pay for what you use.''}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Performance}
+  \framesubtitle{The Poor Compiler}
+  Explain that with templates most of the overhead is
+  in the compilation phase. The runtime can be faster.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Performance}
+  \framesubtitle{Code Bloat}
+  Talk about this concern and how it doesn't exist.
+\end{frame}
 
 \section{Thrust}
 
 \input{_thrust.tex}
 
-%% \section{Case Studies}
+\section{Case Studies}
 
-%% \input{median.tex}
+\input{median.tex}
+
+\begin{frame}
+  \frametitle{Lattice Monte-Carlo Simulation}
+  Courtesy of Michael Wang.
+\end{frame}
+
+%% \section{Conclusion}
 
 %% \begin{frame}
-%%   \frametitle{Lattice Monte-Carlo Simulation}
-%%   Courtesy of Michael Wang.
+%%   \frametitle{Bang for Buck}
+%%   %% \framesubtitle{Some?}
+%%   %% \begin{itemize}
+%%   %%   \item 
+%%   %% \end{itemize}
+%%   Some algorithms are as good as custom kernels.
 %% \end{frame}
 
-%% %% \section{Conclusion}
+%% \begin{frame}
+%%   \frametitle{Generic Programming}
+%%   %% \framesubtitle{Some?}
+%%   %% \begin{itemize}
+%%   %%   \item 
+%%   %% \end{itemize}
+%%   It's a big plus (plus).
+%% \end{frame}
 
-%% %% \begin{frame}
-%% %%   \frametitle{Bang for Buck}
-%% %%   %% \framesubtitle{Some?}
-%% %%   %% \begin{itemize}
-%% %%   %%   \item 
-%% %%   %% \end{itemize}
-%% %%   Some algorithms are as good as custom kernels.
-%% %% \end{frame}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Generic Programming}
-%% %%   %% \framesubtitle{Some?}
-%% %%   %% \begin{itemize}
-%% %%   %%   \item 
-%% %%   %% \end{itemize}
-%% %%   It's a big plus (plus).
-%% %% \end{frame}
-
-%% %% \begin{frame}
-%% %%   \frametitle{Long Term Support}
-%% %%   %% \framesubtitle{Some?}
-%% %%   %% \begin{itemize}
-%% %%   %%   \item 
-%% %%   %% \end{itemize}
-%% %%   Thrust included with CUDA now.
-%% %% \end{frame}
+%% \begin{frame}
+%%   \frametitle{Long Term Support}
+%%   %% \framesubtitle{Some?}
+%%   %% \begin{itemize}
+%%   %%   \item 
+%%   %% \end{itemize}
+%%   Thrust included with CUDA now.
+%% \end{frame}
 
 \end{document}

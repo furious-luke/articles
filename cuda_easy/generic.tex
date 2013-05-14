@@ -5,20 +5,12 @@
   {\Large Generic programming is a paradigm for developing efficient, reusable
     software libraries.}
   \end{block}
-\end{frame}
-
-\begin{frame}
-  \frametitle{What is Generic Programming?}
-  \framesubtitle{Some quotes}
+  \pause
   \begin{block}{}
     {\Large Generic programming is about generalizing software components
       so that they can be easily reused in a wide variety of situations.}
   \end{block}
-\end{frame}
-
-\begin{frame}
-  \frametitle{What is Generic Programming?}
-  \framesubtitle{Some quotes}
+  \pause
   \begin{block}{}
     {\Large Generic programming is a style of computer programming
       in which algorithms are written in terms of to-be-specified-later
@@ -41,13 +33,18 @@
     }
     \end{lstlisting}
   \end{example}
+  \visible<2>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[note] at (2.5cm,-2cm) (A) {But what about different types?};
+    \end{tikzpicture}
+  }
 \end{frame}
 
 \begin{frame}
   \frametitle{What is Generic Programming?}
   \framesubtitle{Example problem}
-  What about types other than int? \\
-  Solutions:
+  \begin{block}{Potential solutions}
   \begin{itemize}
   \item Write different versions for each type.
     \begin{itemize}
@@ -60,10 +57,12 @@
     \end{itemize}
   \item {\bf Use generic programming.}
   \end{itemize}
+  \end{block}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Templates}
+  \framesubtitle{Introduction}
   Templates are how C++ handles generic programming.
   \begin{example}
     \begin{lstlisting}
@@ -81,10 +80,10 @@
 
 \begin{frame}[fragile]
   \frametitle{Templates}
+  \framesubtitle{Introduction}
   \begin{example}
     \begin{lstlisting}
     int main() {
-
       int array_of_ints[10];
       double array_of_doubles[10];
       // TODO: Initialise arrays.
@@ -94,28 +93,6 @@
 
       sum( array_of_ints, 10 );
       sum( array_of_doubles, 10 );
-
-    }
-    \end{lstlisting}
-  \end{example}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Templates}
-  \begin{example}
-    \begin{lstlisting}
-    int main() {
-
-      int array_of_ints[10];
-      double array_of_doubles[10];
-      // TODO: Initialise arrays.
-
-      sum<int>( array_of_ints, 10 );
-      sum<double>( array_of_doubles, 10 );
-
-      sum( array_of_ints, 10 );
-      sum( array_of_doubles, 10 );
-
     }
     \end{lstlisting}
   \end{example}
@@ -123,7 +100,8 @@
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
-  Currently our summation precludes summation over a subset.
+  \frametitle{Pointers}
+  Currently our summation precludes summation over a subset. \\
   But, if we were to use pointers...
   \begin{example}
     \begin{lstlisting}
@@ -140,11 +118,11 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Templates}
+  \frametitle{Iterators}
+  \frametitle{Pointers}
   \begin{example}
     \begin{lstlisting}
     int main() {
-
       int array_of_ints[10];
       double array_of_doubles[10];
       // TODO: Initialise arrays.
@@ -153,7 +131,6 @@
                 array_of_ints + 8 );
       sum<double>( array_of_doubles,
                    array_of_doubles + 4 );
-
     }
     \end{lstlisting}
   \end{example}
@@ -161,64 +138,108 @@
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
-  What if we have a more complex container? Say, a linked list? \\
-  Using the addition operator, \lstinline|++|, would not work. \\
-  However, we can override these operators using C++ objects. \\
-  What if we define a kind of object to represent positions in
-  containers?
+  \framesubtitle{Object Iterators}
+  \begin{itemize}
+  \item What if we have a more complex container? Say, a linked list?
+  \item Using the addition operator, \lstinline|++|, would not work.
+  \item However, remember operator overloading...
+  \item ...we can override these operators using C++ objects!
+  \item What if we define a kind of object to represent positions in containers?
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
-  Iterators do just that.
+  \framesubtitle{Object Iterators}
   \begin{example}
     \begin{lstlisting}
     // Sum a set of numbers.
-    template< typename Iter >
-    typename Iter::value_type
-    sum( Iter start, Iter finish ) {
-      typename Iter::value_type result = 0;
+    template< typename Iterator >
+    typename Iterator::value_type
+    sum( Iterator start, Iterator finish ) {
+      typename Iterator::value_type result = 0;
       while( start != finish )
         result += *start++;
       return result;
     }
     \end{lstlisting}
   \end{example}
+  \invisible<1,3>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[note] at (2.5cm,-1.5cm) (A) {Looks complicated...};
+      \node[noteline,ellipse,text width=4.3cm,text height=.3cm] at (-1.8cm,.45cm) (B) {};
+      \draw[noteline,->] (A) -- (B);
+    \end{tikzpicture}
+  }
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
+  \framesubtitle{Object Iterators}
   \begin{example}
     \begin{lstlisting}
     int main() {
-
       std::list<int> list;
       std::set<double> set;
       // TODO: Fill list and set with elements.
 
-      sum<int>( lise.begin(), list.end() );
+      sum<int>( list.begin(), list.end() );
       sum<double>( set.begin(), set.end() );
-
     }
     \end{lstlisting}
   \end{example}
+  \visible<2>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[note] at (2.5cm,.8cm) (A) {STL uses ``std'' namespace};
+      \node[noteline,ellipse,text width=1cm,text height=.5cm] at (-3.7,.55) (B) {};
+      \draw[noteline,->] (A) -- (B);
+    \end{tikzpicture}
+  }
+  \visible<3>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[note] at (2.5cm,.8cm) (A) {``begin'' points to container start};
+      \node[noteline,ellipse,text width=2cm,text height=.5cm] at (-.5cm,-1cm) (B) {};
+      \draw[noteline,->] (A) -- (B);
+    \end{tikzpicture}
+  }
+  \visible<4>{
+    \begin{tikzpicture}[remember picture,overlay]
+      \pgftransformshift{\pgfpointanchor{current page}{center}}
+      \node[note] at (2.5cm,.8cm) (A) {``end'' points to container end};
+      \node[noteline,ellipse,text width=2cm,text height=.5cm] at (1.8cm,-1cm) (B) {};
+      \draw[noteline,->] (A) -- (B);
+    \end{tikzpicture}
+  }
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Iterators}
-  Things to note:
-  \begin{itemize}
-    \item \lstinline|typename Iter::value_type|
-    \item Pointers behave exactly like iterators.
-  \end{itemize}
+  \framesubtitle{Object Iterators}
+  \begin{center}
+  \begin{tikzpicture}
+    \useasboundingbox (-2,-2) rectangle (8,4);
+    \draw[box] (0,0) rectangle (5,1);
+    \draw[box,dashed] (5,0) rectangle (6,1);
+    \foreach \x in {1,...,5}
+      \draw[box] (\x,0) -- (\x,1);
+    \node at (.5,2) (A) {vec.begin()};
+    \node at (5.5,2) (B) {vec.end()};
+    \draw[infoline] (A) -- (.5,1.1);
+    \draw[infoline] (B) -- (5.5,1.1);
+  \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \begin{frame}
   \frametitle{Algorithms}
+  \framesubtitle{Introduction}
   C++ STL provides a suite of generic algorithms written in
   terms of iterators.
   \begin{columns}
-    \begin{column}{.5\textwidth}
+    \begin{column}{.4\textwidth}
       \begin{itemize}
       \item sort
       \item copy
@@ -226,7 +247,7 @@
       \item reverse
       \end{itemize}
     \end{column}
-    \begin{column}{.5\textwidth}
+    \begin{column}{.4\textwidth}
       \begin{itemize}
       \item fill
       \item find
@@ -239,6 +260,7 @@
 
 \begin{frame}[fragile]
   \frametitle{Algorithms}
+  \framesubtitle{Transform}
   \begin{example}
     \begin{lstlisting}
     template< typename InputIterator,
@@ -249,7 +271,7 @@
                     OutputIterator result,
                     UnaryOperation op )
     {
-      while (first != last) {
+      while( first != last ) {
         *result = op( *first );
         ++first;
         ++result;
@@ -257,23 +279,11 @@
     }
     \end{lstlisting}
   \end{example}
-  \visible<2->{
-    \begin{tikzpicture}[remember picture,overlay]
-      \useasboundingbox (0,0);
-      \node at (current page.center){
-        \begin{tikzpicture}[
-            info/.style={draw=thedarkblue,rectangle,rounded corners=1mm,inner sep=1mm,
-              fill=theblue,thick,text=white,text width=3cm,font=\footnotesize}
-          ]
-          \node[info] at (0,0) {accepts any callable object (functor)};
-        \end{tikzpicture}
-      };
-    \end{tikzpicture}
-  }
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Algorithms}
+  \framesubtitle{Transform}
   \begin{example}
     \begin{lstlisting}
     template< typename T >
@@ -286,23 +296,11 @@
     int main() {
       std::vector<int> vec( 100 );
       std::fill<int>( vec.begin(), vec.end(), 10 );
-      std::transform<int>( vec.begin(), vec.end(), square<int>() );
+      std::transform<int>( vec.begin(), vec.end(),
+                           square<int>() );
     }
     \end{lstlisting}
   \end{example}
-  \visible<2->{
-    \begin{tikzpicture}[remember picture,overlay]
-      \useasboundingbox (0,0);
-      \node at (current page.center){
-        \begin{tikzpicture}[
-            info/.style={draw=thedarkblue,rectangle,rounded corners=1mm,inner sep=1mm,
-              fill=theblue,thick,text=white,text width=3cm,font=\footnotesize}
-          ]
-          \node[info] at (0,0) {accepts any callable object (functor)};
-        \end{tikzpicture}
-      };
-    \end{tikzpicture}
-  }
 \end{frame}
 
 \begin{frame}[fragile]
