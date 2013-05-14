@@ -241,15 +241,18 @@
   \frametitle{Algorithms}
   \begin{example}
     \begin{lstlisting}
-    template< class ForwardIterator,
-              class Generator >
-    void generate( ForwardIterator first,
-                   ForwardIterator last,
-                   Generator gen )
+    template< typename InputIterator,
+              typename OutputIterator,
+              typename UnaryOperation >
+    void transform( InputIterator first,
+                    InputIterator last,
+                    OutputIterator result,
+                    UnaryOperation op )
     {
       while (first != last) {
-        *first = gen();
+        *result = op( *first );
         ++first;
+        ++result;
       }
     }
     \end{lstlisting}
@@ -270,13 +273,44 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Templates}
-  \begin{block}{Summary}
+  \frametitle{Algorithms}
+  \begin{example}
+    \begin{lstlisting}
+    template< typename T >
+    struct square {
+      T operator()( T x ) {
+        return x*x;
+      }
+    };
+
+    int main() {
+      std::vector<int> vec( 100 );
+      std::fill<int>( vec.begin(), vec.end(), 10 );
+      std::transform<int>( vec.begin(), vec.end(), square<int>() );
+    }
+    \end{lstlisting}
+  \end{example}
+  \visible<2->{
+    \begin{tikzpicture}[remember picture,overlay]
+      \useasboundingbox (0,0);
+      \node at (current page.center){
+        \begin{tikzpicture}[
+            info/.style={draw=thedarkblue,rectangle,rounded corners=1mm,inner sep=1mm,
+              fill=theblue,thick,text=white,text width=3cm,font=\footnotesize}
+          ]
+          \node[info] at (0,0) {accepts any callable object (functor)};
+        \end{tikzpicture}
+      };
+    \end{tikzpicture}
+  }
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Summary}
     \begin{itemize}
     \item Give functions/objects variable types.
     \item Very efficient, different code for each type.
     \item Manageable code.
     \item Allows separation of data and algorithms.
     \end{itemize}
-  \end{block}
 \end{frame}

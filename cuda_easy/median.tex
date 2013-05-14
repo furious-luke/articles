@@ -1,0 +1,111 @@
+\begin{frame}
+  \frametitle{Distributed Median}
+  \begin{itemize}
+    \item In serial median can be calculated fairly
+  easily by sorting the array and taking
+  the $\frac{n}{2}$ element.
+  \item With distributed array is considerable harder.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Distributed Median}
+  Define a balance function,
+  \[ b(x) = N_l(x) - \frac{n}{2} \]
+  which represents how close we are to the median by
+  \[ b(x) = 0 \; . \]
+  Here $N_l(x)$ is a count of how many elements are below the point $x$
+  and $n$ is the number of elements in the array.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Distributed Median}
+  Now we just need to find where $b(x) = 0$. We can do
+  this with any root finder, but the Ridders algorithm
+  will work particularaly well for us.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Distributed Median}
+  And already had one written.
+  \begin{example}
+    \begin{lstlisting}
+      template< class Function,
+		class T >
+      T
+      ridders( Function func,
+	       T x1,
+	       T x2 );
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Distributed Median}
+  \begin{example}
+    \begin{lstlisting}
+    template< typename Iterator >
+    struct median_function
+    {
+      Iterator start, finish;
+      long position;
+      mpi::comm comm;
+
+      long
+      operator()( const value_type& x )
+      {
+        long sum_left = std::count_if(
+          start, finish,
+          std::bind2nd(
+            std::less<value_type>(), x
+          )
+        );
+        return comm.all_reduce( sum_left ) - position;
+      }
+    };
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Distributed Median}
+  \begin{example}
+    \begin{lstlisting}
+    template< typename Iterator >
+    struct median_function
+    {
+      long position;
+      mpi::comm comm;
+
+      __device__
+      long
+      operator()( const value_type& x )
+      {
+        long sum_left = thrust::count_if(
+          start, finish,
+          thrust::bind2nd(
+            thrust::less<value_type>(), x
+          )
+        );
+        return comm.all_reduce( sum_left ) - position;
+      }
+    };
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Distributed Median}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+      thrust::device_vector<float> vec( 1000 );
+      thrust::generate( vec.begin(), vec.end(),
+                        counting_iterator<float>( 0 ) );
+      float median = ridders(
+        median_function<float>( start, finish ), 0, 1000
+      );
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
