@@ -1,33 +1,57 @@
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Thrust}
-  So how can Thrust help us write CUDA capable code? \\
-  \pause
-  The Thrust library provides replacements for STL containers and
-  algorithms.
-  \pause
+  \framesubtitle{Introduction}
   \begin{itemize}
-    \item vector
-    \item transform
-    \item copy
-    \item etc
+  \item So how can Thrust help us write CUDA capable code?
+  \pause
+  \item The Thrust library provides replacements for STL containers and
+    algorithms.
+    \begin{itemize}
+    \item \lstinline|vector, transform, copy, count, count_if|
+    \end{itemize}
+  \pause
+  \item And also some new ones.
+    \begin{itemize}
+    \item \lstinline|reduce, transform_reduce|
+    \end{itemize}
+  \pause
+  \item {\bf They are all hardware optimised.}
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Thrust Namespace}
-  Just like the STL is declared inside the \\
-  \vspace{.5cm}\hspace{1cm}\lstinline|std|\vspace{.5cm} \\
-  namespace, all thrust symbols are declared inside the \\
-  \vspace{.5cm}\hspace{1cm}\lstinline|thrust|\vspace{.5cm} \\
-  namespace.
+  \frametitle{Thrust}
+  \framesubtitle{Introduction}
+  \begin{itemize}
+  \item Just like the STL is declared inside the \lstinline|std::| namespace...
+  \item ... all thrust symbols are declared inside a \lstinline|thrust::| namespace.
+  \item Symbols can be the same name without conflicts.
+  \end{itemize}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+      std::transform( vec.begin(), vec.end(),
+                      square<int>() );
+      thrust::transform( vec.begin(), vec.end(),
+                         square<int>() );
+    }
+    \end{lstlisting}
+  \end{example}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Thrust Vectors}
+  \framesubtitle{Device Memory}
   Device memory is distinct from host memory. We need a special
   container class to refer to device memory:
-  \begin{block}{Thrust vector declaration}
+  \begin{block}{Various vectors}
     \begin{lstlisting}
+    template< typename T >
+    class std::vector<T>;
+
+    template< typename T >
+    class thrust::host_vector<T>;
+
     template< typename T >
     class thrust::device_vector<T>;
     \end{lstlisting}
@@ -36,37 +60,67 @@
 
 \begin{frame}[fragile]
   \frametitle{Thrust Vectors}
-  Values can be easily transferred from host to device.
+  \framesubtitle{Creating a Vector}
+  Device vectors may be constructed with a size...
+  \begin{example}
+    \begin{lstlisting}
+    thrust::device_vector<float> dev_vec( 100 );
+    \end{lstlisting}
+  \end{example}
+  ... or resized afterwards, just like a normal vector.
+  \begin{example}
+    \begin{lstlisting}
+    thrust::device_vector<float> dev_vec;
+    dev_vec.resize( 100 );
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Thrust Vectors}
+  \frametitle{Copying To/From Device}
+  Values can be easily transferred from host to device and
+  vice-versa.
   \begin{example}
     \begin{lstlisting}
     std::vector<float> host_vec( 100 );
     thrust::device_vector<float> dev_vec( 100 );
-    thrust::copy( host_vec.begin(), host_vec.end(), dev_vec.begin() );
+    thrust::copy( host_vec.begin(), host_vec.end(),
+                  dev_vec.begin() );
+    // Do some GPU processing.
+    thrust::copy( dev_vec.begin(), dev_vec.end(),
+                  host_vec.begin() );
     \end{lstlisting}
   \end{example}
-  Do a bit on noticing I left off the <float> in copy.
 \end{frame}
 
 \begin{frame}
   \frametitle{Thrust Algorithms}
-  What kinds of algorithms can be optimised for multicore hardware?
+  \framesubtitle{Introduction}
+  \begin{itemize}
+  \item Thrust's algorithms are its real power.
+  \pause
+  \item Each algorithm is optimised for every supported hardware type.
+  \pause
+  \item Like the STL, algorithms are customised with functors.
+  \pause
+  \item What kinds of algorithms can be optimised for multicore hardware?
   \begin{itemize}
     \item Transformation,
     \item reduction,
     \item sorting,
     \item and others.
   \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Transformation}
+  \framesubtitle{Definition}
   Apply a unary operation to each element of a vector and store the
   result in another (or the same) vector.
   \begin{center}
-  \begin{tikzpicture}[
-      box/.style={thick},
-      op/.style={rectangle,fill=white},
-    ]
+  \begin{tikzpicture}
     \draw[box] (0,0) rectangle(6,1);
     \draw[box] (0,3) rectangle(6,4);
     \foreach \x in {1,...,6}{
@@ -82,14 +136,36 @@
 \end{frame}
 
 \begin{frame}[fragile]
+  \frametitle{Transformation}
+  \framesubtitle{Example}
+  \begin{example}
+    \begin{lstlisting}
+    struct norm {
+      __device__
+      float operator()( float x ) {
+        return sqrt( x*x );
+      }
+    };
+
+    int main() {
+      thrust::device_vector<float> src( 100 ),
+                                   dst( 100 );
+      // TODO: Initialise "src".
+      thrust::transform( src.begin(), src.end(),
+                         dst.begin(),
+                         norm() );
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
   \frametitle{Reduction}
+  \framesubtitle{Definition}
   Apply a binary operation to successive elements of a vector and return
   the scalar result.
   \begin{center}
-  \begin{tikzpicture}[
-      box/.style={thick},
-      op/.style={rectangle,fill=white},
-    ]
+  \begin{tikzpicture}
     \draw[box] (0,0) rectangle(1,4);
     \foreach \y in {1,...,4}{
       \draw[box] (0,\y) -- (1,\y);
@@ -112,26 +188,121 @@
 \end{frame}
 
 \begin{frame}[fragile]
+  \frametitle{Reduction}
+  \framesubtitle{Example}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+      thrust::device_vector<float> src( 100 );
+      // TODO: Initialise "src".
+      thrust::reduce( src.begin(), src.end(),
+                      thrust::plus<float>() );
+    }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
   \frametitle{Sorting}
-  Apply an ordering to a vector.
+  \framesubtitle{Definition}
+  \begin{center}
+  \begin{tikzpicture}
+    \draw[box] (0,0) rectangle(6,1);
+    \draw[box] (0,3) rectangle(6,4);
+    \foreach \x in {1,...,6}{
+      \draw[box] (\x,0) -- (\x,1);
+      \draw[box] (\x,3) -- (\x,4);
+      \node at (\x-.5,.5) {$a_\x$};
+    };
+    \node at (.5,3.5) {$a_3$};
+    \node at (1.5,3.5) {$a_1$};
+    \node at (2.5,3.5) {$a_5$};
+    \node at (3.5,3.5) {$a_4$};
+    \node at (4.5,3.5) {$a_2$};
+    \node at (5.5,3.5) {$a_6$};
+    \draw[->] (.5,2.9) -- (2.5,1.1);
+    \draw[->] (1.5,2.9) -- (.5,1.1);
+    \draw[->] (2.5,2.9) -- (4.5,1.1);
+    \draw[->] (3.5,2.9) -- (3.5,1.1);
+    \draw[->] (4.5,2.9) -- (1.5,1.1);
+    \draw[->] (5.5,2.9) -- (5.5,1.1);
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sorting}
+  \framesubtitle{Example}
+  \begin{example}
+    \begin{lstlisting}
+    int main() {
+      thrust::device_vector<float> src( 100 );
+      // TODO: Initialise "src".
+      thrust::sort( src.begin(), src.end(),
+                    thrust::greater<float>() );
+    }
+    \end{lstlisting}
+  \end{example}
 \end{frame}
 
 \begin{frame}
-  \frametitle{M}
-  Explain that the general operations, transformation and
-  reduce, can be applied to a wide range of algorithms.
-  Not all, but a wide range. Talk about how the internals of
-  these general operations can be modified with functors.
+  \frametitle{Application}
+  You would be forgiven for thinking that these 3 algorithms don't
+  cover much. However, many more complex algorithms may be decomposed
+  into these algorithmic methods. \\
+  \vspace{.4cm}
+  Combined with the range of thrust functors and your own custom functors
+  many different complex algorithms can be implemented.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Application}
+  \framesubtitle{Examples}
+  \begin{example}
+    \begin{columns}
+      \begin{column}{.4\textwidth}
+        \begin{itemize}
+        \item Discrete Voronoi
+        \item Bucket sort
+        \item Bounding box
+        \item Histograms
+        \item Lexicographical sort
+        \end{itemize}
+      \end{column}
+      \begin{column}{.5\textwidth}
+        \begin{itemize}
+        \item Monte carlo disjoint sequences
+        \item Padded grid reduction
+        \item Run-length encoding
+        \item SAXPY
+        \item Set operations
+        \end{itemize}
+      \end{column}
+    \end{columns}
+  \end{example}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Application}
+  \framesubtitle{Strategy}
+  \begin{enumerate}
+  \item Does your algorithm subscribe to a fundamental algorithm (transform, reduce, sort)? Done.
+  \pause
+  \item Can your algorithm be decomposed into simpler components? Goto 1 for each component.
+  \pause
+  \item Can't decompose any further and doesn't match a fundamental algorithm? Write your own kernel.
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Advanced Iterators}
-  Talk a little about \lstinline|constant_iterator|,
-  \lstinline|counting_iterator|, \lstinline|transform_iterator| and
-  \lstinline|zip_iterator|.
-\end{frame}
-
-\begin{frame}
-  \frametitle{Examples of Uses}
-  List all the different algorithms in the Thrust examples.
+  \framesubtitle{Overview}
+  There are other powerful features of Thrust, designed to improve
+  flexibility and performance.
+  \begin{itemize}
+  \item \lstinline|thrust::constant_iterator|,
+  \item \lstinline|thrust::counting_iterator|,
+  \item \lstinline|thrust::transform_iterator| and
+  \item \lstinline|thrust::zip_iterator|.
+  \end{itemize}
 \end{frame}
