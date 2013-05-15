@@ -30,12 +30,12 @@
   And already had one written.
   \begin{example}
     \begin{lstlisting}
-      template< class Function,
-		class T >
-      T
-      ridders( Function func,
-	       T x1,
-	       T x2 );
+    template< class Function,
+              class T >
+    T
+    ridders( Function func,
+             T x1,
+	     T x2 );
     \end{lstlisting}
   \end{example}
 \end{frame}
@@ -43,7 +43,7 @@
 \begin{frame}[fragile]
   \frametitle{Distributed Median}
   \begin{example}
-    \begin{lstlisting}
+    \begin{lstlisting}[basicstyle=\tiny\ttfamily]
     template< typename Iterator >
     struct median_function
     {
@@ -70,7 +70,7 @@
 \begin{frame}[fragile]
   \frametitle{Distributed Median}
   \begin{example}
-    \begin{lstlisting}
+    \begin{lstlisting}[basicstyle=\tiny\ttfamily]
     template< typename Iterator >
     struct median_function
     {
@@ -100,10 +100,13 @@
     \begin{lstlisting}
     int main() {
       thrust::device_vector<float> vec( 1000 );
-      thrust::generate( vec.begin(), vec.end(),
-                        counting_iterator<float>( 0 ) );
+      thrust::generate(
+        vec.begin(), vec.end(),
+        thrust::counting_iterator<float>( 0 )
+      );
       float median = ridders(
-        median_function<float>( start, finish ), 0, 1000
+        median_function<float>( start, finish ),
+        0, 1000
       );
     }
     \end{lstlisting}
