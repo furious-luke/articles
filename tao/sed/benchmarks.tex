@@ -49,115 +49,191 @@ For each benchmark we begin with the equation for AB magnitudes:
 For the derivation see that other article I posted to the the TAO
 blog. Or I can email it to you.
 
-\section{Unity}
+\section{Synthesized Data}
 
-\subsection{Definition}
+\subsection{Merger Trees}
 
-The simplest benchmark, in which we define things to end up with unity
-in as many places as possible.
+I've written a Python utility to generate randomised merger trees. A
+suite or parameters controls the depth of each tree and the ranges of
+the various attributes each galaxy may possess (star formation rate,
+cold gas mass, etc).
 
-\begin{itemize}
-  \item ${\lambda \in \Re \mid 1 \leq \lambda \le 2}$
-  \item $f_\lambda(\lambda) = 1 \, , \quad \forall \lambda$
-  \item $r(\lambda) = 1 \, , \quad \forall \lambda$
-\end{itemize}
+Randomised merger trees are useful because running a large number of
+them ensures we try a wide variety of possible tree structures and
+attribute values.
+
+\subsection{Single Stellar Populations}
+
+The same Python utility as above also generates single stellar
+populations, but does so in a very specific manner. SSP data is
+generated to ensure that, when combined with merger tree data, will
+produce rebinned and summed data that perfectly matches any given
+input function. This allows us to generate a combination of data that
+will result in the functions later required for benchmarking.
+
+\section{Benchmarks}
+
+The benchmarks are all based on manipulating $f_\lambda(\lambda)$ and
+$r(\lambda)$ to produce enumerators and denominators to the magnitude
+equation that are either analytically solvable or that can be easily
+numerically integrated with high accuracy. This way we can check the
+enumerators and denominators directly, along with the final magnitudes.
+
+\subsection{Constant}
+
+\subsubsection{Definition}
+
+The simplest benchmark, in which we define the input functions to be
+constants for all $\lambda$:
+\begin{eqnarray*}
+f_\lambda(\lambda) & = & a \, , \quad \forall \lambda \\
+r(\lambda) & = & b \, , \quad \forall \lambda
+\end{eqnarray*}
+where
+\[ \left\{ \lambda \in \Re \mid \lambda_l \leq \lambda \le \lambda_u \right\} \]
 
 \subsection{Analytical Solution}
 
 This gives the enumerator of the magnitude equation as:
 \begin{eqnarray*}
-\int_\lambda f_\lambda r \dx{\lambda} & = & \int_\lambda \dx{\lambda}
+\int_\lambda f_\lambda r \dx{\lambda} & = & ab \int_\lambda \dx{\lambda}
 \\
-& = & \int_1^2 \dx{\lambda} \\
-& = & 1
+& = & ab \int_{\lambda_l}^{\lambda_u} \dx{\lambda} \\
+& = & ab\left( \lambda_u - \lambda_l \right)
 \end{eqnarray*}
 
 And the denominator:
 \begin{eqnarray*}
-\int_\lambda r \frac{c}{\lambda^2} \dx{\lambda} & = & \int_\lambda
+\int_\lambda r \frac{c}{\lambda^2} \dx{\lambda} & = & b \int_\lambda
 \frac{c}{\lambda^2} \dx{\lambda} \\
-&= & \int_1^2 \frac{c}{\lambda^2} \dx{\lambda} \\
-&= & \left. -\frac{c}{\lambda} \right|_1^2 \\
-& = & \frac{c}{2} \si{\angstrom\per\second}
+&= & b \int_{\lambda_l}^{\lambda_u} \frac{c}{\lambda^2} \dx{\lambda} \\
+&= & \left. -\frac{bc}{\lambda} \right|_{\lambda_l}^{\lambda_u} \\
+& = & bc\left( \frac{1}{\lambda_l} - \frac{1}{\lambda_u} \right)
 \end{eqnarray*}
-
-Giving an analytical result of:
-\begin{eqnarray*}
-m_{ab} & = & -2.5\log_{10} \frac{2}{c} - 48.6 \\
-& \approx & -3.160523232
-\end{eqnarray*}
-
-\subsection{Synthetic Data}
-
-So, we need now to synthesize a dataset that should give us $f_\lambda
-= 1$. There are infinitely many ways we could do this and ultimately
-it will depend on the software being used, but the approach I used was:
-\begin{itemize}
-\item I created some fake SSP data with unity as each value. There are
-  three age bins each covering $1\mathrm{Gyr}$. There are also 3
-  wavelength samples at 1, 1.5 and 2.
-\item I created a fake merger tree with three galaxies. Each galaxy
-  exists for $1\mathrm{Gyr}$ and carries an SFR of $3.\dot{3}$
-  (damn it I've forgotten the units for SFR).
-\item I created a fake bandpass filter with unity in each wavelength
-  sample.
-\end{itemize}
-The above produces a rebinned and summed spectra with unity at each
-wavelength in the spectrum.
 
 \subsection{Results}
 
-After running through TAO we get:
-\[ m_{ab} = -3.160523328 \]
-with an error of:
-\[ \mathrm{err}(m_{ab}) = \num{-9.5999e-8} \]
+I have generated two sets of results. The first to explore the
+percentage as a function of wavelength/bandpass filter resolution, the
+second as a function of the wavelength range. It seems the wavelength
+range can affect integration accuracy (as I discovered), so I'm
+including it for all the benchmarks.
 
-\section{Exponential Transmission}
+For these results I have set $a=2$ and $b=3$. From figures
+~\ref{fig:const_res} and ~\ref{fig:const_wave} it obvious accuracy for
+benchmark 1 is excellent, with order $\mathrm{O}(10^{-11})$ and
+demonstrating immediate convergence.
 
-\subsection{Definition}
+\begin{figure}[ht]
+  \centerline{\includegraphics{const_res_error.pdf}}
+  \caption{Percentage error vs. resolution, holding wavelength range
+    constant for benchmark 1.}
+  \label{fig:const_res}
+\end{figure}
 
-We will continue to use the unity benchmark, but now we will place an
-exponential functionin as transmission function.
+\begin{figure}[ht]
+  \centerline{\includegraphics{const_wave_error.pdf}}
+  \caption{Percentage error vs. wavelength range, holding resolution
+    constant for benchmark 1.}
+  \label{fig:const_wave}
+\end{figure}
 
-\begin{itemize}
-  \item $r(\lambda) = \mathrm{e}^{-\lambda}$
-\end{itemize}
+
+\subsection{Sinusoidal Spectrum}
+
+\subsubsection{Definition}
+
+Similar to benchmark one, but defining:
+\begin{eqnarray*}
+f_\lambda(\lambda) & = & A\left(\sin(B\lambda) + 1\right) \, , \quad \forall \lambda \\
+r(\lambda) & = & C \, , \quad \forall \lambda
+\end{eqnarray*}
 
 \subsection{Analytical Solution}
 
 This gives the enumerator of the magnitude equation as:
 \begin{eqnarray*}
-\int_\lambda f_\lambda r \dx{\lambda} & = & 
-  \int_\lambda \mathrm{e}^{-\lambda} \dx{\lambda} \\
-& = & \left. -\mathrm{e}^{-\lambda} \right|_1^2 \\
-& = & \mathrm{e}^{-1} - \mathrm{e}^{-2} \\
-& \approx & 0.232544158
+\int_\lambda f_\lambda r \dx{\lambda}
+& = & AC \int_\lambda \sin(B\lambda) + 1 \dx{\lambda} \\
+& = & \left. AC\left( -\frac{1}{B}\cos(B\lambda) + \lambda \right)
+\right|_{\lambda_l}^{\lambda_u} \\
+& = & AC\left( \frac{1}{B}\left( \cos(B\lambda_l) - \cos(B\lambda_u)
+  \right) + \lambda_u - \lambda_l \right)
 \end{eqnarray*}
 
-And the denominator:
-\begin{eqnarray*}
-\int_\lambda r \frac{c}{\lambda^2} \dx{\lambda}
-& = & \int_\lambda \mathrm{e}^{-\lambda} \frac{c}{\lambda^2}
-\dx{\lambda} \\
-& \approx & \num{3.889158867e+17}
-\end{eqnarray*}
-
-Giving an analytical (sort of) result of:
-\begin{eqnarray*}
-m_{ab} & = & -2.5\log_{10} \frac{0.232544158}{\num{3.889158867e+17}} - 48.6 \\
-& \approx & -3.041624374
-\end{eqnarray*}
-
-\subsection{Synthetic Data}
-
-The same as for unity, but modify the transmission function accordingly.
+And the denominator, which is identical to benchmark 1:
+\[ \int_\lambda r \frac{c}{\lambda^2} \dx{\lambda}
+ = Cc\left( \frac{1}{\lambda_l} - \frac{1}{\lambda_u} \right) \]
 
 \subsection{Results}
 
-After running through TAO we get:
-\[ m_{ab} = -3.041596127 \]
-with an error of:
-\[ \mathrm{err}(m_{ab}) = \num{2.8247e-5} \]
+For these results I have set $A=2$, $B=0.01$ and $C=1$. From figures
+~\ref{fig:sin_res} and ~\ref{fig:sin_wave} two things are
+noticeable. First, the errors are small. Secondly, the errors are
+decreasing with increasing resolution and converging at 0. This is to
+be expected with a sinusoidal test function, as we are using Gaussian
+quadrature for integration.
+
+\begin{figure}[ht]
+  \centerline{\includegraphics{sin_res_error.pdf}}
+  \caption{Percentage error vs. resolution, holding wavelength range
+    constant for benchmark 2.}
+  \label{fig:sin_res}
+\end{figure}
+
+\begin{figure}[ht]
+  \centerline{\includegraphics{sin_wave_error.pdf}}
+  \caption{Percentage error vs. wavelength range, holding resolution
+    constant, for benchmark 2.}
+  \label{fig:sin_wave}
+\end{figure}
+
+% \section{Exponential Transmission}
+
+% \subsection{Definition}
+
+% We will continue to use the unity benchmark, but now we will place an
+% exponential functionin as transmission function.
+
+% \begin{itemize}
+%   \item $r(\lambda) = \mathrm{e}^{-\lambda}$
+% \end{itemize}
+
+% \subsection{Analytical Solution}
+
+% This gives the enumerator of the magnitude equation as:
+% \begin{eqnarray*}
+% \int_\lambda f_\lambda r \dx{\lambda} & = & 
+%   \int_\lambda \mathrm{e}^{-\lambda} \dx{\lambda} \\
+% & = & \left. -\mathrm{e}^{-\lambda} \right|_1^2 \\
+% & = & \mathrm{e}^{-1} - \mathrm{e}^{-2} \\
+% & \approx & 0.232544158
+% \end{eqnarray*}
+
+% And the denominator:
+% \begin{eqnarray*}
+% \int_\lambda r \frac{c}{\lambda^2} \dx{\lambda}
+% & = & \int_\lambda \mathrm{e}^{-\lambda} \frac{c}{\lambda^2}
+% \dx{\lambda} \\
+% & \approx & \num{3.889158867e+17}
+% \end{eqnarray*}
+
+% Giving an analytical (sort of) result of:
+% \begin{eqnarray*}
+% m_{ab} & = & -2.5\log_{10} \frac{0.232544158}{\num{3.889158867e+17}} - 48.6 \\
+% & \approx & -3.041624374
+% \end{eqnarray*}
+
+% \subsection{Synthetic Data}
+
+% The same as for unity, but modify the transmission function accordingly.
+
+% \subsection{Results}
+
+% After running through TAO we get:
+% \[ m_{ab} = -3.041596127 \]
+% with an error of:
+% \[ \mathrm{err}(m_{ab}) = \num{2.8247e-5} \]
 
 
 
