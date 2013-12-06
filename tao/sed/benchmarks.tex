@@ -160,6 +160,56 @@ with an error of:
 \[ \mathrm{err}(m_{ab}) = \num{2.8247e-5} \]
 
 
+\section{Polynomial Spectrum}
+
+\subsection{Definition}
+
+In this benchmark the spectrum is defined to be polyomial and the
+transmission function is kept as unity. I've chosen a polynomial
+that gives a dip and rise in the range ${\lambda \in \Re \mid 1 \leq \lambda \le 2}$.
+
+\begin{itemize}
+  \item $f_\lambda(\lambda) = \frac{1}{4}\left(
+  \lambda^4 - \lambda^3 - \lambda^2 - \lambda
+  \right) + 1$
+\end{itemize}
+
+\subsection{Analytical Solution}
+
+This gives the enumerator of the magnitude equation as:
+\begin{eqnarray*}
+\int_\lambda f_\lambda r \dx{\lambda}
+& = & \frac{1}{4}\left(
+  \lambda^4 - \lambda^3 - \lambda^2 - \lambda
+  \right) + 1 \\
+& = & \left. \left( \frac{1}{4}\left(
+  \frac{\lambda^5}{5} - \frac{\lambda^4}{4} - \frac{\lambda^3}{3} - \frac{\lambda^2}{2}
+  \right) + \lambda \right) \right|_1^2 \\
+& = & \frac{217}{240}
+\end{eqnarray*}
+
+The denominator will be the same as in the unity case:
+\[ \int_\lambda r \frac{c}{\lambda^2} \dx{\lambda} = \frac{c}{2} \si{\angstrom\per\second} \]
+
+Giving an analytical result of:
+\begin{eqnarray*}
+m_{ab} & = & -2.5\log_{10} \frac{434}{240c} - 48.6 \\
+& \approx & -3.051144462
+\end{eqnarray*}
+
+\subsection{Synthetic Data}
+
+The synthetic data for this test is significantly different to the unity
+benchmark in order to generate the polynomial spectrum required.
+
+\subsection{Results}
+
+After running through TAO we get:
+\[ m_{ab} = -3.041596127 \]
+with an error of:
+\[ \mathrm{err}(m_{ab}) = \num{2.8247e-5} \]
+
+
 
 % \section{Exponential Transmission}
 
