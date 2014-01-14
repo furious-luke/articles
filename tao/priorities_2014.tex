@@ -1,0 +1,119 @@
+\title{TAO Priorities 2014}
+\author{
+  Luke Hodkinson \\
+  Center for Astrophysics and Supercomputing \\
+  Swinburne University of Technology \\
+  Melbourne, Hawthorn 32000, \underline{Australia}
+}
+\date{\today}
+
+\documentclass[12pt]{scrartcl}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[scientific-notation=true]{siunitx}
+\usepackage{listings}
+\usepackage{hyperref}
+%% \usepackage[scaled]{beramono}
+%% \renewcommand*\familydefault{\ttdefault}
+%% \usepackage[Tl]{fontenc}
+
+\newcommand{\deriv}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+\newcommand{\sderiv}[2]{\ensuremath{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}}
+\newcommand{\dx}[1]{\ensuremath{\,\mathrm{d}#1}}
+
+%% \lstset{
+%%   language=Python,
+%%   showstringspaces=false,
+%%   formfeed=\newpage,
+%%   tabsize=4,
+%%   basicstyle=\small\ttfamily,
+%%   commentstyle=\color{BrickRed}\itshape,
+%%   keywordstyle=\color{blue},
+%%   stringstyle=\color{OliveGreen},
+%%   morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+%%    zip, with, open}
+%% }
+
+\begin{document}
+\maketitle
+
+\section{Goals}
+
+These are the overarching goals in the order I think they should be
+prioritsed.
+
+\begin{enumerate}
+  \item Release first open version of TAO (carried over from last
+    year).
+  \item Ensure satisfactory accuracy of the science modules.
+  \item Prevent frontend errors, or any other negative experience from
+    the UI.
+  \item Extend TAO with new features.
+\end{enumerate}
+
+\section{Priorities}
+
+Here I describe a finer grained set of actions to achieve the goals
+listed above; these are in order of priority.
+
+I should also say that these priorities are all from a mostly software
+engineery perspective, which will likely be quite evident.
+
+\begin{description}
+  \item[Import remaining datasets] \hfill \\
+    So far we have mini-Millennium (SAGE) and Millennium (SAGE)
+    successfully imported into the database with the latest updates to
+    both SAGE and TAO. Bolshoi is currently processing and Galacticus
+    datasets are being copied to g2.
+  \item[Restart TAO and check basic functionality] \hfill \\
+    We should do some final testing to check that things are working
+    smoothly. In particular, the issue of MPI initialisation failing
+    should be corrected now.
+  \item[Confirm all internal data present and working] \hfill \\
+    By internal data I mean the transmission filters and SSP data. In
+    particular, we need to confirm the half-spectrum SSP data is in
+    place.
+  \item[Install ``init.d'' scripts] \hfill \\
+    Should the servers ever go down for any reason we need to be sure
+    both the databases and workflow automatically restart; we don't
+    want to have to depend on individuals doing it manually.
+  \item[Discuss and implement science benchmarks] \hfill \\
+    I've made a start on building some science benchmarks to test the
+    \emph{accuracy} (emphasied to differentiate from unit tests) of
+    TAO, but we need more to be satisfied the numbers we are producing
+    are correct.
+  \item[Finish unit testing science modules] \hfill \\
+    ``Code without tests is broken by design.'' - Jacob Kaplan-Moss,
+    Django developer. We already have substantial unit tests, but we
+    need to finish them off.
+  \item[Develop a system for automatically testing the UI] \hfill \\
+    The current system of using Selenium and implementing individual
+    unit tests is good, but still lacking in completeness. The
+    possible combinations of paths through the UI is very large, and
+    an automated system for testing this would be invaluable. Getting
+    any kind of error from a web UI can be exceptionally frustrating
+    and can be, in my experience, the sole cause of abandoning use of
+    a site.
+  \item[Extend TAO with new features] \hfill \\
+    Not too sure what features should be scheduled next, but I would
+    say that ensuring we have a solid foundation to work on is more
+    important than adding new things.
+  \item[Replace Twitter Bootstrap theme] \hfill \\
+    We are currently using a stock standard set of widgets and designs
+    for the UI. This is fine, but does not suggest a polished
+    site. Having a professional design the theme for our interfaces
+    would be a great touch.
+  \item[Add basic visualisations to frontend] \hfill \\
+    It occurred to me that it wouldn't be too difficult, and could
+    enhance users' understanding of what they are asking for from TAO,
+    if we added, to the frontend, some generated diagrams of the
+    simulation boxes and the lightcone they have requested. It may
+    help users to see why they can only select a limited number of
+    unique cones, and why images they are building may come back with
+    strange ``kinks'' in the middle due to the Gnomonic projection.
+\end{description}
+
+\end{document}
