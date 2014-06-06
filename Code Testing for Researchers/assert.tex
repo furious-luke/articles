@@ -1,0 +1,98 @@
+\begin{frame}
+  \frametitle{Assertions}
+  \begin{tikzpicture}[overlay]
+    \node[lit,anchor=north west] (expr) at (2.5,2) {{\Large Is expression true?}};
+    \node[bad,anchor=north west] (no) at (5.5,-2) {{\Large Abort}};
+    \node[lit,anchor=north west] (yes) at (-0.5,-2) {{\Large Continue}};
+    \node[below right=of expr] (nolabel) {No};
+    \node[below left=of expr] (yeslabel) {Yes};
+    \draw[line width=1pt,draw=Base06,->,>=latex] (expr.south) |- (3,0) -| (yes.north);
+    \draw[line width=1pt,draw=Base06,->,>=latex] (expr.south) |- (5,0) -| (no.north);
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Assertions}
+  \begin{block}{Advantages}
+    \begin{itemize}
+    \item Very simple.
+    \item Already provided by C/C++ and Python.
+    \item Optimised out.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Disadvantages}
+    \begin{itemize}
+    \item Does not provide much information.
+    \item Not a test ``suite'' as such.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Assertions}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  char* alloc_a_string( size_t size ) {
+    char* p = (char*)malloc( size );
+
+    // What if the allocation fails?
+    // Probably a segfault.
+
+    return p;
+  }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Assertions}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  #include <assert.h>
+
+  char* alloc_a_string( size_t size ) {
+    char* p = (char*)malloc( size );
+    assert( p ); // check allocation
+    return p;
+  }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Assertions}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  #ifndef NDEBUG
+    #define assert( expr ) <something>
+  #else
+    #define assert( expr )
+  #endif
+
+  // In debug mode.
+  gcc -c -o program program.c
+
+  // In optimised mode.
+  gcc -DNDEBUG -c -o program program.c
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Assertions}
+  \begin{example}
+    \begin{lstlisting}[style=Py]
+  def do_some_asserts(*args, **kw):
+
+    # Must have at least one positional.
+    assert len(args) > 0
+
+    # Must have a key of 'hello'.
+    assert kw.has('hello')
+
+    # Can also have messages.
+    assert kw['hello'] == 'world', 'Wrong!'
+    
+    \end{lstlisting}
+  \end{example}
+\end{frame}

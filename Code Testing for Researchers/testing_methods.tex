@@ -1,0 +1,105 @@
+\begin{frame}
+  \frametitle{Testing Methods}
+  \begin{tikzpicture}[overlay]  
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The ``Box'' Approach}
+  Describes the point-of-view of the tester.
+  Divided into three boxes:
+  \begin{itemize}
+  \item Black-box testing.
+  \item White-box testing.
+  \item Grey-box testing.
+  \end{itemize}
+  Why is this useful? Helps decide on ecapsulation and
+  implementation hiding, and with TDD.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Black-box Testing}
+  We don't know anything about internals, only
+  the interfaces.
+
+  TODO: Include picture.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Black-box Testing}
+  \begin{block}{Class definition}
+    \begin{lstlisting}[style=C]
+  // Perform Newton-Raphson solve.
+  // Solution is bounded by [x1,x2].
+  // Initial value is x.
+  // Solve tolerance is tol, maximum iterations are
+  // max_its.
+  template< class FuncT, class T >
+  T newton( FuncT func, T x1, T x2, T x,
+            T tol, int max_its );
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Black-box Testing}
+  \begin{block}{Potential tests}
+    \begin{itemize}
+    \item Check known functions work ($x$, $x^2$, etc).
+    \item Check violation of lower/upper bounds.
+    \item Check variation of initial x.
+    \item Check violation of tolerance.
+    \item Check violation of maximum iterations.
+    \end{itemize}
+  \end{block}
+  \pause
+  \vspace{1cm}
+  {\LARGE\color{Base0A} Can we do better?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{White-box Testing}
+  Have access to application internals.
+
+  TODO: Include picture.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{White-box Testing}
+  \begin{block}{Class implementation}
+    \begin{lstlisting}[style=C]
+  template< class FuncT, class T >
+  T newton( FuncT func, T x1, T x2, T x,
+            T tol, int max_its ) {
+    ...
+    // Use a scaling to make sure we don't
+    // converge simply because x is very small.
+    T scale;
+    if( x > 0.0 )
+      scale = 1.0/x;
+    else
+      scale = 1.0;
+    ...
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{White-box Testing}
+  \begin{block}{More thorough tests}
+    \begin{itemize}
+    \item Check systems with small scales converge correctly.
+    \item Check systems with large scales converge correctly.
+    \item Check initial value of 0 works as expected.
+    \end{itemize}
+  \end{block}
+  \pause
+  \vspace{1cm}
+  {\LARGE\color{Base0A} Perhaps too much effort?}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Grey-box Testing}
+  Somewhere in between.
+\end{frame}

@@ -1,0 +1,80 @@
+\begin{frame}
+  \frametitle{Testing Levels}
+  \begin{tikzpicture}[overlay,shift={(1.5,-2.75)}]
+    \visible<1,3->{
+      \node[nrm,anchor=north west] at (-1.5,5) {{\Large Unit testing}};
+    }
+    \visible<2>{
+      \node[lit,anchor=north west] at (-1.5,5) {{\Large Unit testing}};
+      \node[exp,anchor=north west] at (4.5,5)  {{\small Tests
+          the lowest level of the code, focusing on each individual function.}};
+      \draw[arr] (4.4,4.5) to (3.6,4.5);
+      \node[bb,anchor=north west] at (5,3) {{\small Black-box}};
+      \node[wb,anchor=north west] at (5,2) {{\small White-box}};
+      \node[gb,anchor=north west] at (5,1) {{\small Grey-box}};
+    }
+
+    \visible<-2,4->{
+      \node[nrm,anchor=north west] at (-1.5,3.5)   {{\Large Integration testing}};
+    }
+    \visible<3>{
+      \node[lit,anchor=north west] at (-1.5,3.5)   {{\Large Integration testing}};
+      \node[exp,anchor=north west] at (4.5,5) {{\small Tests
+          the interoperability of separate code pieces.}};
+      \draw[arr] (4.4,3) to (3.6,3);
+      \node[bb,anchor=north west] at (5,3) {{\small Black-box}};
+      \node[gb,anchor=north west] at (5,2) {{\small Grey-box}};
+    }
+
+    \visible<-3,5->{
+      \node[nrm,anchor=north west] at (-1.5,2) {{\Large System testing}};
+    }
+    \visible<4>{
+      \node[lit,anchor=north west] at (-1.5,2) {{\Large System testing}};
+      \node[exp,anchor=north west] at (4.5,5) {{\small Tests the entire system
+          working together.}};
+      \draw[arr] (4.4,1.5) to (3.6,1.5);
+      \node[bb,anchor=north west] at (5,3) {{\small Black-box}};
+      \node[gb,anchor=north west] at (5,2) {{\small Grey-box}};
+    }
+
+    \visible<-4>{
+      \node[nrm,anchor=north west] at (-1.5,0.5)   {{\Large Regression testing}};
+    }
+    \visible<5>{
+      \node[lit,anchor=north west] at (-1.5,0.5)   {{\Large Regression testing}};
+      \node[exp,anchor=north west] at (4.5,5) {{\small Ensures previous errors
+          don't find their way back in.}};
+      \draw[arr] (4.4,0) to (3.6,0);
+      \node[bb,anchor=north west] at (5,3) {{\small Black-box}};
+    }
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Unit Testing}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fixtures}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Mocks}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Integration Testing}
+\end{frame}
+
+\begin{frame}
+  \frametitle{System Testing}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Regression Testing}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Other Tests}
+\end{frame}
