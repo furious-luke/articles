@@ -22,6 +22,28 @@
     minimum width=5cm,
     text=Base04
   },
+  nrm2/.style={
+    draw=none,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base02,
+    ultra thick,
+    text=Base04
+  },
+  short/.style={
+    minimum width=3.2cm,
+    text depth=0.07cm
+  },
+  long/.style={
+    minimum width=6.8cm,
+    text depth=0.07cm
+  },
+  tiny/.style={
+    minimum width=1.5cm,
+    minimum height=0.75cm,
+    inner sep=2mm
+  },
   lit/.style={
     draw=Base0D,
     rectangle,
@@ -52,6 +74,16 @@
     text width=4cm,
     text=Base07,
     text depth=4.7cm
+  },
+  bkg/.style={
+    draw=Base03,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=none,
+    ultra thick,
+    text=Base03,
+    dashed
   },
   arr/.style={
     draw=Base0D,
@@ -152,12 +184,14 @@
 
 \frame{\titlepage}
 
+%% \input{overview.tex}
+
 %% \input{motivation.tex}
 
-\input{testing_methods.tex}
+%% \input{testing_methods.tex}
 
 %% \input{assert.tex}
 
-%% \input{testing_levels.tex}
+\input{testing_levels.tex}
 
 \end{document}

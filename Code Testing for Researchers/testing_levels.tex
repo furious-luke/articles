@@ -53,14 +53,281 @@
 
 \begin{frame}
   \frametitle{Unit Testing}
+  Lowest level of testing.
+  Usually directly tests inputs and outputs of functions/methods.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Unit Testing}
+  Things we would like from unit testing:
+  \begin{itemize}
+  \vspace{0.5cm}
+  \item Easy to implement.
+  \vspace{0.5cm}
+  \item Descriptive failures.
+  \vspace{0.5cm}
+  \item Minimum boilerplate.
+  \vspace{0.5cm}
+  \item Flexibility.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  \begin{block}{Code to test}
+    \begin{lstlisting}[style=C]
+  // Complex number implementation.
+  struct complex {
+    double real;
+    double imag;
+
+    complex add( complex const& other ) const;
+    complex sub( complex const& other ) const;
+    complex div( complex const& other ) const;
+    complex mul( complex const& other ) const;
+  };
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  \begin{block}{Test program 1}
+    \begin{lstlisting}[style=C]
+  int main() {
+    complex a{ 1, 0 }, b{ 0, 1 }, c{ 1, 1 };
+
+    assert( a.add( a ) == 2 );
+    assert( a.sub( a ) == 0 );
+    assert( a.add( b ) == c );
+    assert( a.mul( a ) == a );
+    assert( c.div( a ) == c );
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  Things we would like from unit testing:
+  \begin{itemize}
+  \vspace{0.5cm}
+  \item Easy to implement.
+  \vspace{0.5cm}
+  \item Descriptive failures.
+  \vspace{0.5cm}
+  \item Minimum boilerplate.
+  \vspace{0.5cm}
+  \item Flexibility.
+  \end{itemize}
+  \begin{tikzpicture}[overlay]
+    \node[Base0B,scale=2] at (5.25,4) {\checkmark};
+    \node[Base08,scale=2] at (5.25,2.8) {$\times$};
+    \node[Base0B,scale=2] at (5.25,1.8) {\checkmark};
+    \node[Base08,scale=2] at (5.25,0.6) {$\times$};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  \begin{block}{Test program 2}
+    \begin{lstlisting}[style=C]
+  int main() {
+    complex a{ 1, 0 }, b{ 0, 1 }, c{ 1, 1 };
+    complex c{ 1, 1 };
+
+    if( a.add( a ) != 2 )
+      (printf( "addition failed" ), abort());
+    if( a.add( b ) != c )
+      (printf( "subtraction failed" ), abort());
+    if( a.mul( a ) != a )
+      (printf( "multiplication failed" ), abort());
+    if( c.div( a ) != c )
+      (printf( "division failed" ), abort());
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  Things we would like from unit testing:
+  \begin{itemize}
+  \vspace{0.5cm}
+  \item Easy to implement.
+  \vspace{0.5cm}
+  \item Descriptive failures.
+  \vspace{0.5cm}
+  \item Minimum boilerplate.
+  \vspace{0.5cm}
+  \item Flexibility.
+  \end{itemize}
+  \begin{tikzpicture}[overlay]
+    \node[Base0B,scale=2] at (5.25,4) {\checkmark};
+    \node[Base0B,scale=2] at (5.25,2.8) {\checkmark};
+    \node[Base08,scale=2] at (5.25,1.8) {$\times$};
+    \node[Base08,scale=2] at (5.25,0.6) {$\times$};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  We \emph{could} continue adding more, but, as always, someone
+  has probably already done this.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{C/C++ Unit Testing Frameworks}
+  \begin{tabular}{p{3cm}|p{7cm}}
+    {\color{Base09}CppUnit} & Excellent framework, very well used/tested, multiple loggers, many test assertions. \\
+    \hline
+    {\color{Base09}MinUnit} & Possibly the simplest framework available. \\
+    \hline
+    {\color{Base09}CxxTest} & Essentially no boilerplate, uses Python scripts to detect tests. \\
+    \hline
+    \only<1>{
+      {\color{Base09}Catch} & Personal favorite, combines clever code and rich features.
+    }
+    \only<2>{
+      {\color{Base09}Catch}\hspace{1cm}{\color{Base0B}$\checkmark$} & Personal favorite, combines clever code and rich features.
+    }
+  \end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing}
+  \begin{block}{Test program 3}
+    \begin{lstlisting}[style=C]
+  #include <catch.hpp>
+
+  TEST_CASE( "Complex numbers" ) {
+    complex a{ 1, 0 }, b{ 0, 1 }, c{ 1, 1 };
+    REQUIRE( a.add( a ) == 2 );
+    REQUIRE( a.sub( a ) == 0 );
+    REQUIRE( a.add( b ) == c );
+    REQUIRE( a.mul( a ) == a );
+    REQUIRE( c.div( a ) == c );
+  }
+    \end{lstlisting}
+  \end{block}
+  \visible<2>{ \tikz[overlay] \draw[Base08,line width=2pt] (0.7,1.2) rectangle (2.3,3.3); }
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Successful Results}
+  \begin{block}{Minimal output}
+    All tests passed (5 assertions in 1 test case)
+  \end{block}
+  \begin{block}{Verbose output}
+    \begin{verbatim}
+  complex.cc:55: 
+  PASSED:
+    REQUIRE( c.div( a ) == c )
+  with expansion:
+    1 + 1i == 1 + 1i
+    \end{verbatim}
+  \end{block}
+  \visible<2>{
+  \begin{tikzpicture}[overlay]
+    \draw[Base08,line width=2pt] (2.5,1.7) ellipse (2 and 0.5);
+  \end{tikzpicture}
+  }
+\end{frame}
+
+\begin{frame}
+  \frametitle{Test Assertions}
+  From {\color{Base0D} CxxTest}:
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.4\textwidth}
+      \begin{itemize}
+      \item {\ttfamily\small TS\_ASSERT}
+      \item {\ttfamily\small TS\_ASSERT\_EQUALS}
+      \item {\ttfamily\small TS\_ASSERT\_DIFFERS}
+      \item {\ttfamily\small TS\_ASSERT\_DELTA}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \begin{itemize}
+      \item {\ttfamily\small TS\_ASSERT\_LESS\_THAN}
+      \item {\ttfamily\small TS\_ASSERT\_LESS\_THAN\_EQUALS}
+      \item {\ttfamily\small TS\_ASSERT\_GREATER\_EQUALS}
+      \item {\ttfamily\small TS\_ASSERT\_GREATER\_THAN\_EQUALS}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.5cm}
+  From {\color{Base0D} Catch}:
+  \begin{itemize}
+  \item {\ttfamily\small REQUIRE}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Failed Results}
+  \begin{verbatim}
+-----------------------------------------------
+Complex numbers
+-----------------------------------------------
+complex.cc:53
+...............................................
+
+complex.cc:60: FAILED:
+  REQUIRE( c.div( a ) != c )
+with expansion:
+  1 + 1i != 1 + 1i
+
+===============================================
+1 test case - failed (5 assertions - 1 failed)
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Reporters}
+  \footnotesize
+  \begin{verbatim}
+<Catch name="complex">
+  <Group>
+    <TestCase name="Complex numbers">
+      <Expression success="false" filename="complex.cc" line="60">
+        <Original>
+          c.div( a ) != c
+        </Original>
+        <Expanded>
+          1 + 1i != 1 + 1i
+        </Expanded>
+      </Expression>
+      <OverallResult success="false"/>
+    </TestCase>
+    <OverallResults successes="4" failures="1"/>
+  </Group>
+  <OverallResults successes="4" failures="1"/>
+</Catch>
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unit Testing with ``Catch''}
+  Things we would like from unit testing:
+  \begin{itemize}
+  \vspace{0.5cm}
+  \item Easy to implement.
+  \vspace{0.5cm}
+  \item Descriptive failures.
+  \vspace{0.5cm}
+  \item Minimum boilerplate.
+  \vspace{0.5cm}
+  \item Flexibility.
+  \end{itemize}
+  \begin{tikzpicture}[overlay]
+    \node[Base0B,scale=2] at (5.25,4) {\checkmark};
+    \node[Base0B,scale=2] at (5.25,2.8) {\checkmark};
+    \node[Base0B,scale=2] at (5.25,1.8) {\checkmark};
+    \node[Base0B,scale=2] at (5.25,0.6) {\checkmark};
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
   \frametitle{Fixtures}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Mocks}
 \end{frame}
 
 \begin{frame}
