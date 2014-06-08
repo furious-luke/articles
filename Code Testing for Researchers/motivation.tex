@@ -23,6 +23,19 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Time: Thinking Long Term}
+  \begin{tikzpicture}[overlay]
+    \node[nrm,minimum width=10.7cm,anchor=north west] at (0,-3) {Library};
+    \node[nrm,minimum width=5.15cm,anchor=north west] at (0,-0.5) {Application};
+    \node[nrm,minimum width=5.15cm,anchor=north west] at (5.5,-0.5) {Library};
+    \node[nrm,minimum width=5.15cm,anchor=north west] at (5.5,2) {Application};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (2.8,-1.9) {uses};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (8.3,-1.9) {uses};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (8.3,0.6) {uses};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
   \frametitle{Motivation}
   Show stats on typical code sizes and sizes of other test suites to highlight
   time savings. Also show complexity with stats on if conditionals.
