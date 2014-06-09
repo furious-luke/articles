@@ -53,8 +53,24 @@
 
 \begin{frame}
   \frametitle{Unit Testing}
-  Lowest level of testing.
-  Usually directly tests inputs and outputs of functions/methods.
+  \visible<2->{
+    \vspace{4cm}
+    {\Large\color{Base09}Do standalone functions/methods do what they are supposed to?}
+  }
+  \begin{tikzpicture}[overlay,shift={(-3,3)}]
+    \node[class] (A) at (3,2)   {\textbf{Class A}\nodepart{second}method\_1};
+    \node[class] (B) at (7,2)   {\textbf{Class B}\nodepart{second}method\_2};
+    \node[class] (C) at (0.5,0) {\textbf{Class C}\nodepart{second}method\_3};
+    \coordinate  (O) at (4.5,-0.5);
+    \path[draw,Base06,<-,>=open diamond,thick] (C) -- (O);
+    \path[draw,Base06,->,>=latex,thick] (O) -- (A);
+    \path[draw,Base06,->,>=latex,thick] (O) -| (B);
+    \visible<3->{
+      \node[Base08,anchor=north west,scale=8] at (-0.3,1.5) {$\times$};
+      \draw[Base0B,anchor=north west,line width=2pt] (4.5,1.5) ellipse(1.8 and 0.8);
+      \draw[Base0B,anchor=north west,line width=2pt] (8.5,1.5) ellipse(1.8 and 0.8);
+    }
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}
@@ -134,7 +150,6 @@
     \begin{lstlisting}[style=C]
   int main() {
     complex a{ 1, 0 }, b{ 0, 1 }, c{ 1, 1 };
-    complex c{ 1, 1 };
 
     if( a.add( a ) != 2 )
       (printf( "addition failed" ), abort());
@@ -172,24 +187,24 @@
 
 \begin{frame}[fragile]
   \frametitle{Unit Testing}
-  We \emph{could} continue adding more, but, as always, someone
-  has probably already done this.
+  We {\color{Base09}\emph{could}} continue adding more, but, as always, someone
+  has already done this for us.
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{C/C++ Unit Testing Frameworks}
   \begin{tabular}{p{3cm}|p{7cm}}
-    {\color{Base09}CppUnit} & Excellent framework, very well used/tested, multiple loggers, many test assertions. \\
+    {\color{Base09}CppUnit} & Excellent framework, very well used/tested, multiple loggers, many test assertions.\newline {\color{Base0D}\url{http://cppunit.sourceforge.net}} \vspace{0.1cm} \\
     \hline
-    {\color{Base09}MinUnit} & Possibly the simplest framework available. \\
+    {\color{Base09}MinUnit} & Possibly the simplest framework available.\vspace{0.1cm} {\color{Base0D}\url{http://github.com/siu/minunit}} \vspace{0.1cm} \\
     \hline
-    {\color{Base09}CxxTest} & Essentially no boilerplate, uses Python scripts to detect tests. \\
+    {\color{Base09}CxxTest} & Essentially no boilerplate, uses Python scripts to detect tests.\newline {\color{Base0D}\url{http://cxxtest.com}} \vspace{0.1cm} \\
     \hline
     \only<1>{
-      {\color{Base09}Catch} & Personal favorite, combines clever code and rich features.
+      {\color{Base09}Catch} & Personal favorite, combines clever code and rich features.\newline {\color{Base0D}\url{http://github.com/philsquared/catch}}
     }
     \only<2>{
-      {\color{Base09}Catch}\hspace{1cm}{\color{Base0B}$\checkmark$} & Personal favorite, combines clever code and rich features.
+      {\color{Base09}Catch}\hspace{1cm}{\color{Base0B}$\checkmark$} & Personal favorite, combines clever code and rich features.\newline {\color{Base0D}\url{http://github.com/philsquared/catch}}
     }
   \end{tabular}
 \end{frame}
@@ -326,22 +341,219 @@ with expansion:
   \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Fixtures}
+  \begin{block}{Parse input file}
+    \begin{lstlisting}[style=C]
+  struct info_t {
+    int param_a;
+    int param_b;
+    ...
+  }
+
+  void parse( char const* fn,
+              struct info_t* info )
+  {
+    FILE* f = fopen( fn, "r" );
+    if( !f )
+      throw std::exception;
+    ...
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Fixtures}
+  \begin{block}{Possible unit tests}
+    \begin{lstlisting}[style=C]
+  TEST_CASE( "parse/missing file" ) {
+  }
+
+  TEST_CASE( "parse/empty file" ) {
+  }
+
+  TEST_CASE( "parse/param_a" ) {
+  }
+
+  TEST_CASE( "parse/param_b" ) {
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Fixtures}
+  \begin{block}{Test param\_a}
+    \begin{lstlisting}[style=C]
+  TEST_CASE( "parse/param_a" ) {
+    FILE* f = fopen( "test_file.txt", "w" );
+    // Write a set of test data.
+    fclose( f );
+
+    struct info_t info;
+    parse( "test_file.txt", &info );
+    REQUIRE( info.param_a == 30 );
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Fixtures}
+  \begin{block}{Test param\_b}
+    \begin{lstlisting}[style=C]
+  TEST_CASE( "parse/param_b" ) {
+    FILE* f = fopen( "test_file.txt", "w" );
+    // Write a set of test data.
+    fclose( f );
+
+    struct info_t info;
+    parse( "test_file.txt", &info );
+    REQUIRE( info.param_b == 60 );
+  }
+    \end{lstlisting}
+  \end{block}
+  \visible<2->{
+    \tikz[overlay] \draw[Base08,line width=1pt] (4.5,3.5) ellipse(5 and 0.8);
+  }
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Fixtures}
+  \begin{block}{Input file fixture}
+    \begin{lstlisting}[style=C]
+  struct parse_fixture {
+    std::string   fn;
+    struct info_t info;
+
+    parse_fixture() {
+      // Should use mkftemp
+      fn = "test_file.txt";
+      FILE* f = fopen( fn, "w" );
+      // Write test contents.
+      fclose( f );
+    }
+  };
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Fixtures}
+  \begin{block}{Input file fixture}
+    \begin{lstlisting}[style=C]
+  TEST_CASE_METHOD( parse_fixture, "parse/param_a" ) {
+    parse( fn, &info );
+    REQUIRE( info.param_a == 30 );
+  }
+
+  TEST_CASE_METHOD( parse_fixture, "parse/param_b" ) {
+    parse( fn, &info );
+    REQUIRE( info.param_b == 60 );
+  }
+    \end{lstlisting}
+  \end{block}
 \end{frame}
 
 \begin{frame}
   \frametitle{Integration Testing}
+  \vspace{4cm}
+  {\Large\color{Base09}Do separate classes/functions interact as they should?}
+  \begin{tikzpicture}[overlay,shift={(-2,3)}]
+    \node[class] (A) at (3,2)   {\textbf{Class A}\nodepart{second}method\_1};
+    \node[class] (B) at (7,2)   {\textbf{Class B}\nodepart{second}method\_2};
+    \node[class] (C) at (0.5,0) {\textbf{Class C}\nodepart{second}method\_3};
+    \coordinate  (O) at (4.5,-0.5);
+    \path[draw,Base06,<-,>=open diamond,thick] (C) -- (O);
+    \path[draw,Base06,->,>=latex,thick] (O) -- (A);
+    \path[draw,Base06,->,>=latex,thick] (O) -| (B);
+    \visible<2->{
+      \draw[Base0B,anchor=north west,line width=2pt] (2,-0.5) ellipse(1.8 and 0.8);
+      \node[Base08,anchor=north west,scale=8] at (2.25,3.55) {$\times$};
+      \node[Base08,anchor=north west,scale=8] at (6.2,3.55) {$\times$};
+    }
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Integration Testing}
+  \begin{block}{Combine complex and newton}
+    \begin{lstlisting}[style=C]
+  // Complex number implementation.
+  struct complex;
+
+  // Perform Newton-Raphson solve.
+  // Solution is bounded by [x1,x2].
+  // Initial value is x.
+  // Solve tolerance is tol, maximum iterations are
+  // max_its.
+  template< class FuncT, class T >
+  T newton( FuncT func, T x1, T x2, T x,
+            T tol, int max_its );
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Integration Testing}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  // Example function used with the Newton
+  // -Raphson solver.
+  //
+  //   x^3 - x - 3
+  //
+  template< class T >
+  struct function
+    : public std::unary_function<T>
+  {
+    T operator()( T x ) const {
+      return x*x*x - x - T( 3 );
+    }
+  };
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Integration Testing}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  TEST_CASE( "newton/complex" ) {
+    complex x1( 0.0 ), x2( 0.0 );
+    function f;
+    REQUIRE( newton( f, x1, x2, 0.5 ) == 0 );
+    REQUIRE( newton( f, x1, x2, 0 )   == 0 );
+    REQUIRE( newton( f, x1, x2, 1 )   == 0 );
+  }
+    \end{lstlisting}
+  \end{example}
 \end{frame}
 
 \begin{frame}
   \frametitle{System Testing}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Regression Testing}
+  \begin{itemize}
+  \item Test finished system.
+  \vspace{0.3cm}
+  \item No different in implementation to integration testing.
+  \vspace{0.3cm}
+  \item Likely use fixtures to prepare input environment.
+  \vspace{0.3cm}
+  \item May need complex correctness measures.
+    \begin{itemize}
+    \item Linear regression.
+    \item Approximate comparisons.
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Other Tests}
+  \begin{description}
+  \item[Regression] Be sure to add new failures to the test suite.
+  \item[Smoke] Similar to sanity testing, try out major components to be sure nothing critical is wrong.
+  \item[Destructive] Actively attempt to break components.
+  \item[Installation] Test installation procedure and correctness on various system configurations.
+  \end{description}
 \end{frame}

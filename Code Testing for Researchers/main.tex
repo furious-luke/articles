@@ -1,8 +1,8 @@
 \documentclass{beamer}
 
-\usepackage{listings,tikz}
+\usepackage{listings,tikz,hyperref}
 \usetikzlibrary{calc,arrows,decorations.markings,positioning}
-\usetikzlibrary{shapes.arrows}
+\usetikzlibrary{shapes.arrows,shapes}
 
 % Setup epigraph.
 \usepackage{epigraph,etoolbox}
@@ -13,6 +13,9 @@
 \makeatother
 
 \tikzset{
+  class/.style={
+    rectangle,draw=Base02,text centered,anchor=north west,text=Base02,minimum width=3cm,shading=axis,bottom color=Base03!80,top color=Base06,shading angle=45,rectangle split,rectangle split parts=2
+  },
   nrm/.style={
     draw=none,
     rectangle,
@@ -185,14 +188,12 @@
 
 \frame{\titlepage}
 
-%% \input{overview.tex}
-
-\input{motivation.tex}
-
+%% \input{motivation.tex}
 %% \input{testing_methods.tex}
-
+%% \input{static_analysis.tex}
 %% \input{assert.tex}
-
 %% \input{testing_levels.tex}
+%% \input{automation.tex}
+\input{code_coverage.tex}
 
 \end{document}
