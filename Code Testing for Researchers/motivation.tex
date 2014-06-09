@@ -30,6 +30,26 @@
 \begin{frame}
   \frametitle{Time: Thinking Long Term}
   \begin{tikzpicture}[overlay]
+    \node[lit,minimum width=10.7cm,anchor=north west] at (0,-3) {Library};
+    \node[lit,minimum width=10.7cm,anchor=north west] at (0,-0.5) {Application};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (2.8,-1.9) {uses};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (8.3,-1.9) {uses};
+    \node[single arrow,draw=none,fill=Base09,rotate=-90,anchor=north west] at (2.9,1) {inputs};
+    \node[single arrow,draw=none,fill=Base09,rotate=90,anchor=north west] at (7.8,0.1) {outputs};
+  \end{tikzpicture}
+  \def\eyepath{(-3,0) .. controls (-2,1.8) and (2,2.2) .. (2.7,0) .. controls (2,-1.2) and (-2,-1.4) .. (-3,0)--cycle;}
+  \begin{tikzpicture}[overlay,scale=0.25,shift={(31.5,8)}]
+    \clip\eyepath;
+    \filldraw[color=orange!50!black] (-.2,.2) circle (1.5);
+    \fill[color=black] (-.2,.2) circle (0.7);
+    \fill[color=white] (.3,.5) circle (0.2);
+    \draw[very thick]\eyepath;
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Time: Thinking Long Term}
+  \begin{tikzpicture}[overlay]
     \visible<1>{
       \node[lit,minimum width=10.7cm,anchor=north west] at (0,-3) {Library};
     }
@@ -64,25 +84,52 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Motivation}
-  Show stats on typical code sizes and sizes of other test suites to highlight
-  time savings. Also show complexity with stats on if conditionals.
+  \frametitle{Preparation}
+  \includegraphics[width=\textwidth]{supercomputer.png}
+  \begin{itemize}
+  \item Code needs to be ready to run ASAP.
+  \item Test as much as possible before hand.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Motivation}
+  \frametitle{Code Attractiveness}
   \vspace{1cm}
   \epigraph{``Code without tests is broken by design.''}{--- \textup{Jacob Kaplan-Moss}, Django documentation}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Motivation}
-  Tests help teams work together.
+  \frametitle{Working in Teams}
+  \begin{tikzpicture}[
+      >=stealth,
+      node distance=2.5cm,
+      database/.style={
+        cylinder,
+        cylinder uses custom fill,
+        cylinder body fill=Base09,
+        cylinder end fill=Base0A,
+        shape border rotate=90,
+        aspect=0.25,
+        draw,
+        text=Base06
+      },
+      user/.style={
+        circle,
+        fill=Base0D,
+        text=Base06
+      },
+      overlay,
+      shift={(5,-0.5)}
+    ]
+    \node[database] (db) at (0,0) {DB};
+    \node[user,right of=db] (u1) {User};
+    \node[user,below of=db] (u2) {User};
+    \node[user,above of=db] (u3) {User};
+    \node[user,left of=db]  (u4) {User};
 
-  If you modify someone else's code, how do you know it all still works?
-\end{frame}
-
-\begin{frame}
-  \frametitle{Motivation}
-  Show massive list of projects with test suites.
+    \draw[->] (db) -- (u1);
+    \draw[->] (db) -- (u2);
+    \draw[->] (db) -- (u3);
+    \draw[->] (db) -- (u4);
+  \end{tikzpicture}
 \end{frame}
