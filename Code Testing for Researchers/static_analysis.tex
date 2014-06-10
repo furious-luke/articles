@@ -1,5 +1,48 @@
 \begin{frame}
   \frametitle{Static Analysis}
+  \begin{tikzpicture}[overlay]
+
+    \node[bkg,anchor=north west,text width=3.2cm,text depth=6cm,label=above:{\color{Base04}Static}] at (-0.5,2.3) {};
+    \node[bkg,anchor=north west,text width=6.8cm,text depth=6cm,label=above:{\color{Base04}Dynamic}] at (3.8,2.3) {};
+
+    \node[nrm2,short,anchor=north west] at (-0.2,1.9) {Reviews};
+    \node[nrm2,short,anchor=north west] at (-0.2,0.7) {Walkthroughs};
+    \node[nrm2,short,anchor=north west] at (-0.2,-0.5) {Inspections};
+    \node[nrm2,short,anchor=north west] at (-0.2,-1.7) {IDE (syntax)};
+    \node[nrm2,long,anchor=north west] (F) at (4.1,1.9) {Functional};
+    \node[nrm2,long,anchor=north west] (N) at (4.1,-1.6) {Non-functional};
+
+    \coordinate (o) at (6,0.7);
+    \coordinate (p) at (6,-2.8);
+    \coordinate (g) at (7.52,-3);
+
+    \node[nrm2,tiny,anchor=north west] (a) at (4.1,0.5)  {Unit};
+    \node[nrm2,tiny,anchor=north west] (b) at (5.1,-0.4) {Integration};
+    \node[nrm2,tiny,anchor=north west] (c) at (6.72,0.5)  {System};
+    \node[nrm2,tiny,anchor=north west] (d) at (7.8,-0.4) {Regression};
+    \node[nrm2,tiny,anchor=north west] (e) at (9.4,0.5)  {Sanity};
+
+    \node[lit,short,anchor=north west] at (-0.2,-2.9) {Analysis};
+
+    \node[nrm2,tiny,anchor=north west] (f) at (4.1,-3)  {Performance};
+    \node[nrm2,tiny,anchor=north west]     at (6.95,-3) {Usability};
+    \node[nrm2,tiny,anchor=north west] (h) at (9.18,-3)  {Security};
+
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (a);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (b);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (c);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (d);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (e);
+
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (f);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (g);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (h);
+
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Static Analysis}
   \begin{block}{Compiler errors}
     \begin{itemize}
     \item Parse errors.

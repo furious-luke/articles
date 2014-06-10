@@ -76,23 +76,27 @@
 
 \begin{frame}
   \frametitle{The ``Box'' Approach}
-  Describes the point-of-view of the tester.
-  Divided into three boxes:
+  Used in tandem with testing methods.
+  \vspace{0.5cm}
   \begin{itemize}
+  \item Describes the point-of-view of the tester.
+  \vspace{0.2cm}
   \item Black-box testing.
+  \vspace{0.2cm}
   \item White-box testing.
+  \vspace{0.2cm}
   \item Grey-box testing.
   \end{itemize}
-  Why is this useful? Helps decide on ecapsulation and
-  implementation hiding, and with TDD.
 \end{frame}
 
 \begin{frame}
   \frametitle{Black-box Testing}
   We don't know anything about internals, only
   the interfaces.
-
-  TODO: Include picture.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-9,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (-4,-1) {\textbf{Implementation}\nodepart{second}?};
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -116,10 +120,10 @@
   \begin{block}{Potential tests}
     \begin{itemize}
     \item Check known functions work ($x$, $x^2$, etc).
-    \item Check violation of lower/upper bounds.
+    \item Check variation of lower/upper bounds.
     \item Check variation of initial x.
-    \item Check violation of tolerance.
-    \item Check violation of maximum iterations.
+    \item Check variation of tolerance.
+    \item Check variation of maximum iterations.
     \end{itemize}
   \end{block}
   \pause
@@ -130,8 +134,10 @@
 \begin{frame}
   \frametitle{White-box Testing}
   Have access to application internals.
-
-  TODO: Include picture.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-5,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (0,-1) {\textbf{Implementation}\nodepart{second}defined};
+  \end{tikzpicture}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -171,5 +177,9 @@
 
 \begin{frame}[fragile]
   \frametitle{Grey-box Testing}
-  Somewhere in between.
+  At the level of black-box testing with some awareness of internals.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-9.5,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (-4.5,-1) {\textbf{Implementation}\nodepart{second}aware of};
+  \end{tikzpicture}
 \end{frame}

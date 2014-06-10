@@ -26,6 +26,28 @@
        test_complex
        test_newton
        test_newton_complex
+
+  static:
+       cppcheck --enable=all ${SRCS}
     \end{lstlisting}
   \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Automation - Makefiles}
+  \begin{block}{Build code}
+    \vspace{0.2cm}
+    make
+    \vspace{0.2cm}
+  \end{block}
+  \begin{block}{Run tests}
+    \vspace{0.2cm}
+    make check
+    \vspace{0.2cm}
+  \end{block}
+  \begin{block}{Run static analysis}
+    \vspace{0.2cm}
+    make static
+    \vspace{0.2cm}
+  \end{block}
 \end{frame}
