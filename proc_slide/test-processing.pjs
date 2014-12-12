@@ -1,0 +1,241 @@
+Function.prototype.inheritsFrom = function( parentClass ) {
+    if( parentClass.constructor == Function ) {
+        this.prototype = new parentClass;
+        this.prototype.constructor = this;
+        this.prototype.parent = parentClass.prototype;
+    }
+    else {
+        this.prototype = parentClass;
+        this.prototype.constructor = this;
+        this.prototype.parent = parentClass;
+    }
+    return this;
+}
+
+function Entity( b, c ) {
+    this.b = b;
+    this.c = c;
+}
+Entity.prototype.prepare = function() {}
+Entity.prototype.display = function() {}
+Entity.prototype.update = function() {}
+Entity.prototype.done = function( tick ) {
+    return tick > this.c;
+}
+
+function Scene( b, c ) {
+    Entity.call( this, b, c );
+    this.entities = [];
+    this.active = [];
+}
+Scene.inheritsFrom( Entity );
+Scene.prototype.add_entity = function( ent ) {
+    this.entities.push( ent );
+}
+Scene.prototype.prepare = function() {
+    this.entities.sort( function(a,b){ return a.b - b.b; } );
+    for( var i = 0; i < this.entities.length; ++i )
+        this.entities[i].prepare();
+}
+Scene.prototype.display = function() {
+    for( var i = 0; i < this.active.length; ++i )
+        this.active[i].display();
+}
+Scene.prototype.update = function( tick ) {
+
+    // Add ready entities.
+    while( this.entities.length > 0 && this.entities[0].b <= tick )
+        this.active.push( this.entities.shift() );
+
+    // Remove finished active entities and update.
+    var new_act = [];
+    for( var i = 0; i < this.active.length; ++i ) {
+        var ent = this.active[i];
+        if( !ent.done( tick ) )
+        {
+            ent.update( tick );
+            new_act.push( ent );
+        }
+    }
+    this.active = new_act;
+}
+
+function Actor( b, c, x, y, s ) {
+    Scene.call( this, b, c );
+    this.x = x;
+    this.y = y;
+    this.s = s;
+    if( typeof this.x == undefined )
+        this.x = 0;
+    if( typeof this.y == undefined )
+        this.y = 0;
+    if( typeof this.s == undefined )
+        this.s = 1;
+}
+Actor.inheritsFrom( Scene );
+// Actor.prototype.add_transition = function() {
+//     this.entities.push( ent );
+// }
+Actor.prototype.pre_display = function() {
+    pushMatrix();
+    translate( this.x, this.y );
+    scale( this.s );
+}
+Actor.prototype.post_display = function() {
+    popMatrix();
+}
+
+function Shape( sh, w, h, b, c, x, y, s ) {
+    Actor.call( this, b, c, x, y, s );
+    this.sh = sh;
+    this.w = w;
+    this.h = h;
+}
+Shape.inheritsFrom( Actor );
+Shape.prototype.display = function() {
+    this.pre_display();
+    shape( this.sh, 0, 0, this.w, this.h );
+    this.post_display();
+}
+
+function ElasticEaseOut(obj, name, x, y, b, c) {
+    Entity.call( this, b, c );
+    this.obj = obj;
+    this.name = name;
+    this.x = x;
+    this.y = y;
+}
+ElasticEaseOut.inheritsFrom( Entity );
+ElasticEaseOut.prototype.update = function(t) {
+    this.obj[this.name] = this.calc(t);
+}
+ElasticEaseOut.prototype.calc = function(t) {
+    if( t <= this.b )
+        return this.x;
+    if( t >= this.c )
+        return this.y;
+    t = (float)(t - this.b)/(float)(this.c - this.b);
+    float p = 0.3;
+    float a = this.y - this.x;
+    float s = p/4.0;
+    return (a*pow( 2.0, -10.0*t )*sin( (t - s)*(2*PI)/p ) + this.y);
+};
+
+// class ElasticEaseOut {
+//     float b, c, d;
+
+//     ElasticEaseOut( float b, float c ) {
+//         this.b = b;
+//         this.c = c;
+//         this.d = 1.0;
+//     }
+
+//     void value( float t ) {
+//         if( t == 0.0 )
+//             return b;
+//         if( (t /= d) == 1.0 )
+//             return c;
+//         float p = d*0.3;
+//         float a = c - b;
+//         float s = p/4.0;
+//         return (a*pow( 2.0, -10.0*t )*sin( (t*d - s)*(2*PI)/p ) + c);
+//     }
+// }
+
+
+
+
+Ticker ticker = new Ticker();
+// // Timer timer = new Timer( 30, 60 );
+// // ElasticEaseOut ease = new ElasticEaseOut( 0.9, 1.0 );
+PShape server = loadShape( "server.svg" );
+PShape person = loadShape( "person.svg" );
+int x, y;
+
+void setup() {
+    size( screen.width, screen.height );
+    strokeWeight( 10 );
+    frameRate( 30 );
+    x = width/2;
+    y = height/2;
+    smooth();
+    shapeMode( CENTER );
+
+    var sh = new Shape( server, 180, 180, 30, 120, x, y );
+    sh.add_entity( new ElasticEaseOut( sh, 's', 0.9, 1.0, 30, 40 ) );
+    sh.add_entity( new ElasticEaseOut( sh, 'x', x, x + 150.0, 60, 90 ) );
+    sh.add_entity( new ElasticEaseOut( sh, 'x', x + 150.0, x - 150.0, 90, 120 ) );
+    sh.add_entity( new ElasticEaseOut( sh, 'y', y, y + 100.0, 90, 120 ) );
+
+    scene = new Scene();
+    scene.add_entity( sh );
+    scene.add_entity( new Shape( person, 180, 180, 90, 120, x/2, y/2 ) );
+    scene.prepare();
+}
+
+void draw() {
+    scene.update( ticker.i );
+
+    background( #d8d8d8 );
+    stroke( #585858 );
+    scene.display();
+
+    ticker.update();
+}
+
+///
+/// Allows me to stop time during periods when there is
+/// no activity.
+///
+class Ticker {
+    int i;
+
+    Ticker() {
+        i = 0;
+    }
+
+    void update() {
+        ++i;
+    }
+}
+
+// ///
+// /// 
+// ///
+// class Timer {
+//     int b, c;
+//     float t;
+
+//     Timer( int b, int c ) {
+//         this.b = b;
+//         this.c = c;
+//         update( 0 );
+//     }
+
+//     void update( int tick ) {
+//         if( tick < b )
+//             t = 0.0;
+//         else if( tick <= c )
+//             t = (float)(tick - b)/(float)(c - b);
+//         else
+//             t = 1.0;
+//     }
+// }
+
+// class Actor extends Timer {
+//     Asset obj;
+//     float x, y;
+//     float s;
+
+//     Actor( int b, int c, Asset obj ) {
+//         super( b, c );
+//         this.obj = obj;
+//     }
+
+//     void display() {
+//         obj.display();
+//     }
+
+//     void update() {
+//     }
+// }
