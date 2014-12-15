@@ -153,7 +153,8 @@ PShape person = loadShape( "person.svg" );
 int x, y;
 
 void setup() {
-    size( screen.width, screen.height );
+    // size( screen.width, screen.height );
+    size( 640, 480 );
     strokeWeight( 10 );
     frameRate( 30 );
     x = width/2;

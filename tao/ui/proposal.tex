@@ -1,0 +1,186 @@
+\title{Partial UI Proposal}
+\author{
+  Luke Hodkinson \\
+  Center for Astrophysics and Supercomputing \\
+  Swinburne University of Technology \\
+  Melbourne, Hawthorn 32000, \underline{Australia}
+}
+\date{\today}
+
+\documentclass[12pt]{scrartcl}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{pgfgantt}
+%% \usepackage[scaled]{beramono}
+%% \renewcommand*\familydefault{\ttdefault}
+%% \usepackage[Tl]{fontenc}
+
+\definecolor{Base00}{HTML}{151515}
+\definecolor{Base01}{HTML}{202020}
+\definecolor{Base02}{HTML}{303030}
+\definecolor{Base03}{HTML}{505050}
+\definecolor{Base04}{HTML}{B0B0B0}
+\definecolor{Base05}{HTML}{D0D0D0}
+\definecolor{Base06}{HTML}{E0E0E0}
+\definecolor{Base07}{HTML}{F5F5F5}
+\definecolor{Base08}{HTML}{AC4142}
+\definecolor{Base09}{HTML}{D28445}
+\definecolor{Base0A}{HTML}{F4BF75}
+\definecolor{Base0B}{HTML}{90A959}
+\definecolor{Base0C}{HTML}{75B5AA}
+\definecolor{Base0D}{HTML}{6A9FB5}
+\definecolor{Base0E}{HTML}{AA759F}
+\definecolor{Base0F}{HTML}{8F5536}
+
+\newcommand{\deriv}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+\newcommand{\sderiv}[2]{\ensuremath{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}}
+\newcommand{\dx}[1]{\ensuremath{\,\mathrm{d}#1}}
+
+\lstdefinestyle{C}{
+  language=C++,
+  %% numbers=left,
+  showstringspaces=false,
+  formfeed=\newpage,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{Base08}\itshape,
+  keywordstyle=\color{Base0D},
+  stringstyle=\color{Base0B},
+  morekeywords={std, thrust, include, ifndef, define, endif}
+  %% morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+  %%  zip, with, open}
+}
+\lstdefinestyle{Py}{
+  language=Python,
+  %% numbers=left,
+  showstringspaces=false,
+  formfeed=\newpage,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{Base08}\itshape,
+  keywordstyle=\color{Base0D},
+  stringstyle=\color{Base0B},
+  morekeywords={assert}
+  %% morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+  %%  zip, with, open}
+}
+
+\begin{document}
+\maketitle
+
+\section{UI Requirements}
+
+\begin{description}
+\item[Modularity] Each UI module should be logically independant from the others. This
+  does not mean that there can be no interaction between the modules, but the interfaces
+  should be considered and clean. A UI developer should be able to create a new module and
+  only need to use the prescribed interface mechanisms to extract and output all required
+  data.
+\item[SM Interface] A more concrete connection between the UI modules and science modules
+  is desirable. Taken to the logical conclusion, at least a skeleton, possible even a fully
+  functional UI module, should be able to be generated from the implementation of a science
+  module.
+\item[DRY] Currently the UI system has many repeated implementations of system logic. These
+  are often using different libraries (`knockout` for example). Observing a strict ``Don't
+  Repeat Yourself'' principle will greatly improve clarity and maintainability.
+\item[Simplicity] In order to minimise maintenance overhead we need to refactor and hide as
+  much of the ``busy work'' as possible. We should provide a set of tested core routines to perform
+  common operations and keep the implementations of the actual UI modules to a minimum.
+\end{description}
+
+\section{Proposed Changes}
+
+\begin{description}
+\item[Update Django] We are currently using a rather old version of Django. Updating to at least
+  1.7 will provide a lot of technical advantages, most coming from code reduction.
+\item[Replace UI modules] Implement a new system for representing UI modules. This would be the
+  bulk of the work and would result in the greatest value to the overall system. This would allow
+  dramatically simpler addition of new modules and maintenance of older modules.
+\item[Update DB interface] Currently we are not using Django's migrations scheme for the databases.
+  Migrations allow us to modify the front-end DB models in Django and update all actual DB tables
+  without ever needing to concern ourselves with the database backend. In addition, some of
+  the current Django models are mostly duplicates of others and could easily be refactored using
+  Django table inheritance and composition. This part of the work, while important, would not take
+  too much time.
+\end{description}
+
+\section{Proposed User-Interface Logic}
+
+The presentation of the user interface should be kept separate from the logic of the user
+interface. An obvious point of separation is at the Django form level. The Django form embodies
+all of the information required by each science module. Beyond the form, the display to the
+user can be handled by HTML and a ``templatetags'' library providing a set of helper routines
+to easily render the embedded logic from the Django form to, perhaps, a knockout handler.
+
+Presently the creator of a UI module is required to write their own Django form to XML conversion.
+In the redesign, only validation is required in the form. Conversion to XML is automatic, but
+overridable if necessary.
+
+The additional logic is represented by the use of the Django field validation methods, and by
+the addition of two new required methods. The first, ``exports'', dynamically calculates a list
+of properties that the module will export to other modules. The second, ``requirements'', returns
+a list of properties that needs to be provided by earlier modules. By also providing a mechanism
+to query the values of properties from modules earlier in the tree, all direct interaction with
+other modules is removed, eliciting a strongly modular environment.
+
+In order to satisfy the DRY principle, we can, for the time being, validate input server-side.
+In the future we can look to automatically generate Knockout validation strings and JavaScript
+by using Python's builtin AST features. This way we also have a natural fallback to server-side
+validation in the case of a JavaScript disabled browser.
+
+From the example Python snippets below, and considering the existing code, it will be obvious
+how much of a reduction in both boilerplate and required code will be provided by the proposed
+system.
+
+\lstinputlisting[style=Py]{forms_lightcone.py}
+\lstinputlisting[style=Py]{forms_sed.py}
+\lstinputlisting[style=Py]{forms_filter.py}
+
+\section{The View Component}
+
+The new system would require only very simple views to support the UI modules. All modules
+available from a particular view need to be instantiated, evaluated and returned.
+
+\lstinputlisting[style=Py]{views.py}
+
+\section{Template Rendering}
+
+Rendering HTML from templates can be tedious and complicated. Django uses templatetags to greatly
+simplify the process by allowing refactoring of common operations. Currently we are not using any
+of these features, creating some very complex HTML and JavaScript code. With judicious use of
+templatetags we should be able to reduce the burden of the site designer to be concerned only
+with the visual appearance of the site.
+
+\section{Task Breakdown}
+
+\begin{figure}[ftbp]
+\begin{center}
+\begin{ganttchart}[
+    hgrid,vgrid,
+    x unit=4mm,
+    time slot format=isodate
+]{2015-01-02}{2015-01-30}
+\gantttitlecalendar{year,month,week,weekday} \\
+\ganttbar{Preparation}{2015-01-03}{2015-01-03} \\
+\ganttlinkedbar{New Django}{2015-01-03}{2015-01-04} \\
+\ganttlinkedbar{Update DB}{2015-01-05}{2015-01-06} \\
+\ganttlinkedbar{Lightcone}{2015-01-07}{2015-01-12} \\
+\ganttlinkedbar{SED}{2015-01-13}{2015-01-15} \\
+\ganttlinkedbar{Filter}{2015-01-16}{2015-01-17} \\
+\ganttlinkedbar{Selection}{2015-01-18}{2015-01-19} \\
+\ganttlinkedbar{SQL}{2015-01-20}{2015-01-22} \\
+\ganttlinkedbar{Premade}{2015-01-23}{2015-01-24} \\
+\ganttlinkedbar{Views}{2015-01-23}{2015-01-24} \\
+\ganttlinkedbar{Templates}{2015-01-25}{2015-01-29} \\
+\end{ganttchart}
+\end{center}
+\caption{Task Breakdown}
+\end{figure}
+
+\end{document}
