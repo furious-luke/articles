@@ -5,6 +5,7 @@ def Lightcone(TAOForm):
     GEOMETRY_CHOICES = [
         ('L', 'Lightcone'),
         ('B', 'Box'),
+        ('P', 'Premade'),
     ]
     geometry = forms.CharField(max_length=1, choices=GEOMETRY_CHOICES)
     ra = forms.FloatField()
