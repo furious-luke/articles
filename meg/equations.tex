@@ -1,0 +1,139 @@
+\title{Yay! Equations!}
+
+\documentclass[12pt]{scrartcl}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{hyperref}
+%% \usepackage[scaled]{beramono}
+%% \renewcommand*\familydefault{\ttdefault}
+%% \usepackage[Tl]{fontenc}
+
+% Setup the tikz package for pictures.
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{shapes,decorations.pathmorphing}
+
+\newcommand{\deriv}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+\newcommand{\sderiv}[2]{\ensuremath{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}}
+\newcommand{\dx}[1]{\ensuremath{\,\mathrm{d}#1}}
+
+\begin{document}
+\maketitle
+
+\section{Fourier Transformation}
+
+This one is my favorite equation, so it comes first. I'll start by trying
+to explain a bit about what it does. I think it might actually be kind
+of a reasonable option for your present, as the Fourier transformation is
+used all the time for sound related operations. For example, one if its
+foremost uses is to convert a series of sound wave data from a time series
+to a frequency series. So, what does that actually mean. Well, if you were
+to plot a sound wave, much like what you're doing with the first part
+of the present, you would have it in a time series format. Along the x-axis
+is time, and along the y-axis is the amplitude of the wave (how compressed/
+extended the air is in that part of the wave).
+
+Now, if you were to then run that data through the Fourier transform you'd
+end up with a plot of the frequency content of that sound. That would mean
+that the x-axis would then be frequency instead of time, and the y-axis would
+be the amount of that frequency involved in the sound.
+
+Besides the equation being very elegant, it's a fascinating concept to me;
+that from a set of data providing no obvious information about frequency we
+can deduce directly how much of any frequency you may care to consider exists
+within that data.
+
+The mechanism by which it works is also interesting, I think. It uses the
+concept of basis functions in functional spaces to decompose the wave
+into parts, then shift those parts to a new basis in a frequency domain. Without
+doing a 3 hour lecture it's a bit much to lay on someone (sorry!), but
+I think it's pretty cool.
+
+Enough of all that, here is what it looks like:
+\[ \hat{f}(\nu) = \int_{-\infty}^{\infty}f(t)e^{-2\pi it\nu}\dx{t} \; . \]
+Here we have:
+\begin{eqnarray*}
+\hat{f} & = & \textrm{the wave function in Fourier (frequency) space,} \\
+\nu & = & \textrm{frequency,} \\
+f & = & \textrm{the wave function in time space,} \\
+t & = & \textrm{time,} \\
+e & = & \textrm{the natural number,} \\
+\pi & = & \textrm{I'm sure you don't need explanation of this guy,} \\
+i & = & \textrm{the imaginary number (also cool).}
+\end{eqnarray*}
+The big looking ``S'' thing at the immediate right of the = sign is an integral
+symbol, it goes with the ``dt'' bit at the end, don't worry too much
+about that, it's a part of calculus and might be a bit much to cover here.
+
+\section{Euler's Identity}
+
+Okay, so if it's elegance you're after it doesn't get any better than this:
+\[ e^{i\pi} + 1 = 0 \; . \]
+It's so simple, but involves a whole lot of great stuff, and says something
+lovely about the natural number ($e$), geometric functions ($sin$ and $cos$)
+and the unit circle.
+
+This is a pretty good one for the person that enjoys the universal constants,
+like $e$, $\pi$, and even good old $0$ and $1$. Also, once again, we have that
+imaginary number in there, which is always fun.
+
+Furthermore, here is some stuff people (mathematicians) have said about it:
+\begin{itemize}
+  \item the gold standard for mathematical beauty,
+  \item it is absolutely paradoxical; we cannot understand it, and we don't know what it means, but we have proved it, and therefore we know it must be the truth
+  \item Like a Shakespearean sonnet that captures the very essence of love, or a painting that brings out the beauty of the human form that is far more than just skin deep, Euler's equation reaches down into the very depths of existence
+  \item the most famous formula in all mathematics
+\end{itemize}
+
+So, you can see that this is pretty damn popular!
+
+\section{Zeta Function Regularisation and an Infinite Sum}
+
+This one is also AMAZING, as in mind blown kind of stuff. As a matter
+of fact, you may not even believe it yourself. Anyway, let's have a look.
+
+Say I asked you to sum up the natural numbers up to a certain limit. So,
+something like this:
+\[ 1 + 2 + 3 + ... + N \; . \]
+What could you say about the answer? Well, first we could definitely say
+it would be positive. And also, it would probably be pretty big. And, for
+almost all possible values of $N$ you would be right.
+
+But, what if $N = \infty$? What would you say then? The obvious answer is
+that the sum might be $\infty$ itself. I mean, that kind of makes sense,
+right? Summing up a whole bunch of positive numbers up to and including
+infinity; it should be infinity.
+
+Wrong! And you'll never guess what the actual answer is. It's $-\frac{1}{12}$.
+Yep. A negative number. Mind equals blown. You might be tempted to say that
+it's just a mathematical trick, and doesn't actually mean anything. However this
+result is actually used in cutting edge physics, so may indeed have real
+physical meaning. The mathematics behind it aren't even
+that complicated. Next time I see you I'll show you how it's done. It's very
+cool.
+
+Anyway, the actual equation would look like this:
+\[ \sum_{i=1}^{\infty}i = -\frac{1}{12} \; . \]
+
+\section{Time-dependent Schr\"{o}dinger Equation}
+
+Okay, last one. This one is the basis for quantum mechanics, and while it's
+not really that elegant in form, it provides a foundation for some of the
+most counter-intuitive results to have come out of mathematics and physics.
+I like this equation because it underlies the fact that the universe behaves
+in ways that are impossible to understand without mathematics to assist us.
+
+This is what it looks like:
+\[ i\hbar\frac{\partial}{\partial t}\Psi(\mathbf{r},t) = \left[\frac{-\hbar^2}{2\mu}\nabla^2 + 
+   V(\mathbf{r},t)\right]\Psi(\mathbf{r},t) \; . \]
+I'm afraid going in to detail about it would take some time. I'd be happy
+to provide some more details if you think you'd like to use it and need to know
+a bit more about it.
+
+\end{document}
