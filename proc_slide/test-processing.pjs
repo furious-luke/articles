@@ -12,7 +12,7 @@ Function.prototype.inheritsFrom = function( parentClass ) {
     return this;
 }
 
-function Entity( warp ) {
+function Entity(warp) {
     if(warp === undefined) {
         this.b = undefined;
         this.c = undefined;
@@ -28,87 +28,115 @@ function Entity( warp ) {
 }
 Entity.prototype.prepare = function() {}
 Entity.prototype.display = function() {}
-Entity.prototype.update = function() {}
-Entity.prototype.done = function( tick ) {
+Entity.prototype.update = function(tick) {}
+Entity.prototype.done = function(tick) {
     return tick > this.c;
 }
 
-function Scene( warp ) {
-    Entity.call( this, warp );
+function Timeline(warp) {
+    Entity.call(this, warp);
     this.entities = [];
     this.active = [];
 }
-Scene.inheritsFrom( Entity );
-Scene.prototype.add_entity = function( ent ) {
-    this.entities.push( ent );
+Timeline.inheritsFrom(Entity);
+Timeline.prototype.add_entity = function(ent) {
+    this.entities.push(ent);
 }
-Scene.prototype.prepare = function() {
-    this.entities.sort( function(a,b){ return a.b - b.b; } );
-    for( var i = 0; i < this.entities.length; ++i )
-        this.entities[i].prepare();
+Timeline.prototype.prepare = function() {
+    if(this.entities.length > 0) {
+        for(var i = 0; i < this.entities.length; ++i)
+            this.entities[i].prepare();
+        this.entities.sort(function(a,b){ return a.b - b.b; });
+        if(this.b === undefined) {
+            this.b = this.entities[0].b;
+            this.c = this.entities[this.entities.length - 1].c;
+        }
+    }
 }
-Scene.prototype.display = function() {
-    for( var i = 0; i < this.active.length; ++i )
-        this.active[i].display();
-}
-Scene.prototype.update = function( tick ) {
-
+Timeline.prototype.update = function(tick) {
     // Add ready entities.
-    while( this.entities.length > 0 && this.entities[0].b <= tick )
-        this.active.push( this.entities.shift() );
-
+    while(this.entities.length > 0 && this.entities[0].b <= tick)
+        this.active.push(this.entities.shift());
     // Remove finished active entities and update.
     var new_act = [];
-    for( var i = 0; i < this.active.length; ++i ) {
+    for(var i = 0; i < this.active.length; ++i) {
         var ent = this.active[i];
-        if( !ent.done( tick ) )
-        {
-            ent.update( tick );
-            new_act.push( ent );
+        if(!ent.done(tick)) {
+            ent.update(tick);
+            new_act.push(ent);
         }
     }
     this.active = new_act;
 };
 
-function Actor( warp, pos, s ) {
-    Scene.call( this, warp );
-    if(pos === undefined) {
-        this.x = undefined;
-        this.y = undefined;
+function Node(orig, scale, warp) {
+    Entity.call(this, warp);
+    this.children = new Timeline();
+    this.tweens = new Timeline();
+    if(orig === undefined) {
+        this.x = 0;
+        this.y = 0;
     }
-    else if(pos.constructor === Array) {
-        this.x = pos[0];
-        this.y = pos[1];
+    else if(orig.constructor === Array) {
+        this.x = orig[0];
+        this.y = orig[1];
     }
     else {
-        this.x = pos;
-        this.y = pos;
+        this.x = orig;
+        this.y = orig;
     }
-    this.s = s;
-    if( this.x === undefined )
-        this.x = 0;
-    if( this.y === undefined )
-        this.y = 0;
-    if( this.s === undefined )
-        this.s = 1;
+    if(scale === undefined)
+        this.scale = 1;
+    else
+        this.scale = scale;
 }
-Actor.inheritsFrom( Scene );
-Actor.prototype.add_transition = function(name, x, y, tween) {
-    var trans = new Transition(x, y, this, name);
+Node.inheritsFrom(Entity);
+Node.prototype.add_child = function(node) {
+    this.children.add_entity(node);
+}
+Node.prototype.add_tween = function(name, a, b, tween) {
+    var trans = new Transition(a, b, this, name);
     tween.add_transition(trans);
-    this.add_entity(tween);
+    this.tweens.add_entity(tween);
 }
-Actor.prototype.pre_display = function() {
+Node.prototype.prepare = function() {
+    this.children.prepare();
+    this.tweens.prepare();
+    if(this.b === undefined) {
+        if(this.children.b === undefined)
+            this.b = this.tweens.b;
+        else if(this.tweens.b === undefined)
+            this.b = this.children.b;
+        else
+            this.b = Math.min(this.children.b, this.tweens.b);
+    }
+    if(this.c === undefined) {
+        if(this.children.c === undefined)
+            this.c = this.tweens.c;
+        else if(this.tweens.c === undefined)
+            this.c = this.children.c;
+        else
+            this.c = Math.max(this.children.c, this.tweens.c);
+    }
+}
+Node.prototype.update = function(tick) {
+    this.children.update(tick);
+    this.tweens.update(tick);
+}
+Node.prototype.display = function() {
     pushMatrix();
-    translate( (pxoffs + this.x)*ppp, (pyoffs + this.y)*ppp );
-    scale( this.s );
-}
-Actor.prototype.post_display = function() {
+    translate(this.x*ppp, this.y*ppp);
+    scale(this.scale);
+    this.render();
+    for(var i = 0; i < this.children.active.length; ++i)
+        this.children.active[i].display();
     popMatrix();
-};
+}
+Node.prototype.render = function() {
+}
 
-function Shape( sh, size, warp, pos, s ) {
-    Actor.call( this, warp, pos, s );
+function Shape(sh, size, orig, scale, warp) {
+    Node.call(this, orig, scale, warp);
     this.sh = sh;
     if(size === undefined) {
         this.w = 1;
@@ -123,20 +151,29 @@ function Shape( sh, size, warp, pos, s ) {
         this.h = size;
     }
 }
-Shape.inheritsFrom( Actor );
-Shape.prototype.display = function() {
-    this.pre_display();
-    shape( this.sh, 0, 0, this.w*ppp, this.h*ppp );
-    this.post_display();
+Shape.inheritsFrom(Node);
+Shape.prototype.render = function() {
+    shape(this.sh, 0, 0, this.w*ppp, this.h*ppp);
 }
 
-function Tween(warp) {
-    Entity.call( this, warp );
+function Text(txt, font, orig, scale, warp) {
+    Node.call(this, orig, scale, warp);
+    this.txt = txt;
+    this.font = font;
+}
+Text.inheritsFrom(Node);
+Text.prototype.render = function() {
+    textFont(this.font);
+    text(this.txt, 0, 0);
+}
+
+function Tween(b, c) {
+    Entity.call(this, [b, c]);
     this.w = (float)(this.c - this.b);
     this.interp = undefined;
     this.transitions = [];
 }
-Tween.inheritsFrom( Entity );
+Tween.inheritsFrom(Entity);
 Tween.prototype.add_transition = function(trans) {
     this.transitions.push(trans);
 }
@@ -177,24 +214,66 @@ Transition.prototype.update = function(interp) {
         this.objs[i][0][this.objs[i][1]] = v;
 }
 
-function ElasticEaseOut(warp) {
-    Tween.call(this, warp);
+function TweenLinear(b, c) {
+    Tween.call(this, b, c);
 }
-ElasticEaseOut.inheritsFrom( Tween );
+TweenLinear.inheritsFrom( Tween );
+TweenLinear.prototype.calc_interp = function(t) {
+    return t;
+};
+
+function TweenBackIn(b, c) {
+    Tween.call(this, b, c);
+}
+TweenBackIn.inheritsFrom( Tween );
+TweenBackIn.prototype.calc_interp = function(t) {
+    return t*t*(2.70158*t - 1.70158);
+};
+
+function TweenBackOut(b, c) {
+    Tween.call(this, b, c);
+}
+TweenBackOut.inheritsFrom( Tween );
+TweenBackOut.prototype.calc_interp = function(t) {
+    t = t - 1;
+    return (t*t*(2.70158*t + 1.70158) + 1);
+};
+
+function TweenBack(b, c) {
+    Tween.call(this, b, c);
+}
+TweenBack.inheritsFrom( Tween );
+TweenBack.prototype.calc_interp = function(t) {
+    t *= 2;
+    if(t < 1)
+        return 0.5*t*t*(3.59491*t - 2.59491);
+    else {
+        t -= 2;
+        return 0.5*(t*t*(3.59491*t + 2.59491) + 2);
+    }
+};
+
+function ElasticEaseOut(b, c) {
+    Tween.call(this, b, c);
+}
+ElasticEaseOut.inheritsFrom(Tween);
 ElasticEaseOut.prototype.calc_interp = function(t) {
     float p = 0.3;
     float a = 1.0;
     float s = p/4.0;
-    return (a*pow( 2.0, -10.0*t )*sin( (t - s)*(2*PI)/p ) + 1.0);
+    return (a*pow(2.0, -10.0*t)*sin((t - s)*(2*PI)/p) + 1.0);
 };
 
 
 
 
 
+
 Ticker ticker = new Ticker();
+Node scene;
 PShape server = loadShape( "server.svg" );
 PShape person = loadShape( "person.svg" );
+PFont  font   = loadFont( "Futura Koyu.ttf" );
 float ppp;
 float pwidth;
 float pheight;
@@ -207,32 +286,36 @@ void setup() {
     frameRate( 30 );
     smooth();
     shapeMode( CENTER );
+    stroke( #585858 );
+    fill( #585858 );
 
-    scene = new Scene();
+    scene = new Node([pxoffs, pyoffs]);
 
-    var tw = new ElasticEaseOut([120, 150]);
+    // var tw = new ElasticEaseOut([120, 150]);
 
-    var sh = new Shape(server, 0.3, [30, 150], 0);
-    sh.add_transition("s", 0.9, 1.0, new ElasticEaseOut([30, 50]));
-    sh.add_transition("x", 0, 0.5, new ElasticEaseOut([60, 90]));
-    sh.add_transition("x", 0.5, -0.5, tw );
-    sh.add_transition("y", 0, -0.5, tw );
-    scene.add_entity(sh);
+    var srv = new Shape(server, 0.3);
+    srv.add_tween("scale", 0.9, 1.0, new ElasticEaseOut(30, 50));
+    srv.add_tween("scale", 1.0, 2.0, new ElasticEaseOut(120, 150));
+    srv.add_tween("x", 0, 0.5, new ElasticEaseOut(90, 120));
+    // srv.add_tween("x", 0.5, -0.5, tw );
+    // srv.add_tween("y", 0, -0.5, tw );
+    scene.add_child(srv);
 
-    sh = new Shape(person, 0.4, [90, 120], [-0.2, -0.5]);
-    sh.add_transition("s", 0.1, 1.0, new ElasticEaseOut([90, 120]));
-    scene.add_entity(sh);
+    var per = new Shape(person, 0.4, [-0.2, -0.5], 1, [60, 150]);
+    per.add_tween("scale", 0.1, 1.0, new ElasticEaseOut(60, 120));
+    srv.add_child(per);
+
+    var txt = new Text("Hello world!", font, [0, 0.5]);
+    txt.add_tween("x", -0.5, 0.5, new TweenBack(0, 30));
+    scene.add_child(txt);
 
     scene.prepare();
 }
 
 void draw() {
     scene.update( ticker.i );
-
     background( #d8d8d8 );
-    stroke( #585858 );
     scene.display();
-
     ticker.update();
 }
 
@@ -260,44 +343,3 @@ class Ticker {
         ++i;
     }
 }
-
-// ///
-// /// 
-// ///
-// class Timer {
-//     int b, c;
-//     float t;
-
-//     Timer( int b, int c ) {
-//         this.b = b;
-//         this.c = c;
-//         update( 0 );
-//     }
-
-//     void update( int tick ) {
-//         if( tick < b )
-//             t = 0.0;
-//         else if( tick <= c )
-//             t = (float)(tick - b)/(float)(c - b);
-//         else
-//             t = 1.0;
-//     }
-// }
-
-// class Actor extends Timer {
-//     Asset obj;
-//     float x, y;
-//     float s;
-
-//     Actor( int b, int c, Asset obj ) {
-//         super( b, c );
-//         this.obj = obj;
-//     }
-
-//     void display() {
-//         obj.display();
-//     }
-
-//     void update() {
-//     }
-// }
