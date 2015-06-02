@@ -1,287 +1,13 @@
-Function.prototype.inheritsFrom = function( parentClass ) {
-    if( parentClass.constructor == Function ) {
-        this.prototype = new parentClass;
-        this.prototype.constructor = this;
-        this.prototype.parent = parentClass.prototype;
-    }
-    else {
-        this.prototype = parentClass;
-        this.prototype.constructor = this;
-        this.prototype.parent = parentClass;
-    }
-    return this;
-}
 
-function Entity(warp) {
-    if(warp === undefined) {
-        this.b = undefined;
-        this.c = undefined;
-    }
-    else if(warp.constructor === Array) {
-        this.b = warp[0];
-        this.c = warp[1];
-    }
-    else {
-        this.b = -warp;
-        this.c = undefined;
-    }
-}
-Entity.prototype.prepare = function() {}
-Entity.prototype.display = function() {}
-Entity.prototype.update = function(tick) {}
-Entity.prototype.done = function(tick) {
-    return tick > this.c;
-}
-
-function Timeline(warp) {
-    Entity.call(this, warp);
-    this.entities = [];
-    this.active = [];
-}
-Timeline.inheritsFrom(Entity);
-Timeline.prototype.add_entity = function(ent) {
-    this.entities.push(ent);
-}
-Timeline.prototype.prepare = function() {
-    if(this.entities.length > 0) {
-        for(var i = 0; i < this.entities.length; ++i)
-            this.entities[i].prepare();
-        this.entities.sort(function(a,b){ return a.b - b.b; });
-        if(this.b === undefined) {
-            this.b = this.entities[0].b;
-            this.c = this.entities[this.entities.length - 1].c;
-        }
-    }
-}
-Timeline.prototype.update = function(tick) {
-    // Add ready entities.
-    while(this.entities.length > 0 && this.entities[0].b <= tick)
-        this.active.push(this.entities.shift());
-    // Remove finished active entities and update.
-    var new_act = [];
-    for(var i = 0; i < this.active.length; ++i) {
-        var ent = this.active[i];
-        if(!ent.done(tick)) {
-            ent.update(tick);
-            new_act.push(ent);
-        }
-    }
-    this.active = new_act;
-};
-
-function Node(orig, scale, warp) {
-    Entity.call(this, warp);
-    this.children = new Timeline();
-    this.tweens = new Timeline();
-    if(orig === undefined) {
-        this.x = 0;
-        this.y = 0;
-    }
-    else if(orig.constructor === Array) {
-        this.x = orig[0];
-        this.y = orig[1];
-    }
-    else {
-        this.x = orig;
-        this.y = orig;
-    }
-    if(scale === undefined)
-        this.scale = 1;
-    else
-        this.scale = scale;
-}
-Node.inheritsFrom(Entity);
-Node.prototype.add_child = function(node) {
-    this.children.add_entity(node);
-}
-Node.prototype.add_tween = function(name, a, b, tween) {
-    var trans = new Transition(a, b, this, name);
-    tween.add_transition(trans);
-    this.tweens.add_entity(tween);
-}
-Node.prototype.prepare = function() {
-    this.children.prepare();
-    this.tweens.prepare();
-    if(this.b === undefined) {
-        if(this.children.b === undefined)
-            this.b = this.tweens.b;
-        else if(this.tweens.b === undefined)
-            this.b = this.children.b;
-        else
-            this.b = Math.min(this.children.b, this.tweens.b);
-    }
-    if(this.c === undefined) {
-        if(this.children.c === undefined)
-            this.c = this.tweens.c;
-        else if(this.tweens.c === undefined)
-            this.c = this.children.c;
-        else
-            this.c = Math.max(this.children.c, this.tweens.c);
-    }
-}
-Node.prototype.update = function(tick) {
-    this.children.update(tick);
-    this.tweens.update(tick);
-}
-Node.prototype.display = function() {
-    pushMatrix();
-    translate(this.x*ppp, this.y*ppp);
-    scale(this.scale);
-    this.render();
-    for(var i = 0; i < this.children.active.length; ++i)
-        this.children.active[i].display();
-    popMatrix();
-}
-Node.prototype.render = function() {
-}
-
-function Shape(sh, size, orig, scale, warp) {
-    Node.call(this, orig, scale, warp);
-    this.sh = sh;
-    if(size === undefined) {
-        this.w = 1;
-        this.h = 1;
-    }
-    else if(size.constructor === Array) {
-        this.w = size[0];
-        this.h = size[1];
-    }
-    else {
-        this.w = size;
-        this.h = size;
-    }
-}
-Shape.inheritsFrom(Node);
-Shape.prototype.render = function() {
-    shape(this.sh, 0, 0, this.w*ppp, this.h*ppp);
-}
-
-function Text(txt, font, orig, scale, warp) {
-    Node.call(this, orig, scale, warp);
-    this.txt = txt;
-    this.font = font;
-}
-Text.inheritsFrom(Node);
-Text.prototype.render = function() {
-    textFont(this.font);
-    text(this.txt, 0, 0);
-}
-
-function Tween(b, c) {
-    Entity.call(this, [b, c]);
-    this.w = (float)(this.c - this.b);
-    this.interp = undefined;
-    this.transitions = [];
-}
-Tween.inheritsFrom(Entity);
-Tween.prototype.add_transition = function(trans) {
-    this.transitions.push(trans);
-}
-Tween.prototype.update = function(t) {
-    this.calc_t(t);
-    for( var i = 0; i < this.transitions.length; ++i )
-        this.transitions[i].update(this.interp);
-}
-Tween.prototype.calc_t = function(t) {
-    if( t <= this.b ) {
-        this.t = 0.0;
-        this.interp = 0.0;
-    }
-    if( t >= this.c ) {
-        this.t = 1.0;
-        this.interp = 1.0;
-    }
-    else {
-        this.t = (float)(t - this.b)/this.w;
-        this.interp = this.calc_interp(this.t);
-    }
-}
-
-function Transition(x, y, obj, name) {
-    this.x = x;
-    this.y = y;
-    this.w = y - x;
-    this.objs = [];
-    if( obj != undefined && name != undefined )
-        this.add_obj(obj, name);
-}
-Transition.prototype.add_obj = function(obj, name) {
-    this.objs.push([obj, name]);
-}
-Transition.prototype.update = function(interp) {
-    var v = this.x + interp*this.w;
-    for( var i = 0; i < this.objs.length; ++i )
-        this.objs[i][0][this.objs[i][1]] = v;
-}
-
-function TweenLinear(b, c) {
-    Tween.call(this, b, c);
-}
-TweenLinear.inheritsFrom( Tween );
-TweenLinear.prototype.calc_interp = function(t) {
-    return t;
-};
-
-function TweenBackIn(b, c) {
-    Tween.call(this, b, c);
-}
-TweenBackIn.inheritsFrom( Tween );
-TweenBackIn.prototype.calc_interp = function(t) {
-    return t*t*(2.70158*t - 1.70158);
-};
-
-function TweenBackOut(b, c) {
-    Tween.call(this, b, c);
-}
-TweenBackOut.inheritsFrom( Tween );
-TweenBackOut.prototype.calc_interp = function(t) {
-    t = t - 1;
-    return (t*t*(2.70158*t + 1.70158) + 1);
-};
-
-function TweenBack(b, c) {
-    Tween.call(this, b, c);
-}
-TweenBack.inheritsFrom( Tween );
-TweenBack.prototype.calc_interp = function(t) {
-    t *= 2;
-    if(t < 1)
-        return 0.5*t*t*(3.59491*t - 2.59491);
-    else {
-        t -= 2;
-        return 0.5*(t*t*(3.59491*t + 2.59491) + 2);
-    }
-};
-
-function ElasticEaseOut(b, c) {
-    Tween.call(this, b, c);
-}
-ElasticEaseOut.inheritsFrom(Tween);
-ElasticEaseOut.prototype.calc_interp = function(t) {
-    float p = 0.3;
-    float a = 1.0;
-    float s = p/4.0;
-    return (a*pow(2.0, -10.0*t)*sin((t - s)*(2*PI)/p) + 1.0);
-};
-
-
-
-
-
-
-Ticker ticker = new Ticker();
-Node scene;
 PShape server = loadShape( "server.svg" );
 PShape person = loadShape( "person.svg" );
 PFont  font   = loadFont( "Futura Koyu.ttf" );
-float ppp;
-float pwidth;
-float pheight;
-float pxoffs;
-float pyoffs;
 
 void setup() {
-    setup_scale( 800, 600 ); // screen.width, screen.height
+    slide.setup();
+    slide.camera.initialise( 800, 600 );  // screen.width, screen.height
+
+    size( 800, 600 );
     strokeWeight( 10 );
     frameRate( 30 );
     smooth();
@@ -289,57 +15,30 @@ void setup() {
     stroke( #585858 );
     fill( #585858 );
 
-    scene = new Node([pxoffs, pyoffs]);
-
     // var tw = new ElasticEaseOut([120, 150]);
 
-    var srv = new Shape(server, 0.3);
-    srv.add_tween("scale", 0.9, 1.0, new ElasticEaseOut(30, 50));
-    srv.add_tween("scale", 1.0, 2.0, new ElasticEaseOut(120, 150));
-    srv.add_tween("x", 0, 0.5, new ElasticEaseOut(90, 120));
+    var srv = new slide.Shape( server, 0.3 );
+    srv.add_tween( 'scale', 0.9, 1.0, new slide.ElasticEaseOut( 30, 50 ) );
+    srv.add_tween( 'scale', 1.0, 2.0, new slide.ElasticEaseOut( 120, 150 ) );
+    srv.add_tween( 'x', 0, 0.5, new slide.ElasticEaseOut( 90, 120 ) );
     // srv.add_tween("x", 0.5, -0.5, tw );
     // srv.add_tween("y", 0, -0.5, tw );
-    scene.add_child(srv);
+    slide.scene.add_child( srv );
 
-    var per = new Shape(person, 0.4, [-0.2, -0.5], 1, [60, 150]);
-    per.add_tween("scale", 0.1, 1.0, new ElasticEaseOut(60, 120));
-    srv.add_child(per);
+    var per = new slide.Shape( person, 0.4, [-0.2, -0.5], 1, [60, 150] );
+    per.add_tween( 'scale', 0.1, 1.0, new slide.ElasticEaseOut( 60, 120 ) );
+    srv.add_child( per );
 
-    var txt = new Text("Hello world!", font, [0, 0.5]);
-    txt.add_tween("x", -0.5, 0.5, new TweenBack(0, 30));
-    scene.add_child(txt);
+    var txt = new slide.Text( 'Hello world!', font, [0, 0.5] );
+    txt.add_tween( 'x', -0.5, 0.5, new slide.TweenBack( 0, 30 ) );
+    slide.scene.add_child( txt );
 
-    scene.prepare();
+    slide.scene.prepare();
 }
 
 void draw() {
-    scene.update( ticker.i );
+    slide.scene.update( slide.ticker.i );
     background( #d8d8d8 );
-    scene.display();
-    ticker.update();
-}
-
-void setup_scale( w, h ) {
-    size( w, h );
-    ppp     = 0.5*width;
-    pwidth  = width/ppp;
-    pheight = height/ppp;
-    pxoffs  = 0.5*pwidth;
-    pyoffs  = 0.5*pheight;
-}
-
-///
-/// Allows me to stop time during periods when there is
-/// no activity.
-///
-class Ticker {
-    int i;
-
-    Ticker() {
-        i = 0;
-    }
-
-    void update() {
-        ++i;
-    }
+    slide.scene.display();
+    slide.ticker.update();
 }
