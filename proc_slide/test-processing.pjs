@@ -1,13 +1,27 @@
+/* @pjs font="FuturaKoyu.ttf,FuturaExtended.ttf"; */
 
 PShape server = loadShape( "server.svg" );
+PShape conch = loadShape( "nautilus.svg" );
 PShape person = loadShape( "person.svg" );
-PFont  font   = loadFont( "Futura Koyu.ttf" );
+PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
+PFont  extend = loadFont( "FuturaExtended.ttf" );
+
+void splash() {
+    var ctr = new slide.Node( 0, 1, [0, 10] );
+    slide.scene.add_child( ctr );
+
+    ctr.add_child( new slide.Shape( conch, 0.3, 0 ) );
+    ctr.add_child( new slide.Text( 'Introduction to Shell Scripting', koyu, [-1, -0.5], 4 ) );
+    ctr.add_child( new slide.Text( 'Luke Hodkinson', extend, [-0.5, -0.2], 4 ) );
+    ctr.add_child( new slide.Pause( 9 ) );
+}
 
 void setup() {
     slide.setup();
-    slide.camera.initialise( 800, 600 );  // screen.width, screen.height
+    slide.camera.initialise( 800, 600 );
 
     size( 800, 600 );
+    // jProcessingJS( this, { fullscreen: true } );
     strokeWeight( 10 );
     frameRate( 30 );
     smooth();
@@ -15,23 +29,24 @@ void setup() {
     stroke( #585858 );
     fill( #585858 );
 
-    // var tw = new ElasticEaseOut([120, 150]);
+    splash();
 
-    var srv = new slide.Shape( server, 0.3 );
-    srv.add_tween( 'scale', 0.9, 1.0, new slide.ElasticEaseOut( 30, 50 ) );
-    srv.add_tween( 'scale', 1.0, 2.0, new slide.ElasticEaseOut( 120, 150 ) );
-    srv.add_tween( 'x', 0, 0.5, new slide.ElasticEaseOut( 90, 120 ) );
-    // srv.add_tween("x", 0.5, -0.5, tw );
-    // srv.add_tween("y", 0, -0.5, tw );
-    slide.scene.add_child( srv );
+    // var srv = new slide.Shape( server, 0.3, 0, 1, [30, undefined] );
+    // var t0 = srv.add_tween( 'scale', 0.9, 1.0, new slide.ElasticEaseOut( 30 ) );
+    // var t1 = srv.add_tween( 'x', 0, 0.5, new slide.ElasticEaseOut( 30 ) );
+    // srv.add_tween( 'scale', 1.0, 2.0, new slide.ElasticEaseOut( 30 ) );
+    // slide.scene.add_child( srv );
 
-    var per = new slide.Shape( person, 0.4, [-0.2, -0.5], 1, [60, 150] );
-    per.add_tween( 'scale', 0.1, 1.0, new slide.ElasticEaseOut( 60, 120 ) );
-    srv.add_child( per );
+    // var per = new slide.Shape( person, 0.4, [-0.2, -0.5], 1, [60, 150] );
+    // per.add_tween( 'scale', 0.1, 1.0, new slide.ElasticEaseOut( 60 ) );
+    // srv.add_child( per );
 
-    var txt = new slide.Text( 'Hello world!', font, [0, 0.5] );
-    txt.add_tween( 'x', -0.5, 0.5, new slide.TweenBack( 0, 30 ) );
-    slide.scene.add_child( txt );
+    // var txt = new slide.Text( 'Hello world!', font, [0, 0.5], 1, [0, undefined] );
+    // txt.add_tween( 'x', -0.5, 0.5, new slide.TweenBack( 30 ) );
+    // slide.scene.add_child( txt );
+
+    // var test_list = new slide.List( ['First', 'Second', 'Third'], font, [0, 0], 1, [0, 160] );
+    // slide.scene.add_child( test_list );
 
     slide.scene.prepare();
 }
@@ -41,4 +56,8 @@ void draw() {
     background( #d8d8d8 );
     slide.scene.display();
     slide.ticker.update();
+}
+
+void keyTyped() {
+    slide.key_typed();
 }

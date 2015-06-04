@@ -2,15 +2,37 @@
 
     var Tween = slide.Entity.extend({
 
-        create: function( b, c ) {
-            slide.Entity.prototype.create.call( this, [b, c] );
-            this.w = this.c - this.b;
+        create: function( warp ) {
+            slide.Entity.prototype.create.call( this, warp );
             this.interp = undefined;
             this.transitions = [];
         },
 
         add_transition: function( trans ) {
             this.transitions.push( trans );
+        },
+
+        prepare: function( parent, sibling ) {
+            if( parent !== undefined )
+                parent._sibling = this;
+            var invalid = false;
+
+            // If our warp start is undefined, try to use the end of
+            // any sibling, otherwise use the start of the parent.
+            if( this.b.abs === undefined ) {
+                if( sibling !== undefined )
+                    this.b.abs = sibling.c;
+                else
+                    this.b.abs = parent.b;
+                this.b.rel = 0;
+            }
+
+            invalid |= this.resolve_timepoint( this.b );
+            invalid |= this.resolve_timepoint( this.c );
+            if( invalid )
+                return true;
+            this.w = this.c.value - this.b.value;
+            return false;
         },
 
         update: function( t ) {
@@ -20,26 +42,22 @@
         },
 
         calc_t: function( t ) {
-            if( t <= this.b ) {
+            if( t <= this.b.value ) {
                 this.t = 0.0;
                 this.interp = 0.0;
             }
-            if( t >= this.c ) {
+            if( t >= this.c.value ) {
                 this.t = 1.0;
                 this.interp = 1.0;
             }
             else {
-                this.t = (t - this.b)/this.w;
+                this.t = (t - this.b.value)/this.w;
                 this.interp = this.calc_interp( this.t );
             }
         }
     });
 
     var TweenLinear = Tween.extend({
-
-        create: function( b, c ) {
-            Tween.prototype.create.call( this, b, c );
-        },
 
         calc_interp: function( t ) {
             return t;
@@ -48,20 +66,12 @@
 
     var TweenBackIn = Tween.extend({
 
-        create: function( b, c ) {
-            Tween.prototype.create.call( this, b, c );
-        },
-
         calc_interp: function( t ) {
             return t*t*(2.70158*t - 1.70158);
         }
     });
 
     var TweenBackOut = Tween.extend({
-
-        create: function( b, c ) {
-            Tween.prototype.create.call( this, b, c );
-        },
 
         calc_interp: function( t ) {
             t = t - 1;
@@ -70,10 +80,6 @@
     });
 
     var TweenBack = Tween.extend({
-
-        create: function( b, c ) {
-            Tween.prototype.create.call( this, b, c );
-        },
 
         calc_interp: function( t ) {
             t *= 2;
@@ -87,10 +93,6 @@
     });
 
     var ElasticEaseOut = Tween.extend({
-
-        create: function( b, c ) {
-            Tween.prototype.create.call( this, b, c );
-        },
 
         calc_interp: function( t ) {
             var p = 0.3;
