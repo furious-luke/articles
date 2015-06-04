@@ -121,11 +121,16 @@
             if( height === undefined )
                 height = screen.height;
 
-            this.ppp     = 0.5*width;
-            this.pwidth  = width/this.ppp;
-            this.pheight = height/this.ppp;
+	    var scaler = (width < height) ? width : height;
+
+            this.ppp     = 0.5*scaler;
+	    this.ppp_inv = 1.0/this.ppp;
+            this.pwidth  = width*this.ppp_inv;
+            this.pheight = height*this.ppp_inv;
             this.pxoffs  = 0.5*this.pwidth;
             this.pyoffs  = 0.5*this.pheight;
+	    this.w = this.pwidth;
+	    this.h = this.pheight;
 
             slide.scene.x = this.pxoffs;
             slide.scene.y = this.pyoffs;
@@ -138,25 +143,15 @@
             Entity.prototype.create.call( this, warp );
             this.entities = [];
             this.active = [];
-            this.w = undefined;
-            this.h = undefined;
         },
 
         add_entity: function( ent ) {
             this.entities.push( ent );
-            ent.parent = this;
         },
 
         prepare: function() {
             if( this.entities.length > 0 ) {
                 var invalid = false;
-
-                // First attempt to resolve the timeline commencement.
-                if( this.b.abs === undefined && this.parent !== undefined ) {
-                    this.b.abs = this.parent.b;
-                    this.b.rel = 0;
-                }
-                invalid |= resolve_timepoint( this.b );
 
                 // Prepare all entities contained in the timeline to ensure
                 // we have all warps set.
@@ -170,19 +165,17 @@
                 // Sort the entities based on the start time.
                 this.entities.sort( function( a, b ){ return a.b.value - b.b.value; });
 
-                // Try to resolve my duration.
-                if( this.c.abs === undefined ) {
-                    var max = 0;
-                    for( var ii = 0; ii < this.entities.length; ++ii ) {
-                        if( this.entities[ii].c.value > max )
-                            max = this.entities[ii].c.value;
-                    }
-                    this.c.value = max;
+                // Resolve my duration.
+		this.b = { value: this.entities[0].b.value };
+		this.c = { value: this.entities[0].c.value };
+                for( var ii = 1; ii < this.entities.length; ++ii ) {
+                    if( this.entities[ii].c.value > this.c.value )
+                        this.c.value = this.entities[ii].c.value;
+                    if( this.entities[ii].b.value < this.b.value )
+                        this.b.value = this.entities[ii].b.value;
                 }
-                else
-                    resolve_timepoint( this.c );
 
-                return isNaN( this.c.value );
+                // return isNaN( this.c.value );
             }
         },
 
@@ -195,28 +188,14 @@
             // Remove finished active entities and update.
             // TODO: Optimise array reduction.
             var new_act = [];
-            var max_w, max_h
             for(var ii = 0; ii < this.active.length; ++ii ) {
                 var ent = this.active[ii];
                 if( !ent.done( tick ) ) {
                     ent.update( tick );
-
-                    // Update width and height while I'm here.
-                    if( max_w === undefined )
-                        max_w = ent.w;
-                    else if( ent.w !== undefined && ent.w > max_w )
-                        max_w = ent.w;
-                    if( max_h === undefined )
-                        max_h = ent.h;
-                    else if( ent.h !== undefined && ent.h > max_h )
-                        max_h = ent.h;
-
                     new_act.push( ent );
                 }
             }
             this.active = new_act;
-            this.w = max_w;
-            this.h = max_h;
         }
     });
 
@@ -246,10 +225,10 @@
 
         create: function( orig, scale, warp ) {
             Entity.prototype.create.call( this, warp );
+
             this.children = new Timeline();
-            this.children.parent = this;
             this.tweens = new Timeline();
-            this.tweens.parent = this;
+
             if( orig === undefined ) {
                 this.x = 0;
                 this.y = 0;
@@ -273,6 +252,7 @@
         add_child: function( node ) {
             this.children.add_entity( node );
             node.parent = this;
+	    return this;
         },
 
         add_tween: function( name, a, b, tween ) {
@@ -337,6 +317,21 @@
         update: function( tick ) {
             this.children.update( tick );
             this.tweens.update( tick );
+
+	    // Aggregate children sizes.
+	    var w = 0, h = 0;
+	    if( this.children.active.length ) {
+		w = this.children.active[0].w;
+		h = this.children.active[0].h;
+		for( var ii = 0; ii < this.children.active.length; ++ii ) {
+		    var cw = this.children.active[ii].w;
+		    var ch = this.children.active[ii].h;
+		    if( cw > w ) w = cw;
+		    if( ch > h ) h = ch;
+		}
+	    }
+	    this.children.w = w;
+	    this.children.h = h;
         },
 
         display: function() {
@@ -358,6 +353,12 @@
         create: function() {
             Node.prototype.create.call( this, [0, 0], 1, [0, undefined] );
         },
+
+	update: function( tick ) {
+	    this.w = slide.camera.w;
+	    this.h = slide.camera.h;
+	    Node.prototype.update.call( this, tick );
+	},
 
         prepare: function() {
 
@@ -405,8 +406,15 @@
             this.font = font;
         },
 
+	update: function( tick ) {
+            this.pjs.textFont( this.font, 0.03*slide.camera.ppp );
+            this.w = this.pjs.textWidth( this.txt )*slide.camera.ppp_inv*this.scale;
+	    this.h = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
+	},
+
         render: function() {
-            this.pjs.textFont( this.font, 12 );
+	    this.pjs.textAlign( this.pjs.CENTER, this.pjs.CENTER );
+            this.pjs.textFont( this.font, 0.03*slide.camera.ppp );
             this.pjs.text( this.txt, 0, 0 );
         }
     });
@@ -435,12 +443,12 @@
 
     var Boxed = Node.extend({
 
-        update: function() {
+        update: function( tick ) {
             if( this.parent !== undefined ) {
                 this.w = this.parent.w;
                 this.h = this.parent.h;
             }
-            Node.prototype.update.call( this );
+            Node.prototype.update.call( this, tick );
         }
     });
 
@@ -450,11 +458,26 @@
             Boxed.prototype.create.call( this, 0, 1 );
         },
 
-        update: function() {
-            Boxed.prototype.update.call( this );
+        update: function( tick ) {
+            Boxed.prototype.update.call( this, tick );
 
             // Set offset.
-            this.x = 0.5*(this. - this.children.w);
+            // this.x = 0.5*(this.w - this.children.w);
+        }
+    });
+
+    var HRight = Boxed.extend({
+
+        create: function( margin ) {
+            Boxed.prototype.create.call( this, 0, 1 );
+	    this.margin = (margin !== undefined) ? margin : 0;
+        },
+
+        update: function( tick ) {
+            Boxed.prototype.update.call( this, tick );
+
+            // Set offset.
+            this.x = 0.5*(this.w - this.children.w) - this.margin;
         }
     });
 
@@ -464,6 +487,14 @@
         slide.scene = new Scene();
     }
 
+    var ralign = function( margin ) {
+	return new HRight( margin );
+    }
+
+    var text = function( txt, font, orig, scale, warp ) {
+	return new Text( txt, font, orig, scale, warp );
+    }
+
     slide.Entity = Entity;
     slide.Timeline = Timeline;
     slide.Transition = Transition;
@@ -471,10 +502,16 @@
     slide.Shape = Shape;
     slide.Text = Text;
     slide.Pause = Pause;
+    slide.Boxed = Boxed;
+    slide.HCentered = HCentered;
+    slide.HRight = HRight;
 
     slide.timepoint = timepoint;
     slide.resolve_timepoint = resolve_timepoint;
     slide.key_typed = key_typed;
     slide.setup = setup;
+
+    slide.ralign = ralign;
+    slide.text = text;
 
 }( window.slide = window.slide || {} ));

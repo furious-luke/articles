@@ -7,12 +7,14 @@ PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
 PFont  extend = loadFont( "FuturaExtended.ttf" );
 
 void splash() {
-    var ctr = new slide.Node( 0, 1, [0, 10] );
+    var ctr = new slide.Boxed( 0, 1, [0, 10] );
     slide.scene.add_child( ctr );
 
-    ctr.add_child( new slide.Shape( conch, 0.3, 0 ) );
-    ctr.add_child( new slide.Text( 'Introduction to Shell Scripting', koyu, [-1, -0.5], 4 ) );
-    ctr.add_child( new slide.Text( 'Luke Hodkinson', extend, [-0.5, -0.2], 4 ) );
+    ctr.add_child( slide.text( 'Introduction to Shell Scripting', koyu, [0, -0.6], 4.5 ) );
+    ctr.add_child( new slide.Shape( conch, 0.3, [0, -0.25] ) );
+    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'Luke Hodkinson', extend, [0, 0.1], 3 ) ) );
+    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'CAS eResearch', extend, [0, 0.25], 3 ) ) );
+    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'Swinburne University', extend, [0, 0.4], 3 ) ) );
     ctr.add_child( new slide.Pause( 9 ) );
 }
 
