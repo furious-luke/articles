@@ -3,63 +3,248 @@
 PShape server = loadShape( "server.svg" );
 PShape conch = loadShape( "nautilus.svg" );
 PShape person = loadShape( "person.svg" );
+PShape tux_sh    = loadShape( "tux.svg" );
+PShape mac_sh = loadShape( "mac.svg" );
+PShape win_sh = loadShape( "win.svg" );
 PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
 PFont  extend = loadFont( "FuturaExtended.ttf" );
 
-void splash() {
-    var ctr = new slide.Boxed( 0, 1, [0, 10] );
-    slide.scene.add_child( ctr );
-
-    ctr.add_child( slide.text( 'Introduction to Shell Scripting', koyu, [0, -0.6], 4.5 ) );
-    ctr.add_child( new slide.Shape( conch, 0.3, [0, -0.25] ) );
-    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'Luke Hodkinson', extend, [0, 0.1], 3 ) ) );
-    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'CAS eResearch', extend, [0, 0.25], 3 ) ) );
-    ctr.add_child( slide.ralign( 0.1 ).add_child( slide.text( 'Swinburne University', extend, [0, 0.4], 3 ) ) );
-    ctr.add_child( new slide.Pause( 9 ) );
-}
-
 void setup() {
+    slide.palette = {
+	base00: #181818,
+	base01: #282828,
+	base02: #383838,
+	base03: #585858,
+	base04: #B8B8B8,
+	base05: #D8D8D8,
+	base06: #E8E8E8,
+	base07: #F8F8F8,
+	base08: #AB4642,
+	base0D: #7CAFC2
+    };
+
     slide.setup();
     slide.camera.initialise( 800, 600 );
 
     size( 800, 600 );
     // jProcessingJS( this, { fullscreen: true } );
+
     strokeWeight( 10 );
     frameRate( 30 );
     smooth();
     shapeMode( CENTER );
-    stroke( #585858 );
-    fill( #585858 );
+    stroke( slide.palette.base03 );
+    fill( slide.palette.base03 );
 
-    splash();
+    slide.default_stroke = slide.palette.base03;
+    slide.default_fill = slide.palette.base03;
 
-    // var srv = new slide.Shape( server, 0.3, 0, 1, [30, undefined] );
-    // var t0 = srv.add_tween( 'scale', 0.9, 1.0, new slide.ElasticEaseOut( 30 ) );
-    // var t1 = srv.add_tween( 'x', 0, 0.5, new slide.ElasticEaseOut( 30 ) );
-    // srv.add_tween( 'scale', 1.0, 2.0, new slide.ElasticEaseOut( 30 ) );
-    // slide.scene.add_child( srv );
-
-    // var per = new slide.Shape( person, 0.4, [-0.2, -0.5], 1, [60, 150] );
-    // per.add_tween( 'scale', 0.1, 1.0, new slide.ElasticEaseOut( 60 ) );
-    // srv.add_child( per );
-
-    // var txt = new slide.Text( 'Hello world!', font, [0, 0.5], 1, [0, undefined] );
-    // txt.add_tween( 'x', -0.5, 0.5, new slide.TweenBack( 30 ) );
-    // slide.scene.add_child( txt );
-
-    // var test_list = new slide.List( ['First', 'Second', 'Third'], font, [0, 0], 1, [0, 160] );
-    // slide.scene.add_child( test_list );
+    // splash();
+    // intro();
+    linux();
 
     slide.scene.prepare();
 }
 
 void draw() {
     slide.scene.update( slide.ticker.i );
-    background( #d8d8d8 );
+    background( slide.palette.base05 );
     slide.scene.display();
     slide.ticker.update();
 }
 
 void keyTyped() {
     slide.key_typed();
+}
+
+void splash() {
+    var ctr = new slide.Boxed( 0, 1, [0, undefined] );
+    slide.scene.add_child( ctr );
+
+    ctr.add_child(
+	slide.text( 'Introduction to Shell Scripting', koyu, { origin: [0, -0.6], scale: 4.5 } ).add_tween(
+	    slide.tweens.back([ 10, 20 ]), 'x',
+	    function( obj ) {
+		return [obj.x, -0.5*(slide.camera.w + obj.w) - obj.gx];
+	    }
+	)
+    );
+    ctr.add_child(
+	slide.shape( conch, 0.3, [0, -0.25] ).add_tween(
+	    slide.tweens.linear([ 15, 80 ]), 'scale', 1, 2.5
+	).add_tween(
+	    slide.tweens.linear([ 15, 80 ]), 'y', -0.25, 0
+	)
+    );
+    ctr.add_child(
+	slide.ralign( 0.1 ).add_child(
+	    slide.text( 'Luke Hodkinson', extend, { origin: [0, 0.1], scale: 3 } ).add_tween(
+		slide.tweens.back([ 15, 10 ]), 'x',
+		function( obj ) {
+		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+		}
+	    )
+	)
+    );
+    ctr.add_child(
+	slide.ralign( 0.1 ).add_child(
+	    slide.text( 'CAS eResearch', extend, { origin: [0, 0.25], scale: 3 } ).add_tween(
+		slide.tweens.back([ 18, 10 ]), 'x',
+		function( obj ) {
+		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+		}
+	    )
+	)
+    );
+    ctr.add_child(
+	slide.ralign( 0.1 ).add_child(
+	    slide.text( 'Swinburne University', extend, { origin: [0, 0.4], scale: 3 } ).add_tween(
+		slide.tweens.back([ 21, 10 ]), 'x',
+		function( obj ) {
+		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+		}
+	    )
+	)
+    );
+    ctr.add_child( new slide.Pause( 9 ) );
+}
+
+void intro() {
+    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    // var tp = 0;
+    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
+    slide.scene.add_child( ctr );
+
+    ctr.add_child(
+    	slide.shape( conch, 0.3, [0, 0], 2.5, [tp, 100] ).add_tween(
+	    slide.tweens.quartic([ [tp, 20], 20 ]), 'x', 0, -0.25*slide.camera.w
+	).add_tween(
+	    slide.tweens.quartic([ [tp, 70], 20 ]), 'x', -0.25*slide.camera.w, 0
+	).add_tween(
+	    slide.tweens.back_in([ [tp, 110], 10 ]), 'x', function( obj ) {
+		return [obj.x, -0.5*(slide.camera.w + obj.w)];
+	    }
+	)
+    );
+
+    ctr.add_child(
+	slide.list(
+	    ['Linux shell', 'Navigation', 'Searching', 'Processes', 'Scripting', 'Pipes/redirection'],
+	    extend, { warp: [ [tp, 40], 30 ], font_size: 0.1, origin: [0.2*slide.camera.w, 0] }
+	)
+    );
+
+    ctr.add_child( new slide.Pause( [tp, 60] ) );
+}
+
+void linux() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
+    slide.scene.add_child( ctr );
+
+    // Heading.
+    var hdr = ctr.add_child(
+	slide.text(
+	    'Linux Shell', koyu, { origin: [0, -0.42*slide.camera.h], font_size: 0.15, warp: [tp, 200] }
+	).add_tween(
+	    slide.tweens.back_out( [ tp, 20 ] ), 'x', function( obj ) {
+	    	return [-0.5*(slide.camera.w + obj.w), -0.45*slide.camera.w + 0.5*obj.w];
+	    }
+	)
+    );
+
+    ctr.add_child(
+    	slide.shape(
+    	    conch, 0.3, [0, 0], 2.5
+    	).add_tween(
+    	    slide.tweens.back_in([ [tp, 20], 10 ]), 'x', function( obj ) {
+    		return [obj.x, -0.5*(slide.camera.w + obj.w)];
+    	    }
+    	)
+    );
+
+    var tux = ctr.add_child(
+	slide.shape(
+	    tux_sh, 0.5, [0, 0], 1, [[tp, 30], undefined]
+	).add_tween(
+	    slide.tweens.back_out([ [tp, 30], 10 ]), 'x', function( obj ) {
+		return [-0.5*(slide.camera.w + obj.w), 0];
+	    }
+	).add_tween(
+	    slide.tweens.back_out([ undefined, 10 ]), 'x', function( obj ) {
+		return [0, -0.5*(slide.camera.w + obj.w)];
+	    }
+	)
+    );
+
+    var mac = ctr.add_child(
+    	slide.shape(
+    	    mac_sh, 0.5, [0, 0], 1, [tux.get_tween( 1 ).b, undefined]
+    	).add_tween(
+    	    slide.tweens.back_out([ tux.get_tween( 1 ).b, 10 ]), 'x', function( obj ) {
+    		return [0.5*(slide.camera.w + obj.w), 0];
+    	    }
+    	).add_tween(
+    	    slide.tweens.back_out([ undefined, 10 ]), 'x', function( obj ) {
+    		return [0, -0.5*(slide.camera.w + obj.w)];
+    	    }
+    	)
+    );
+
+    var win = ctr.add_child(
+    	slide.shape(
+    	    win_sh, 0.5, [0, 0], 1, [mac.get_tween( 1 ).b, undefined]
+    	).add_tween(
+    	    slide.tweens.back_out([ mac.get_tween( 1 ).b, 10 ]), 'x', function( obj ) {
+    		return [0.5*(slide.camera.w + obj.w), 0];
+    	    }
+    	).add_tween(
+    	    slide.tweens.back_out([ undefined, 10 ]), 'x', function( obj ) {
+    		return [0, -0.5*(slide.camera.w + obj.w)];
+    	    }
+    	)
+    );
+
+    tux.add_tween(
+    	slide.tweens.back_out([ win.get_tween( 1 ).b, 10 ]), 'x', function( obj ) {
+    	    return [0.5*(slide.camera.w + obj.w), 0];
+    	}
+    );
+
+    // ctr.add_child( new slide.Pause( tux.get_tween( 0 ).c ) );
+    // ctr.add_child( new slide.Pause( mac.get_tween( 0 ).c ) );
+    // ctr.add_child( new slide.Pause( win.get_tween( 0 ).c ) );
+    // ctr.add_child( new slide.Pause( tux.get_tween( 2 ).c ) );
+
+    tux.add_tween(
+ 	slide.tweens.quartic([ undefined, 20 ]), 'x', 0, -0.25*slide.camera.w
+    );
+
+    var lin_list = ctr.add_child(
+    	slide.list(
+    	    ['Open source', 'Secure', 'Customisable', 'Cost', 'Software', 'Compatibility'], extend, {
+    		warp: [ [tux.get_tween( 3 ).b, 10], 30 ], font_size: 0.1, origin: [0.15*slide.camera.w, 0]
+    	    }
+    	)
+    );
+    lin_list.add_tween(
+    	slide.tweens.linear([ [lin_list.c, -10], 10 ]), 'alpha', 255, 0
+    );
+
+    // ctr.add_child( new slide.Pause([ lin_list.b, 15 ]) );
+
+    var perc = ctr.add_child(
+    	slide.text( '97%', koyu, {
+    	    origin: [0.2*slide.camera.w, -0.15*slide.camera.h],
+    	    font_size: 0.4,
+    	    warp: [[lin_list.c, 5], 50],
+    	    stroke: slide.palette.base08,
+    	    fill: slide.palette.base08
+    	})
+    );
+
+    tux.add_tween(
+ 	slide.tweens.quartic([ perc.c, 20 ]), 'x', -0.25*slide.camera.w, 0
+    );
 }

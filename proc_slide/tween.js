@@ -12,28 +12,35 @@
             this.transitions.push( trans );
         },
 
-        prepare: function( parent, sibling ) {
-            if( parent !== undefined )
-                parent._sibling = this;
+        prepare: function() {
             var invalid = false;
 
             // If our warp start is undefined, try to use the end of
             // any sibling, otherwise use the start of the parent.
             if( this.b.abs === undefined ) {
-                if( sibling !== undefined )
-                    this.b.abs = sibling.c;
+                if( this.sibling !== undefined )
+                    this.b.abs = this.sibling.c;
                 else
-                    this.b.abs = parent.b;
-                this.b.rel = 0;
+                    this.b.abs = this.parent.b;
             }
 
             invalid |= this.resolve_timepoint( this.b );
             invalid |= this.resolve_timepoint( this.c );
             if( invalid )
                 return true;
+
             this.w = this.c.value - this.b.value;
             return false;
         },
+
+	enter: function() {
+
+	    // Tweens often need some setup to handle taking the
+	    // starting point of transisions. Call all the transitions
+	    // to set themselves up.
+	    for( var ii = 0; ii < this.transitions.length; ++ii )
+		this.transitions[ii].enter( this );
+	},
 
         update: function( t ) {
             this.calc_t( t );
@@ -92,6 +99,42 @@
         }
     });
 
+    var Quartic = Tween.extend({
+
+        calc_interp: function( t ) {
+	    t *= 2;
+	    if( t < 1 )
+		return 0.5*t*t*t*t;
+	    else {
+		t -= 2;
+		return -0.5*(t*t*t*t - 2);
+	    }
+        }
+    });
+
+    var QuarticIn = Tween.extend({
+
+        calc_interp: function( t ) {
+	    return t*t*t*t;
+        }
+    });
+
+    var QuarticOut = Tween.extend({
+
+        calc_interp: function( t ) {
+	    --t;
+	    return -(t*t*t*t - 1);
+        }
+    });
+
+    var QuinticOut = Tween.extend({
+
+        calc_interp: function( t ) {
+	    --t;
+	    return (t*t*t*t*t + 1);
+        }
+    });
+
     var ElasticEaseOut = Tween.extend({
 
         calc_interp: function( t ) {
@@ -102,11 +145,60 @@
         }
     });
 
-    slide.Tween = Tween;
-    slide.TweenLinear = TweenLinear;
-    slide.TweenBackIn = TweenBackIn;
-    slide.TweenBackOut = TweenBackOut;
-    slide.TweenBack = TweenBack;
-    slide.ElasticEaseOut = ElasticEaseOut;
+    var linear = function( warp ) {
+	return new TweenLinear( warp );
+    }
+
+    var back = function( warp ) {
+	return new TweenBack( warp );
+    }
+
+    var back_in = function( warp ) {
+	return new TweenBackIn( warp );
+    }
+
+    var back_out = function( warp ) {
+	return new TweenBackOut( warp );
+    }
+
+    var quartic = function( warp ) {
+	return new Quartic( warp );
+    }
+
+    var quartic_in = function( warp ) {
+	return new QuarticIn( warp );
+    }
+
+    var quartic_out = function( warp ) {
+	return new QuarticOut( warp );
+    }
+
+    var quintic_out = function( warp ) {
+	return new QuinticOut( warp );
+    }
+
+    var elastic_out = function( warp ) {
+	return new ElasticEaseOut( warp );
+    }
+
+    slide.tweens = {};
+    slide.tweens.Tween = Tween;
+    slide.tweens.TweenLinear = TweenLinear;
+    slide.tweens.TweenBackIn = TweenBackIn;
+    slide.tweens.TweenBackOut = TweenBackOut;
+    slide.tweens.TweenBack = TweenBack;
+    slide.tweens.Quartic = Quartic;
+    slide.tweens.QuarticOut = QuarticOut;
+    slide.tweens.QuinticOut = QuinticOut;
+    slide.tweens.ElasticEaseOut = ElasticEaseOut;
+
+    slide.tweens.linear = linear;
+    slide.tweens.back = back;
+    slide.tweens.back_in = back_in;
+    slide.tweens.back_out = back_out;
+    slide.tweens.quartic = quartic;
+    slide.tweens.quartic_in = quartic_in;
+    slide.tweens.quintic_out = quintic_out;
+    slide.tweens.elastic_out = elastic_out;
 
 }( window.slide = window.slide || {} ));

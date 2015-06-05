@@ -1,3 +1,10 @@
+function get_default( obj, name, def ) {
+    if( obj[name] === undefined )
+	return def;
+    else
+	return obj[name];
+}
+
 (function( slide, undefined ) {
 
     var apply_relative = function( tp, abs ) {
@@ -58,11 +65,15 @@
                 this.c = timepoint();
             }
 
-            // Both start and duration.
+            // Both start and duration (possibly timepoint).
             else if( warp.constructor === Array ) {
                 this.b = timepoint( warp[0] );
-                if( warp[1] !== undefined )
-                    this.c = timepoint( [this.b, warp[1]] );
+                if( warp[1] !== undefined ) {
+		    if( typeof warp[1] === 'object' && warp[1] !== null )
+			this.c = timepoint( warp[1] );
+		    else
+			this.c = timepoint( [this.b, warp[1]] );
+		}
                 else
                     this.c = timepoint();
             }
@@ -85,6 +96,12 @@
 
         update: function( tick ) {
         },
+
+	enter: function() {
+	},
+
+	flatten: function() {
+	},
 
         done: function( tick ) {
             return tick > this.c.value;
@@ -174,16 +191,17 @@
                     if( this.entities[ii].b.value < this.b.value )
                         this.b.value = this.entities[ii].b.value;
                 }
-
-                // return isNaN( this.c.value );
             }
         },
 
         update: function( tick ) {
 
             // Add ready entities.
-            while( this.entities.length > 0 && this.entities[0].b.value <= tick )
-                this.active.push( this.entities.shift() );
+            while( this.entities.length > 0 && this.entities[0].b.value <= tick ) {
+		var ent = this.entities.shift();
+		ent.enter();
+                this.active.push( ent );
+	    }
 
             // Remove finished active entities and update.
             // TODO: Optimise array reduction.
@@ -201,10 +219,10 @@
 
     var Transition = Class({
 
-        create: function( x, y, obj, name ) {
+        create: function( obj, name, x, y ) {
             this.x = x;
             this.y = y;
-            this.w = y - x;
+	    this.w = this.y - this.x;
             this.objs = [];
             if( obj != undefined && name != undefined )
                 this.add_obj( obj, name );
@@ -214,6 +232,9 @@
             this.objs.push( [obj, name] );
         },
 
+	enter: function() {
+	},
+
         update: function( interp ) {
             var v = this.x + interp*this.w;
             for( var ii = 0; ii < this.objs.length; ++ii )
@@ -221,9 +242,37 @@
         }
     });
 
+    var GeneralTransition = Transition.extend({
+
+        create: function( obj, name, func ) {
+	    Transition.prototype.create.call( this, obj, name, 0, 0 );
+            this.func = func;
+        },
+
+	enter: function( tween ) {
+	    this.x = [];
+	    this.y = [];
+            this.w = [];
+	    for( var ii = 0; ii < this.objs.length; ++ii ) {
+		var span = this.func( this.objs[ii][0], this.objs[ii][1], this, tween );
+		this.x.push( span[0] );
+		this.y.push( span[1] );
+		this.w.push( span[1] - span[0] );
+	    }
+	},
+
+        update: function( interp ) {
+            for( var ii = 0; ii < this.objs.length; ++ii ) {
+		var v = this.x[ii] + interp*this.w[ii];
+                this.objs[ii][0][this.objs[ii][1]] = v;
+	    }
+        }
+    });
+
     var Node = Entity.extend({
 
-        create: function( orig, scale, warp ) {
+        create: function( orig, scale, warp, opts ) {
+	    opts = opts || {}
             Entity.prototype.create.call( this, warp );
 
             this.children = new Timeline();
@@ -245,25 +294,44 @@
                 this.scale = 1;
             else
                 this.scale = scale;
+
             this.w = undefined;
             this.h = undefined;
+
+	    this.stroke = get_default( opts, 'stroke', slide.default_stroke );
+	    this.fill = get_default( opts, 'fill', slide.default_fill );
+	    this.alpha = 255;
         },
 
         add_child: function( node ) {
             this.children.add_entity( node );
             node.parent = this;
+	    return node;
+        },
+
+        add_tween: function( tween, name, a, b ) {
+	    var trans;
+	    if( a instanceof Function )
+		trans = new GeneralTransition( this, name, a );
+	    else
+		trans = new Transition( this, name, a, b );
+            tween.add_transition( trans );
+
+            tween.parent = this;
+            if( this.tweens.entities.length > 0 )
+                tween.sibling = this.tweens.entities[this.tweens.entities.length - 1];
+
+            this.tweens.add_entity( tween );
 	    return this;
         },
 
-        add_tween: function( name, a, b, tween ) {
-            var trans = new Transition( a, b, this, name );
-            tween.add_transition( trans );
-            this.tweens.add_entity( tween );
-            tween.parent = this;
-            if( this.tweens.entities.length > 0 )
-                tween.sibling = this.tweens.entites[this.tweens.entites.length - 1];
-            return tween;
-        },
+	get_child: function( index ) {
+	    return this.children.entities[index];
+	},
+
+	get_tween: function( index ) {
+	    return this.tweens.entities[index];
+	},
 
         prepare: function() {
             var invalid = false;
@@ -283,10 +351,10 @@
             invalid |= this.children.prepare( this );
             invalid |= this.tweens.prepare( this );
 
-            // Only finalise if we were able to complete the children
-            // and tweens.
-            if( invalid )
-                return true;
+            // // Only finalise if we were able to complete the children
+            // // and tweens.
+            // if( invalid )
+            //     return true;
 
             // If the end of our warp is undefined, try to use either the
             // children or tween.
@@ -334,15 +402,40 @@
 	    this.children.h = h;
         },
 
+	flatten: function() {
+
+	    // Update my global position.
+	    this.gx = this.x;
+	    this.gy = this.y;
+	    if( this.parent !== undefined ) {
+		this.gx += this.parent.gx;
+		this.gy += this.parent.gy;
+	    }
+
+	    // Update my global alpha.
+	    this.galpha = this.alpha;
+	    if( this.parent !== undefined )
+		this.galpha = ((this.galpha/255)*(this.parent.galpha/255))*255;
+
+	    for( var ii = 0; ii < this.children.active.length; ++ii )
+		this.children.active[ii].flatten();
+	},
+
         display: function() {
             this.pjs.pushMatrix();
             this.pjs.translate( this.x*slide.camera.ppp, this.y*slide.camera.ppp );
             this.pjs.scale( this.scale );
+	    this.set_colors();
             this.render();
             for( var ii = 0; ii < this.children.active.length; ++ii )
                 this.children.active[ii].display();
             this.pjs.popMatrix();
         },
+
+	set_colors: function() {
+	    this.pjs.stroke( this.stroke, this.galpha );
+	    this.pjs.fill( this.fill, this.galpha );
+	},
 
         render: function() {
         }
@@ -358,6 +451,15 @@
 	    this.w = slide.camera.w;
 	    this.h = slide.camera.h;
 	    Node.prototype.update.call( this, tick );
+	    this.flatten( this );
+	},
+
+	flatten: function() {
+	    this.gx = 0;
+	    this.gy = 0;
+	    this.galpha = 255;
+	    for( var ii = 0; ii < this.children.active.length; ++ii )
+		this.children.active[ii].flatten();
 	},
 
         prepare: function() {
@@ -373,26 +475,32 @@
 
     var Shape = Node.extend({
 
-        create: function( sh, size, orig, scale, warp ) {
+        create: function( shape, size, orig, scale, warp ) {
             Node.prototype.create.call( this, orig, scale, warp );
-            this.sh = sh;
+            this.shape = shape;
             if( size === undefined ) {
-                this.w = 1;
-                this.h = 1;
+                this.sw = 1;
+                this.sh = 1;
             }
             else if( size.constructor === Array ) {
-                this.w = size[0];
-                this.h = size[1];
+                this.sw = size[0];
+                this.sh = size[1];
             }
             else {
-                this.w = size;
-                this.h = size;
+                this.sw = size;
+                this.sh = size;
             }
         },
 
+	update: function( tick ) {
+	    this.w = this.sw*this.scale;
+	    this.h = this.sh*this.scale;
+	    Node.prototype.update.call( this, tick );
+	},
+
         render: function() {
             this.pjs.pushStyle(); // shapes can change styles
-            this.pjs.shape( this.sh, 0, 0, this.w*slide.camera.ppp, this.h*slide.camera.ppp );
+            this.pjs.shape( this.shape, 0, 0, this.sw*slide.camera.ppp, this.sh*slide.camera.ppp );
             this.pjs.popStyle();
             this.pjs.ellipseMode( this.pjs.CENTER ); // can also be changed
         }
@@ -400,31 +508,35 @@
 
     var Text = Node.extend({
 
-        create: function( txt, font, orig, scale, warp ) {
-            Node.prototype.create.call( this, orig, scale, warp );
+        create: function( txt, font, opts ) {
+	    opts = opts || {};
+            Node.prototype.create.call( this, opts.origin, opts.scale, opts.warp, opts );
             this.txt = txt;
             this.font = font;
+	    this.font_size = get_default( opts, 'font_size', 0.03 );
         },
 
 	update: function( tick ) {
-            this.pjs.textFont( this.font, 0.03*slide.camera.ppp );
+            this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
             this.w = this.pjs.textWidth( this.txt )*slide.camera.ppp_inv*this.scale;
 	    this.h = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
+	    Node.prototype.update.call( this, tick );
 	},
 
         render: function() {
 	    this.pjs.textAlign( this.pjs.CENTER, this.pjs.CENTER );
-            this.pjs.textFont( this.font, 0.03*slide.camera.ppp );
+            this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
             this.pjs.text( this.txt, 0, 0 );
         }
     });
 
-    // TODO: This should be entity.
     var Pause = Node.extend({
 
         create: function( tp ) {
-            Node.prototype.create.call( this, 0, 1, [tp, 0] );
+            Node.prototype.create.call( this, 0, 1, [tp, 1] );
             this.triggered = false;
+	    this._angle = 0;
+	    this.alpha = 255;
         },
 
         update: function( tick ) {
@@ -433,7 +545,26 @@
                 slide.ticker.paused = true;
                 add_key_listener( this );
             }
+	    Node.prototype.update.call( this, tick );
         },
+
+	render: function() {
+	    var ppp = slide.camera.ppp;
+	    var x = 0.87*0.5*slide.camera.w, y = 0.82*0.5*slide.camera.h
+	    var w = 0.02, h = 0.1;
+	    this.pjs.rect( x*ppp, y*ppp, w*ppp, h*ppp, 2 );
+	    this.pjs.rect( (x + w + 0.02)*ppp, y*ppp, w*ppp, h*ppp, 2 );
+	    this.pjs.noFill();
+	    this.pjs.strokeWeight( 4 );
+	    for( var ii = 0; ii < 2*this.pjs.PI; ii += this.pjs.PI/4 )
+		this.pjs.arc( (x + 0.5*(2*w + 0.02))*ppp, (y + 0.5*h)*ppp, 1.5*h*ppp, 1.5*h*ppp, ii + this._angle, ii + this.pjs.PI/8 + this._angle );
+	    this.pjs.strokeWeight( 1 );
+	    this.pjs.fill( 88, 88, 88 );
+
+	    this._angle += 0.03;
+	    if( this._angle >= 2*this.pjs.PI )
+		this._angle = 0;
+	},
 
         key_typed: function() {
             slide.ticker.paused = false;
@@ -466,6 +597,18 @@
         }
     });
 
+    var VCentered = Boxed.extend({
+
+        create: function() {
+            Boxed.prototype.create.call( this, 0, 1 );
+        },
+
+        update: function( tick ) {
+            Boxed.prototype.update.call( this, tick );
+            this.y = 0.5*(this.h - this.children.w);
+        }
+    });
+
     var HRight = Boxed.extend({
 
         create: function( margin ) {
@@ -491,8 +634,12 @@
 	return new HRight( margin );
     }
 
-    var text = function( txt, font, orig, scale, warp ) {
-	return new Text( txt, font, orig, scale, warp );
+    var shape = function( sh, size, orig, scale, warp ) {
+	return new Shape( sh, size, orig, scale, warp );
+    }
+
+    var text = function( txt, font, opts ) {
+	return new Text( txt, font, opts );
     }
 
     slide.Entity = Entity;
@@ -512,6 +659,7 @@
     slide.setup = setup;
 
     slide.ralign = ralign;
+    slide.shape = shape;
     slide.text = text;
 
 }( window.slide = window.slide || {} ));
