@@ -1,0 +1,47 @@
+Linux
+
+  Talking about the unix/linux shell
+  A form of input to the machine
+  Is not a graphical system
+  Several kinds (focusing on bash)
+  Can access machines remotely
+  Why important? Supercomputers accessed via shell.
+
+  Log in to supercomputer via shell (talk about username)
+
+Navigation
+
+  pwd
+  ls (-l, -a)
+  cd
+  mkdir
+  rmdir
+  Permissions (chmod)
+
+Searching
+
+  find
+  globbing
+  grep
+  regex
+
+Processes
+
+  ps
+
+Scripts
+
+  Editors
+  Making a script
+  Running a script
+  Environment
+  Sourcing a script
+  Automatically loaded scripts
+
+Pipes
+
+  Linux philosophy (small programs, specific purpose)
+  pipes
+  sed
+  awk
+  xargs

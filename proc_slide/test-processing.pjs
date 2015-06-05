@@ -24,10 +24,10 @@ void setup() {
     };
 
     slide.setup();
-    slide.camera.initialise( 800, 600 );
+    slide.camera.initialise(); // 800, 600 );
 
-    size( 800, 600 );
-    // jProcessingJS( this, { fullscreen: true } );
+    // size( 800, 600 );
+    jProcessingJS( this, { fullscreen: true } );
 
     strokeWeight( 10 );
     frameRate( 30 );
@@ -129,7 +129,7 @@ void intro() {
 
     ctr.add_child(
 	slide.list(
-	    ['Linux shell', 'Navigation', 'Searching', 'Processes', 'Scripting', 'Pipes/redirection'],
+	    ['Linux Shell', 'Navigation', 'Searching', 'Processes', 'Scripting', 'Pipes/redirection'],
 	    extend, { warp: [ [tp, 40], 30 ], font_size: 0.1, origin: [0.2*slide.camera.w, 0] }
 	)
     );
@@ -212,10 +212,10 @@ void linux() {
     	}
     );
 
-    // ctr.add_child( new slide.Pause( tux.get_tween( 0 ).c ) );
-    // ctr.add_child( new slide.Pause( mac.get_tween( 0 ).c ) );
-    // ctr.add_child( new slide.Pause( win.get_tween( 0 ).c ) );
-    // ctr.add_child( new slide.Pause( tux.get_tween( 2 ).c ) );
+    ctr.add_child( new slide.Pause( tux.get_tween( 0 ).c ) );
+    ctr.add_child( new slide.Pause( mac.get_tween( 0 ).c ) );
+    ctr.add_child( new slide.Pause( win.get_tween( 0 ).c ) );
+    ctr.add_child( new slide.Pause( tux.get_tween( 2 ).c ) );
 
     tux.add_tween(
  	slide.tweens.quartic([ undefined, 20 ]), 'x', 0, -0.25*slide.camera.w
@@ -232,19 +232,30 @@ void linux() {
     	slide.tweens.linear([ [lin_list.c, -10], 10 ]), 'alpha', 255, 0
     );
 
-    // ctr.add_child( new slide.Pause([ lin_list.b, 15 ]) );
+    ctr.add_child( new slide.Pause([ lin_list.b, 15 ]) );
 
     var perc = ctr.add_child(
     	slide.text( '97%', koyu, {
-    	    origin: [0.2*slide.camera.w, -0.15*slide.camera.h],
+    	    origin: [0.2*slide.camera.w, -0.2*slide.camera.h],
     	    font_size: 0.4,
     	    warp: [[lin_list.c, 5], 50],
     	    stroke: slide.palette.base08,
     	    fill: slide.palette.base08
     	})
     );
+    var perc_txt = ctr.add_child(
+	slide.text_box( 'In the June 2014 Top 500 supercomputer list, the top open-source operating system set a new high with 485 systems out of the fastest 500 running Linux.', koyu, {
+    	    origin: [0.2*slide.camera.w, 0.15*slide.camera.h],
+    	    font_size: 0.08,
+	    width: 1.0,
+	    height: 0.8,
+    	    warp: [perc.b, 50]
+	})
+    );
+
+    ctr.add_child( new slide.Pause([ perc.b, 0 ]) );
 
     tux.add_tween(
- 	slide.tweens.quartic([ perc.c, 20 ]), 'x', -0.25*slide.camera.w, 0
+    	slide.tweens.quartic([ perc.c, 20 ]), 'x', -0.25*slide.camera.w, 0
     );
 }

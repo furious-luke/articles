@@ -160,6 +160,7 @@ function get_default( obj, name, def ) {
             Entity.prototype.create.call( this, warp );
             this.entities = [];
             this.active = [];
+	    this.index = 0;
         },
 
         add_entity: function( ent ) {
@@ -197,8 +198,8 @@ function get_default( obj, name, def ) {
         update: function( tick ) {
 
             // Add ready entities.
-            while( this.entities.length > 0 && this.entities[0].b.value <= tick ) {
-		var ent = this.entities.shift();
+            while( this.index < this.entities.length && this.entities[this.index].b.value <= tick ) {
+		var ent = this.entities[this.index++];
 		ent.enter();
                 this.active.push( ent );
 	    }
@@ -400,6 +401,8 @@ function get_default( obj, name, def ) {
 	    }
 	    this.children.w = w;
 	    this.children.h = h;
+
+	    ++slide.update_cnt;
         },
 
 	flatten: function() {
@@ -448,10 +451,14 @@ function get_default( obj, name, def ) {
         },
 
 	update: function( tick ) {
+	    slide.update_cnt = 0;
+
 	    this.w = slide.camera.w;
 	    this.h = slide.camera.h;
 	    Node.prototype.update.call( this, tick );
 	    this.flatten( this );
+
+	    // console.log( slide.update_cnt );
 	},
 
 	flatten: function() {
