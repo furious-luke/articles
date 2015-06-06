@@ -1,13 +1,14 @@
-/* @pjs font="FuturaKoyu.ttf,FuturaExtended.ttf"; */
+/* @pjs font="FuturaKoyu.ttf,FuturaExtended.ttf,UbuntuMono.ttf"; */
 
-PShape server = loadShape( "server.svg" );
+PShape server_sh = loadShape( "server.svg" );
 PShape conch = loadShape( "nautilus.svg" );
-PShape person = loadShape( "person.svg" );
+PShape user_sh = loadShape( "person.svg" );
 PShape tux_sh    = loadShape( "tux.svg" );
 PShape mac_sh = loadShape( "mac.svg" );
 PShape win_sh = loadShape( "win.svg" );
 PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
 PFont  extend = loadFont( "FuturaExtended.ttf" );
+PFont  term_fnt = loadFont( "UbuntuMono.ttf" );
 
 void setup() {
     slide.palette = {
@@ -20,14 +21,16 @@ void setup() {
 	base06: #E8E8E8,
 	base07: #F8F8F8,
 	base08: #AB4642,
+	base09: #DC9656,
+	base0A: #F7CA88,
 	base0D: #7CAFC2
     };
 
     slide.setup();
-    slide.camera.initialise(); // 800, 600 );
+    slide.camera.initialise( 800, 600 );
 
-    // size( 800, 600 );
-    jProcessingJS( this, { fullscreen: true } );
+    size( 800, 600 );
+    // jProcessingJS( this, { fullscreen: true } );
 
     strokeWeight( 10 );
     frameRate( 30 );
@@ -38,10 +41,16 @@ void setup() {
 
     slide.default_stroke = slide.palette.base03;
     slide.default_fill = slide.palette.base03;
+    slide.default_font = koyu;
+    slide.default_list_font = extend;
 
     // splash();
     // intro();
-    linux();
+    // linux();
+    // linux_shell();
+    ssh();
+
+    // console.log( PFont.list() );
 
     slide.scene.prepare();
 }
@@ -76,34 +85,28 @@ void splash() {
 	    slide.tweens.linear([ 15, 80 ]), 'y', -0.25, 0
 	)
     );
-    ctr.add_child(
-	slide.ralign( 0.1 ).add_child(
-	    slide.text( 'Luke Hodkinson', extend, { origin: [0, 0.1], scale: 3 } ).add_tween(
-		slide.tweens.back([ 15, 10 ]), 'x',
-		function( obj ) {
-		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-		}
-	    )
+    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
+	slide.text( 'Luke Hodkinson', extend, { origin: [0, 0.1], scale: 3 } ).add_tween(
+	    slide.tweens.back([ 15, 10 ]), 'x',
+	    function( obj ) {
+		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+	    }
 	)
     );
-    ctr.add_child(
-	slide.ralign( 0.1 ).add_child(
-	    slide.text( 'CAS eResearch', extend, { origin: [0, 0.25], scale: 3 } ).add_tween(
-		slide.tweens.back([ 18, 10 ]), 'x',
-		function( obj ) {
-		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-		}
-	    )
+    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
+	slide.text( 'CAS eResearch', extend, { origin: [0, 0.25], scale: 3 } ).add_tween(
+	    slide.tweens.back([ 18, 10 ]), 'x',
+	    function( obj ) {
+		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+	    }
 	)
     );
-    ctr.add_child(
-	slide.ralign( 0.1 ).add_child(
-	    slide.text( 'Swinburne University', extend, { origin: [0, 0.4], scale: 3 } ).add_tween(
-		slide.tweens.back([ 21, 10 ]), 'x',
-		function( obj ) {
-		    return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-		}
-	    )
+    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
+	slide.text( 'Swinburne University', extend, { origin: [0, 0.4], scale: 3 } ).add_tween(
+	    slide.tweens.back([ 21, 10 ]), 'x',
+	    function( obj ) {
+		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+	    }
 	)
     );
     ctr.add_child( new slide.Pause( 9 ) );
@@ -146,7 +149,7 @@ void linux() {
     // Heading.
     var hdr = ctr.add_child(
 	slide.text(
-	    'Linux Shell', koyu, { origin: [0, -0.42*slide.camera.h], font_size: 0.15, warp: [tp, 200] }
+	    'Linux', koyu, { origin: [0, -0.42*slide.camera.h], font_size: 0.15, warp: [tp, undefined] }
 	).add_tween(
 	    slide.tweens.back_out( [ tp, 20 ] ), 'x', function( obj ) {
 	    	return [-0.5*(slide.camera.w + obj.w), -0.45*slide.camera.w + 0.5*obj.w];
@@ -215,10 +218,10 @@ void linux() {
     ctr.add_child( new slide.Pause( tux.get_tween( 0 ).c ) );
     ctr.add_child( new slide.Pause( mac.get_tween( 0 ).c ) );
     ctr.add_child( new slide.Pause( win.get_tween( 0 ).c ) );
-    ctr.add_child( new slide.Pause( tux.get_tween( 2 ).c ) );
+    // ctr.add_child( new slide.Pause( tux.get_tween( 2 ).c ) );
 
     tux.add_tween(
- 	slide.tweens.quartic([ undefined, 20 ]), 'x', 0, -0.25*slide.camera.w
+ 	slide.tweens.quartic([ [undefined, 10], 20 ]), 'x', 0, -0.25*slide.camera.w
     );
 
     var lin_list = ctr.add_child(
@@ -238,10 +241,12 @@ void linux() {
     	slide.text( '97%', koyu, {
     	    origin: [0.2*slide.camera.w, -0.2*slide.camera.h],
     	    font_size: 0.4,
-    	    warp: [[lin_list.c, 5], 50],
+    	    warp: [ [lin_list.c, 5], 55 ],
     	    stroke: slide.palette.base08,
     	    fill: slide.palette.base08
-    	})
+    	}).add_tween(
+	    slide.tweens.elastic_out([ [lin_list.c, 5], 20 ] ), 'scale', 0.2, 1
+	)
     );
     var perc_txt = ctr.add_child(
 	slide.text_box( 'In the June 2014 Top 500 supercomputer list, the top open-source operating system set a new high with 485 systems out of the fastest 500 running Linux.', koyu, {
@@ -249,13 +254,216 @@ void linux() {
     	    font_size: 0.08,
 	    width: 1.0,
 	    height: 0.8,
-    	    warp: [perc.b, 50]
+    	    warp: [[perc.b, 15], 40],
+	    use_tween: true
 	})
     );
 
-    ctr.add_child( new slide.Pause([ perc.b, 0 ]) );
+    ctr.add_child( new slide.Pause( perc_txt.c) );
 
     tux.add_tween(
     	slide.tweens.quartic([ perc.c, 20 ]), 'x', -0.25*slide.camera.w, 0
     );
+
+    // Put a limit on the header warp.
+    hdr.c.abs = tux.get_last_tween().c;
+}
+
+void linux_shell() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
+    slide.scene.add_child( ctr );
+
+    // Heading.
+    var old_hdr = ctr.add_child(
+	slide.text(
+	    'Linux', koyu, { origin: [0, -0.42*slide.camera.h], font_size: 0.15, warp: [tp, undefined] }
+	).add_tween(
+	    slide.tweens.back_in( [ tp, 20 ] ), 'x', function( obj ) {
+	    	return [-0.45*slide.camera.w + 0.5*obj.w, -0.5*(slide.camera.w + obj.w)];
+	    }
+	)
+    );
+    var hdr = ctr.add_child(
+	slide.text(
+	    'Linux Shell', koyu, {
+		origin: [0, -0.42*slide.camera.h],
+		font_size: 0.15,
+		warp: [old_hdr.get_tween( 0 ).c, undefined]
+	    }
+	).add_tween(
+	    slide.tweens.back_out( [ old_hdr.get_tween( 0 ).c, 20 ] ), 'x', function( obj ) {
+	    	return [-0.5*(slide.camera.w + obj.w), -0.45*slide.camera.w + 0.5*obj.w];
+	    }
+	)
+    );
+
+    var tux = ctr.add_child(
+	slide.shape(
+	    tux_sh, 0.5, [0, 0], 1, [tp, undefined]
+	).add_tween(
+	    slide.tweens.back_in([ [old_hdr.get_tween( 0 ).b, 10], 20 ]), 'x', function( obj ) {
+		return [0, 0.5*(slide.camera.w + obj.w)];
+	    }
+	)
+    );
+
+    var term = ctr.add_child(
+	slide.terminal({
+	    text: slide.stream( history ),
+	    origin: [0, 0.06],
+	    warp: [[tux.c, 5], undefined],
+	    radius: 0.02,
+	    fill: slide.palette.base03,
+	    font: term_fnt,
+	    font_size: 0.07,
+	    columns: 64,
+	    rows: 23,
+	    height: 0.05,
+	    font_fill: slide.palette.base06
+	})
+    );
+    term.add_tween(
+	slide.tweens.back_out([ [tux.c, 5], 10 ]), 'w', 0, term.max_width
+    ).add_tween(
+	slide.tweens.back_out([ [tux.c, 15], 10 ]), 'h', 0.05, term.max_height
+    ).add_tween(
+	slide.tweens.back_out([ term.get_tween( 1 ).c, 20 ]), 'w', term.max_width, 0.5*term.max_width
+    );
+    term.get_tween( 2 ).add_transition( new slide.Transition( term, 'x', 0, 0.11*slide.camera.w ) );
+    term.get_tween( 2 ).add_transition( new slide.Transition( term, 'max_chars', 64, 32 ) );
+
+    var sh_list = ctr.add_child(
+    	slide.list(
+    	    ['Text based', 'Very powerful', 'Multiple varieties', 'Endless possibilities',
+	     'Acess devices'], extend, {
+    		warp: [ [term.get_tween( 2 ).b, 10], 30 ],
+		font_size: 0.1,
+		origin: [-0.21*slide.camera.w, 0]
+    	    }
+    	)
+    );
+    sh_list.add_tween(
+    	slide.tweens.linear([ [sh_list.c, -10], 10 ]), 'alpha', 255, 0
+    );
+
+    term.add_tween(
+    	slide.tweens.back_in([ [sh_list.c, -10], 10 ]), 'h', term.max_height, 0.05
+    ).add_tween(
+    	slide.tweens.back_in([ [sh_list.c, 0], 10 ]), 'w', 0.5*term.max_width, 0
+    );
+
+    ctr.add_child( new slide.Pause( term.get_tween( 1 ).c ) );
+    ctr.add_child( new slide.Pause([ sh_list.c, -10 ]) );
+
+    // Put a limit on the header warp.
+    hdr.c = slide.timepoint( term.c );
+}
+
+void ssh() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
+    slide.scene.add_child( ctr );
+
+    var hdr = slide.helpers.heading_open( ctr, 'Linux Shell', tp );
+
+    var srv = ctr.add_child( slide.shape( server_sh, 0.5, slide.helpers.center(), 0, [tp, undefined] ) );
+    slide.helpers.pop_in( srv );
+    slide.helpers.move_left( srv, [undefined, 30] );
+    slide.helpers.move_right( srv, [undefined, 30] );
+    var g2_list = slide.helpers.list( ctr,
+				      ['GPU cluster', 'CentOS Linux', 'Access via SSH'],
+				      [srv.get_tween( 1 ).b, 10] );
+    slide.helpers.fade_out( g2_list, [g2_list.c, -10] );
+
+    ctr.add_child( new slide.Pause( g2_list.get_last_tween().b ) );
+
+    var user = ctr.add_child( slide.shape( user_sh, 0.5, slide.helpers.left(), 0, [srv.get_last_tween().c, undefined] ) );
+    slide.helpers.pop_in( user, undefined );
+
+    ctr.add_child( new slide.Pause( user.get_last_tween().c ) );
+
+    var ssh_txt = ctr.add_child(
+    	slide.text(
+    	    'SSH', koyu, {
+		font_size: 0.2, origin: [-0.02*slide.camera.w, 0], alpha: 0, warp: [user.get_last_tween().c, undefined],
+		fill: slide.palette.base09
+	    }
+    	)
+    );
+    slide.helpers.fade_in( ssh_txt, user.get_last_tween().c );
+    ssh_txt.add_tween(
+    	slide.tweens.quartic([ [undefined, 20], 20 ]),
+    	'y', 0, -0.2*slide.camera.h
+    );
+    user.add_tween(
+    	slide.tweens.quartic([ ssh_txt.get_last_tween().b, 20 ]),
+    	'y', slide.helpers.center()[1], -0.2*slide.camera.h
+    );
+    srv.add_tween(
+    	slide.tweens.quartic([ ssh_txt.get_last_tween().b, 20 ]),
+    	'y', slide.helpers.center()[1], -0.2*slide.camera.h
+    );
+
+    ctr.add_child( new slide.Pause( ssh_txt.get_tween( 0 ).c ) );
+
+    var term = ctr.add_child(
+    	slide.terminal({
+    	    text: 'ssh <username>@<host>\n\nssh <username>@g2.hpc.swin.edu.au\n\nssh guest01@g2.hpc.swin.edu.au\n\n',
+    	    origin: [0, 0.05*slide.camera.h],
+	    warp: [[srv.get_last_tween().b, 10], undefined],
+    	    radius: 0.02,
+    	    fill: slide.palette.base03,
+    	    font: term_fnt,
+    	    font_size: 0.07,
+    	    columns: 64,
+    	    rows: 10,
+    	    height: 0.05,
+    	    font_fill: slide.palette.base06,
+	    use_prompt: true
+    	})
+    );
+    term.add_tween(
+    	slide.tweens.back_out([ [srv.get_last_tween().b, 10], 10 ]), 'w', 0, term.max_width
+    ).add_tween(
+    	slide.tweens.back_out([ [undefined, 5], 10 ]), 'h', 0.05, term.max_height
+    );
+
+    ctr.add_child( new slide.Pause( term.get_last_tween().c ) );
+
+    term.add_tween(
+    	slide.tweens.back_in([ undefined, 10 ]), 'h', term.max_height, 0.05*slide.camera.h
+    ).add_tween(
+    	slide.tweens.back_in([ [undefined, 5], 10 ]), 'w', term.max_width, 0
+    );
+
+    ssh_txt.add_tween(
+    	slide.tweens.quartic([ [term.get_last_tween().c, -10], 20 ]),
+    	'y', -0.2*slide.camera.h, 0
+    ).add_tween(
+    	slide.tweens.linear([ undefined, 20 ]),
+    	'alpha', 255, 0
+    );
+    user.add_tween(
+    	slide.tweens.quartic([ [term.get_last_tween().c, -10], 20 ]),
+    	'y', -0.2*slide.camera.h, 0
+    ).add_tween(
+    	slide.tweens.back_in([ undefined, 20 ]),
+	'x', function( obj ) {
+	    return [obj.x, -0.5*(slide.camera.w + obj.w)];
+	}
+    );
+    srv.add_tween(
+    	slide.tweens.quartic([ [term.get_last_tween().c, -10], 20 ]),
+    	'y', -0.2*slide.camera.h, 0
+    ).add_tween(
+    	slide.tweens.back_in([ undefined, 20 ]),
+	'x', function( obj ) {
+	    return [obj.x, 0.5*(slide.camera.w + obj.w)];
+	}
+    );
+
+    slide.helpers.heading_close( hdr, [srv.get_last_tween().b, 10] );
 }

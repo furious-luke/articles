@@ -32,7 +32,7 @@ function get_default( obj, name, def ) {
             tp = { abs: value[0], rel: value[1] };
         }
         else
-            tp = { abs: value };
+	    tp = { abs: value }
         resolve_timepoint( tp );
         return tp;
     }
@@ -89,6 +89,31 @@ function get_default( obj, name, def ) {
         },
 
         prepare: function() {
+
+            // If our warp start is undefined, try to use the end of
+            // any sibling, otherwise use the start of the parent.
+            if( this.b.abs === undefined ) {
+                if( this.sibling !== undefined )
+                    this.b.abs = this.sibling.c;
+                else
+                    this.b.abs = this.parent.b;
+                this.b.rel = 0;
+            }
+            resolve_timepoint( this.b );
+
+	    // If we have no end to the warp, then try to use the first parent we
+	    // can find.
+            if( this.c.abs === undefined ) {
+                var par = this.parent;
+                while( par !== undefined && par.c.value === undefined )
+                    par = par.parent;
+                if( par !== undefined )
+                    this.c.value = par.c.value;
+            }
+            else
+                resolve_timepoint( this.c );
+
+            return isNaN( this.c.value );
         },
 
         display: function() {
@@ -301,7 +326,8 @@ function get_default( obj, name, def ) {
 
 	    this.stroke = get_default( opts, 'stroke', slide.default_stroke );
 	    this.fill = get_default( opts, 'fill', slide.default_fill );
-	    this.alpha = 255;
+	    this.alpha = get_default( opts, 'alpha', 255 );
+	    this.alpha_blend = get_default( opts, 'alpha_blend', true );
         },
 
         add_child: function( node ) {
@@ -334,6 +360,10 @@ function get_default( obj, name, def ) {
 	    return this.tweens.entities[index];
 	},
 
+	get_last_tween: function() {
+	    return this.tweens.entities[this.tweens.entities.length - 1];
+	},
+
         prepare: function() {
             var invalid = false;
 
@@ -352,20 +382,15 @@ function get_default( obj, name, def ) {
             invalid |= this.children.prepare( this );
             invalid |= this.tweens.prepare( this );
 
-            // // Only finalise if we were able to complete the children
-            // // and tweens.
-            // if( invalid )
-            //     return true;
-
             // If the end of our warp is undefined, try to use either the
             // children or tween.
             if( this.c.abs === undefined ) {
                 if( this.children.c.value === undefined )
-                    this.c.value = this.tweens.c.value;
+		    this.c.value = this.tweens.c.value;
                 else if( this.tweens.c.value === undefined )
-                    this.c.value = this.children.c.value;
+		    this.c.value = this.children.c.value;
                 else
-                    this.c.value = Math.max( this.children.c.value, this.tweens.c.value );
+		    this.c.value = Math.max( this.children.c.value, this.tweens.c.value );
 
                 // If we still couldn't get a finish time, try to adopt
                 // any parent's value.
@@ -417,7 +442,7 @@ function get_default( obj, name, def ) {
 
 	    // Update my global alpha.
 	    this.galpha = this.alpha;
-	    if( this.parent !== undefined )
+	    if( this.alpha_blend && this.parent !== undefined )
 		this.galpha = ((this.galpha/255)*(this.parent.galpha/255))*255;
 
 	    for( var ii = 0; ii < this.children.active.length; ++ii )
@@ -478,6 +503,28 @@ function get_default( obj, name, def ) {
             if( ii == 100 )
                 throw new Error( 'Failed to prepare slides.' );
         }
+    });
+
+    var Rect = Node.extend({
+
+        create: function( w, h, opts ) {
+	    opts = opts || {};
+            Node.prototype.create.call( this, opts.origin, opts.scale, opts.warp, opts );
+	    this.w = w;
+	    this.h = h;
+	    this.radius = get_default( opts, 'radius', 0 );
+	},
+
+	render: function() {
+	    var ppp = slide.camera.ppp;
+	    this.pjs.rectMode( this.pjs.CENTER );
+	    this.pjs.noStroke();
+	    if( this.radius )
+		this.pjs.rect( this.x*ppp, this.y*ppp, this.w*ppp, this.h*ppp, this.radius*ppp, this.radius*ppp, this.radius*ppp, this.radius*ppp );
+	    else
+		this.pjs.rect( this.x*ppp, this.y*ppp, this.w*ppp, this.h*ppp );
+	    this.pjs.stroke( slide.default_stroke );
+	}
     });
 
     var Shape = Node.extend({
@@ -543,7 +590,7 @@ function get_default( obj, name, def ) {
             Node.prototype.create.call( this, 0, 1, [tp, 1] );
             this.triggered = false;
 	    this._angle = 0;
-	    this.alpha = 255;
+	    this.alpha = 150;
         },
 
         update: function( tick ) {
@@ -556,11 +603,14 @@ function get_default( obj, name, def ) {
         },
 
 	render: function() {
+	    this.pjs.rectMode( this.pjs.CORNER );
 	    var ppp = slide.camera.ppp;
 	    var x = 0.87*0.5*slide.camera.w, y = 0.82*0.5*slide.camera.h
 	    var w = 0.02, h = 0.1;
+	    this.pjs.noStroke();
 	    this.pjs.rect( x*ppp, y*ppp, w*ppp, h*ppp, 2 );
 	    this.pjs.rect( (x + w + 0.02)*ppp, y*ppp, w*ppp, h*ppp, 2 );
+	    this.pjs.stroke( slide.default_stroke, this.alpha );
 	    this.pjs.noFill();
 	    this.pjs.strokeWeight( 4 );
 	    for( var ii = 0; ii < 2*this.pjs.PI; ii += this.pjs.PI/4 )
@@ -631,14 +681,37 @@ function get_default( obj, name, def ) {
         }
     });
 
+    var HLeft = Boxed.extend({
+
+        create: function( margin ) {
+            Boxed.prototype.create.call( this, 0, 1 );
+	    this.margin = (margin !== undefined) ? margin : 0;
+        },
+
+        update: function( tick ) {
+            Boxed.prototype.update.call( this, tick );
+
+            // Set offset.
+            this.x = -0.5*(this.w - this.children.w) + this.margin;
+        }
+    });
+
     var setup = function() {
         slide.ticker = new Ticker();
         slide.camera = new Camera();
         slide.scene = new Scene();
     }
 
+    var lalign = function( margin ) {
+	return new HLeft( margin );
+    }
+
     var ralign = function( margin ) {
 	return new HRight( margin );
+    }
+
+    var rect = function( w, h, opts ) {
+	return new Rect( w, h, opts );
     }
 
     var shape = function( sh, size, orig, scale, warp ) {
@@ -659,13 +732,16 @@ function get_default( obj, name, def ) {
     slide.Boxed = Boxed;
     slide.HCentered = HCentered;
     slide.HRight = HRight;
+    slide.Rect = Rect;
 
     slide.timepoint = timepoint;
     slide.resolve_timepoint = resolve_timepoint;
     slide.key_typed = key_typed;
     slide.setup = setup;
 
+    slide.lalign = lalign;
     slide.ralign = ralign;
+    slide.rect = rect;
     slide.shape = shape;
     slide.text = text;
 

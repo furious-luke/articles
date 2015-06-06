@@ -78,15 +78,21 @@
     	    this.font_size = get_default( opts, 'font_size', 0.03 );
     	    this.line_sep = get_default( opts, 'line_sep', 1.5*this.font_size );
 	    this.word_sep = get_default( opts, 'word_sep', 0.03 );
-    	    this.create_entries();
+    	    this.create_entries( opts.use_tween );
     	},
 
-    	create_entries: function() {
+    	create_entries: function( use_tween ) {
     	    for( var ii = 0; ii < this.words.length; ++ii ) {
     	    	var entry = new TextBoxEntry( this.words[ii], this.font, {
 	    	    font_size: this.font_size, warp: [this.b, this.c]
 	    	} );
     	    	this.add_child( entry );
+		if( use_tween ) {
+		    entry.alpha = 0;
+		    entry.add_tween(
+			slide.tweens.linear([ [this.b, ii], 5 ]), 'alpha', 0, 255
+		    )
+		}
     	    }
         },
 
@@ -120,27 +126,9 @@
 	},
 
     	update: function( tick ) {
-            // this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
-
-            // var lh = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
-            // this.w = this.pjs.textWidth( this.txt[0] );
-    	    // for( var ii = 1; ii < this.txt.length; ++ii ) {
-    	    // 	var cw = this.pjs.textWidth( this.txt[ii] );
-    	    // 	if( cw > this.w ) this.w = cw
-    	    // }
-    	    // this.w *= slide.camera.ppp_inv*this.scale;
-    	    // this.h = lh*this.txt.length + this.line_sep*(this.txt.length - 1);
-
     	    slide.Node.prototype.update.call( this, tick );
-
 	    this.align_entries();
-
-    	    // for( var ii = 0; ii < this.children.active.length; ++ii ) {
-    	    // 	var entry = this.children.active[ii];
-    	    // 	entry.x = -0.5*this.w;
-    	    // 	entry.y = ii*lh - 0.5*this.h + ii*this.line_sep;
-    	    // }
-    	},
+    	}
     });
 
     var list = function( txt, font, opts ) {
