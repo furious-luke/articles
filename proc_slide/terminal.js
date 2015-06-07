@@ -8,8 +8,7 @@
 	    this.max_lines = get_default( opts, 'rows', 25 );
     	    this.font = get_default( opts, 'font', 'monospace' );
     	    this.font_size = get_default( opts, 'font_size', 0.03 );
-    	    this.line_sep = get_default( opts, 'line_sep', 1.5*this.font_size );
-	    this.word_sep = get_default( opts, 'word_sep', 0.03 );
+    	    this.line_sep = get_default( opts, 'line_sep', 80*this.font_size );
             slide.Rect.prototype.create.call( this, 0, 0, opts );
 	    this._char_width();
 	    this.padding = 0.02;
@@ -28,10 +27,12 @@
 
     	render: function() {
 	    slide.Rect.prototype.render.call( this );
+	    var ppp = slide.camera.ppp;
 
 	    if( this.font_fill )
 		this.pjs.fill( this.font_fill );
 	    this.pjs.textAlign( this.pjs.LEFT, this.pjs.CENTER );
+	    this._char_width();
 
 	    // Are we using a basic text block or a stream?
 	    var txt;
@@ -40,10 +41,9 @@
 	    else
 		txt = this.txt;
 
-	    var ppp = slide.camera.ppp;
-	    this._char_width();
 	    var y = this.y + 0.5*this.h - this.padding - 0.5*this.line_height, pos = txt.length;
 	    var first = true;
+	    y -= this.line_height*this._start_line();
 	    while( pos > 0 ) {
 		if( y - 0.5*this.line_height < this.y - 0.5*this.h + 0.95*this.padding )
 		    break;
@@ -104,42 +104,182 @@
 	    }
     	},
 
+	_start_line: function() {
+
+	    // Are we using a basic text block or a stream?
+	    var txt;
+	    if( this.txt.stream !== undefined )
+	    	txt = this.txt.stream;
+	    else
+	    	txt = this.txt;
+
+	    var y = this.y + 0.5*this.h - this.padding - 0.5*this.line_height, pos = txt.length;
+	    var first = true, n_lines = 0;
+	    while( pos > 0 ) {
+	    	if( y - 0.5*this.line_height < this.y - 0.5*this.h + 0.95*this.padding )
+	    	    break;
+
+	    	// Do we want the prompt?
+	    	var x;
+	    	if( first && this.use_prompt ) {
+	    	    first = false;
+	    	    ++n_lines;
+	    	    y -= this.line_height;
+	    	    if( y - 0.5*this.line_height < this.y - 0.5*this.h + 0.95*this.padding )
+	    		break;
+	    	}
+
+	    	// Extract first (last) line.
+	    	var start = txt.lastIndexOf( '\n', pos - 1 );
+	    	if( start == -1 )
+	    	    start = 0;
+	    	else if( start > pos )
+	    	    start = pos;
+	    	else
+	    	    ++start;
+
+	    	// Split over multiple lines if too long.
+	    	var n_splits = Math.floor( (pos - start)/this.max_chars );
+	    	var remainder = (pos - start) - n_splits*this.max_chars;
+
+	    	// Only add this extra line if we just printed some remainder,
+	    	// or if there are also no full lines to print.
+	    	if( remainder || !n_splits ) {
+	    	    ++n_lines;
+	    	    y -= this.line_height;
+	    	}
+
+	    	// Now render the split lines.
+	    	for( var ii = 0; ii < n_splits; ++ii ) {
+	    	    if( y - 0.5*this.line_height < this.y - 0.5*this.h + 0.95*this.padding )
+	    		break;
+	    	    ++n_lines;
+	    	    y -= this.line_height;
+	    	}
+
+	    	pos = start - 1;
+	    }
+
+	    return this.max_lines - n_lines;
+	},
+
 	_char_width: function() {
             this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
 	    this.char_width = this.pjs.textWidth( 'a' )*slide.camera.ppp_inv*this.scale;
-            this.line_height = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
+            this.line_height = (this.pjs.textAscent() + this.pjs.textDescent() + this.line_sep)*slide.camera.ppp_inv*this.scale;
 	}
     });
 
-    var Stream = slide.Entity.extend({
+    var StreamEntry = slide.Entity.extend({
 
-	create: function( txt ) {
-	    slide.Entity.prototype.create.call( this );
-	    this.lines = txt.split( '\n' );
-	    this.prompt = '$ ';
+	create: function( strm, txt, tp ) {
+	    slide.Entity.prototype.create.call( this, [tp, 0] );
+	    this.stream = strm;
+	    this.text = txt;
+	},
+
+	update: function( tick ) {
+	    if( this._push_tick != tick ) {
+		this.stream.push( this.text );
+		this._push_tick = tick;
+	    }
+	}
+    });
+
+    var Stream = slide.Node.extend({
+
+	create: function( txt, opts ) {
+	    opts = opts || {};
+	    slide.Node.prototype.create.call( this, 0, 1, [opts.b, opts.c] );
+	    if( txt === undefined )
+		this.lines = [];
+	    else if( txt.constructor === Array )
+		this.lines = txt;
+	    else
+		this.lines = txt.split( '\n' );
+	    this.prompt = get_default( opts, 'prompt', '$ ' );
 	    this.caret = '_';
 	    this.stream = '';
+	},
+
+	entry: function( txt, opts ) {
+	    opts = opts || {};
+	    var tp;
+	    if( opts.b === undefined )
+		tp = this.get_last_child().c;
+	    else
+		tp = opts.b;
+	    var entry = this.add_child( new StreamEntry( this, txt, tp ) );
+	    if( !opts.no_pause )
+		this.pause( get_default( opts, 'pause_delay', 10 ) );
+	},
+
+	raw_entry: function( txt, opts ) {
+	    opts = opts || {};
+	    opts.pause_delay = 1;
+	    return this.entry( slide.stream.raw( txt ), opts );
+	},
+
+	push: function( txt ) {
+	    this._done = false;
+	    this.lines.push( txt );
 	},
 
 	enter: function() {
 	    this.line = 0;
 	    this.col = 0;
 	    this._history = '';
-	    this._done = false;
+	    this._stream = this.prompt;
+	    this._done = this.lines.length == 0;
+	    this._delay = 0;
+	    this._delay_tick = 0;
+
+	    this._pause_help = '';
 	},
 
 	update: function( tick ) {
-	    if( this.pjs.frameCount%2 == 0 && !this._done ) {
-		var line = this.lines[this.line].slice( 0, this.col + 1 );
-		this._stream = this._history + this.prompt + line
-		if( ++this.col >= this.lines[this.line].length ) {
-		    this._history += line + '\n';
-		    if( ++this.line >= this.lines.length ) {
-			this.line = 0;
-			this._done = true;
+	    slide.Node.prototype.update.call( this, tick );
+
+	    if( !this._delay ) {
+		if( this.pjs.frameCount%2 == 0 && !this._done ) {
+		    var line = this.lines[this.line];
+
+		    // Check for a delay command.
+		    if( typeof line === 'number' && (line%1) === 0 ) {
+			this._delay = line;
+			if( ++this.line >= this.lines.length )
+			    this._done = true;
+
+			// TODO: Fix this.
+			this._pause_help += 'slide.helpers.pause([ term.get_child( 0 ).b, ' + (tick + 0.5*this._delay - this.b.value) + ' ]);\n';
+			console.log( this._pause_help );
 		    }
-		    this.col = 0;
+
+		    // Check for a raw block.
+		    else if( typeof line === 'object' ) {
+			this._stream = this._history + line.txt + '\n' + this.prompt;
+			this._history += line.txt + '\n';
+			if( ++this.line >= this.lines.length )
+			    this._done = true;
+			this.col = 0;
+		    }
+
+		    // Else it's a command.
+		    else {
+			line = line.slice( 0, this.col + 1 );
+			this._stream = this._history + this.prompt + line
+			if( ++this.col >= this.lines[this.line].length ) {
+			    this._history += this.prompt + line + '\n';
+			    if( ++this.line >= this.lines.length )
+				this._done = true;
+			    this.col = 0;
+			}
+		    }
 		}
+	    }
+	    else if( tick != this._delay_tick ) {
+		--this._delay;
+		this._delay_tick = tick;
 	    }
 	    this.stream = this._stream + ((this.pjs.frameCount%20 < 10) ? this.caret : '');
 	}
@@ -150,7 +290,11 @@
     }
 
     var stream = function( opts ) {
-	return new Stream( opts );
+	return new Stream( opts.text, opts );
+    }
+
+    stream.raw = function( txt ) {
+	return { txt: txt };
     }
 
     slide.terminal = terminal;

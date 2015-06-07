@@ -28,6 +28,7 @@ void setup() {
 
     slide.setup();
     slide.camera.initialise( 800, 600 );
+    slide.disable_pause = false;
 
     size( 800, 600 );
     // jProcessingJS( this, { fullscreen: true } );
@@ -43,12 +44,14 @@ void setup() {
     slide.default_fill = slide.palette.base03;
     slide.default_font = koyu;
     slide.default_list_font = extend;
+    slide.default_mono_font = term_fnt;
 
     // splash();
     // intro();
     // linux();
     // linux_shell();
-    ssh();
+    // ssh();
+    filesystem();
 
     // console.log( PFont.list() );
 
@@ -141,8 +144,8 @@ void intro() {
 }
 
 void linux() {
-    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
-    var tp = 0;
+    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    // var tp = 0;
     var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
     slide.scene.add_child( ctr );
 
@@ -270,8 +273,8 @@ void linux() {
 }
 
 void linux_shell() {
-    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
-    var tp = 0;
+    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    // var tp = 0;
     var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
     slide.scene.add_child( ctr );
 
@@ -364,17 +367,16 @@ void linux_shell() {
 void ssh() {
     // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
     var tp = 0;
-    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
-    slide.scene.add_child( ctr );
+    var ctr = slide.helpers.container( tp );
 
-    var hdr = slide.helpers.heading_open( ctr, 'Linux Shell', tp );
+    var hdr = slide.helpers.heading( 'Linux Shell', tp );
 
     var srv = ctr.add_child( slide.shape( server_sh, 0.5, slide.helpers.center(), 0, [tp, undefined] ) );
     slide.helpers.pop_in( srv );
     slide.helpers.move_left( srv, [undefined, 30] );
     slide.helpers.move_right( srv, [undefined, 30] );
-    var g2_list = slide.helpers.list( ctr,
-				      ['GPU cluster', 'CentOS Linux', 'Access via SSH'],
+
+    var g2_list = slide.helpers.list( ['GPU cluster', 'CentOS Linux', 'Access via SSH'],
 				      [srv.get_tween( 1 ).b, 10] );
     slide.helpers.fade_out( g2_list, [g2_list.c, -10] );
 
@@ -409,26 +411,12 @@ void ssh() {
 
     ctr.add_child( new slide.Pause( ssh_txt.get_tween( 0 ).c ) );
 
-    var term = ctr.add_child(
-    	slide.terminal({
-    	    text: 'ssh <username>@<host>\n\nssh <username>@g2.hpc.swin.edu.au\n\nssh guest01@g2.hpc.swin.edu.au\n\n',
-    	    origin: [0, 0.05*slide.camera.h],
-	    warp: [[srv.get_last_tween().b, 10], undefined],
-    	    radius: 0.02,
-    	    fill: slide.palette.base03,
-    	    font: term_fnt,
-    	    font_size: 0.07,
-    	    columns: 64,
-    	    rows: 10,
-    	    height: 0.05,
-    	    font_fill: slide.palette.base06,
-	    use_prompt: true
-    	})
-    );
-    term.add_tween(
-    	slide.tweens.back_out([ [srv.get_last_tween().b, 10], 10 ]), 'w', 0, term.max_width
-    ).add_tween(
-    	slide.tweens.back_out([ [undefined, 5], 10 ]), 'h', 0.05, term.max_height
+    var term = slide.helpers.terminal(
+	'ssh <username>@<host>\n\nssh <username>@g2.hpc.swin.edu.au\n\nssh guest01@g2.hpc.swin.edu.au\n\n',
+	[srv.get_last_tween().b, 10],
+	{
+    	    rows: 10
+	}
     );
 
     ctr.add_child( new slide.Pause( term.get_last_tween().c ) );
@@ -465,5 +453,63 @@ void ssh() {
 	}
     );
 
-    slide.helpers.heading_close( hdr, [srv.get_last_tween().b, 10] );
+    slide.helpers.exit_left( hdr, [srv.get_last_tween().b, 10] );
+}
+
+void filesystem() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Filesystem', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    var term = slide.helpers.left_terminal(
+	slide.stream({
+	    b: [hdr.b, 40], c: 1000, prompt: '[guest01@g2]$ '
+	}),
+	[hdr.get_last_tween().c, -10],
+	{ duration: 1000 }
+    );
+    slide.helpers.tv_off( term, term.c );
+
+    term.txt.pause( 20 );
+    term.txt.entry( 'whoami', { no_pause: true } );
+    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
+    term.txt.raw_entry( 'guest01' );
+    term.txt.entry( 'pwd', { no_pause: true } );
+    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
+    term.txt.raw_entry( '/home/guest01', { no_pause: true } );
+    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
+    term.txt.entry( 'ls' );
+    term.txt.raw_entry( 'bandwidthTest       lab0-vectorAdd\nlab0-vectorAdd.sol  p093_swin' );
+    term.txt.entry( 'ls -F' );
+    term.txt.raw_entry( 'bandwidthTest/       lab0-vectorAdd/\nlab0-vectorAdd.sol/  p093_swin/' );
+    term.txt.entry( 'tree' );
+    term.txt.raw_entry( '.\n\
+├── bandwidthTest\n\
+│   ├── bandwidthTest.cu\n\
+│   ├── CMakeLists.txt\n\
+│   ├── NsightEclipse.xml\n\
+│   └── readme.txt\n\
+├── lab0-vectorAdd\n\
+│   └── vectorAdd.cu\n\
+├── lab0-vectorAdd.sol\n\
+│   └── vectorAdd.cu' );
+    term.txt.entry( 'ls -F bandwidthTest' );
+    term.txt.raw_entry( 'bandwidthTest.cu  CMakeLists.txt\nNsightEclipse.xml readme.txt' );
+    term.txt.entry( 'ls -F /' );
+    term.txt.raw_entry( 'ansys_inc@  cgroup/\ninclude/    logs/\nmisc/       opt/\n...' );
+    term.txt.entry( 'ls', { no_pause: true } );
+    term.txt.raw_entry( 'bandwidthTest       lab0-vectorAdd\nlab0-vectorAdd.sol  p093_swin' );
+    term.txt.entry( 'cd bandwidthTest' );
+    term.txt.entry( 'pwd', { no_pause: true } );
+    term.txt.raw_entry( '/home/guest01/bandwidthTest' );
+    term.txt.entry( 'ls -a' );
+    term.txt.raw_entry( '.   bandwidthTest.cu  NsightEclipse.xml\n..  CMakeLists.txt    readme.txt' );
+    term.txt.entry( 'cd ..', { no_pause: true } );
+    term.txt.entry( 'pwd', { no_pause: true } );
+    term.txt.raw_entry( '/home/guest01' );
+
+    slide.helpers.exit_left( hdr, [term.get_last_tween().c, 200] );
 }

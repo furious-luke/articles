@@ -18,7 +18,7 @@
 	    opts = opts || {};
             slide.Node.prototype.create.call( this, opts.origin, opts.scale, opts.warp );
             this.txt = txt;
-	    this.font = font;
+	    this.font = font || slide.default_list_font;
 	    this.font_size = get_default( opts, 'font_size', 0.03 );
 	    this.line_sep = get_default( opts, 'line_sep', 0.05 );
 	    this.create_entries();
@@ -137,6 +137,27 @@
 
     var text_box = function( txt, font, opts ) {
 	return new TextBox( txt, font, opts );
+    }
+
+    slide.Node.prototype.list = function( items, opts ) {
+	opts = opts || {};
+	var lc = this.get_last_child();
+	if( lc !== undefined )
+	    lc = lc.c;
+	opts.warp = [lc, get_default( opts, 'duration', 40 )];
+	opts.font_size = opts.font_size || 0.1;
+	var node = this.add_child( slide.list( items, opts.font, opts ) );
+	node.pause([ node.b, 30 ]); // pause just before fade out
+	slide.helpers.fade_out( node, [ node.c, -10 ]);
+	return node;
+    }
+
+    slide.Node.prototype.list_right = function( items, opts ) {
+	opts = opts || {};
+	opts.origin = slide.helpers.right();
+	if( opts.x !== undefined )
+	    opts.origin[0] = opts.x*slide.camera.w;
+	return this.list( items, opts );
     }
 
     slide.List = List;

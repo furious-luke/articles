@@ -119,6 +119,12 @@ function get_default( obj, name, def ) {
         display: function() {
         },
 
+	step: function( tick ) {
+	},
+
+	aggregate: function() {
+	},
+
         update: function( tick ) {
         },
 
@@ -134,7 +140,11 @@ function get_default( obj, name, def ) {
 
         resolve_timepoint: function( tp ) {
             return resolve_timepoint( tp );
-        }
+        },
+
+	dump: function( indent ) {
+	    var spaces = Array( indent + 1 ).join( ' ' );
+	}
     });
 
     var Ticker = Class({
@@ -220,26 +230,52 @@ function get_default( obj, name, def ) {
             }
         },
 
-        update: function( tick ) {
+	step: function( tick ) {
 
             // Add ready entities.
             while( this.index < this.entities.length && this.entities[this.index].b.value <= tick ) {
 		var ent = this.entities[this.index++];
-		ent.enter();
+		ent._entered = true;
                 this.active.push( ent );
 	    }
 
             // Remove finished active entities and update.
             // TODO: Optimise array reduction.
             var new_act = [];
-            for(var ii = 0; ii < this.active.length; ++ii ) {
+            for( var ii = 0; ii < this.active.length; ++ii ) {
                 var ent = this.active[ii];
                 if( !ent.done( tick ) ) {
-                    ent.update( tick );
+		    ent.step( tick );
                     new_act.push( ent );
-                }
+		}
             }
             this.active = new_act;
+	},
+
+        update: function( tick ) {
+
+            // // Add ready entities.
+            // while( this.index < this.entities.length && this.entities[this.index].b.value <= tick ) {
+	    // 	var ent = this.entities[this.index++];
+	    // 	ent.enter();
+            //     this.active.push( ent );
+	    // }
+
+            // // Remove finished active entities and update.
+            // // TODO: Optimise array reduction.
+            // var new_act = [];
+            for( var ii = 0; ii < this.active.length; ++ii ) {
+                var ent = this.active[ii];
+		if( ent._entered ) {
+		    ent._entered = false;
+		    ent.enter();
+		}
+                // if( !ent.done( tick ) ) {
+                    ent.update( tick );
+            //         new_act.push( ent );
+                }
+            // }
+            // this.active = new_act;
         }
     });
 
@@ -356,6 +392,10 @@ function get_default( obj, name, def ) {
 	    return this.children.entities[index];
 	},
 
+	get_last_child: function() {
+	    return this.children.entities[this.children.entities.length - 1];
+	},
+
 	get_tween: function( index ) {
 	    return this.tweens.entities[index];
 	},
@@ -408,11 +448,21 @@ function get_default( obj, name, def ) {
             return isNaN( this.c.value );
         },
 
-        update: function( tick ) {
-            this.children.update( tick );
-            this.tweens.update( tick );
+	step: function( tick ) {
+            this.children.step( tick );
+            this.tweens.step( tick );
+	},
+
+	aggregate: function() {
 
 	    // Aggregate children sizes.
+	    this._calc_children_sizes();
+
+	    for( var ii = 0; ii < this.children.active.length; ++ii )
+		this.children.active[ii].aggregate();
+	},
+
+	_calc_children_sizes: function() {
 	    var w = 0, h = 0;
 	    if( this.children.active.length ) {
 		w = this.children.active[0].w;
@@ -426,7 +476,12 @@ function get_default( obj, name, def ) {
 	    }
 	    this.children.w = w;
 	    this.children.h = h;
+	},
 
+        update: function( tick ) {
+            this.children.update( tick );
+            this.tweens.update( tick );
+	    this._calc_children_sizes();
 	    ++slide.update_cnt;
         },
 
@@ -451,8 +506,7 @@ function get_default( obj, name, def ) {
 
         display: function() {
             this.pjs.pushMatrix();
-            this.pjs.translate( this.x*slide.camera.ppp, this.y*slide.camera.ppp );
-            this.pjs.scale( this.scale );
+	    this.transform();
 	    this.set_colors();
             this.render();
             for( var ii = 0; ii < this.children.active.length; ++ii )
@@ -460,13 +514,34 @@ function get_default( obj, name, def ) {
             this.pjs.popMatrix();
         },
 
+	transform: function() {
+            this.pjs.translate( this.x*slide.camera.ppp, this.y*slide.camera.ppp );
+            this.pjs.scale( this.scale );
+	},
+
 	set_colors: function() {
 	    this.pjs.stroke( this.stroke, this.galpha );
 	    this.pjs.fill( this.fill, this.galpha );
 	},
 
         render: function() {
-        }
+        },
+
+	dump: function( indent ) {
+	    var spaces = Array( indent + 1 ).join( ' ' );
+	    Entity.prototype.dump.call( this, indent );
+	    console.log( spaces + '  x:  ' + this.x );
+	    console.log( spaces + '  y:  ' + this.y );
+	    console.log( spaces + '  gx: ' + this.gx );
+	    console.log( spaces + '  gy: ' + this.gy );
+	    console.log( spaces + '  w:  ' + this.w );
+	    console.log( spaces + '  h:  ' + this.h );
+	    console.log( spaces + '  cw: ' + this.children.w );
+	    console.log( spaces + '  ch: ' + this.children.h );
+	    console.log( spaces + '  children' );
+	    for( var ii = 0; ii < this.children.active.length; ++ii )
+		this.children.active[ii].dump( indent + 4 );
+	}
     });
 
     var Scene = Node.extend({
@@ -475,11 +550,20 @@ function get_default( obj, name, def ) {
             Node.prototype.create.call( this, [0, 0], 1, [0, undefined] );
         },
 
+	aggregate: function() {
+	    this.w = slide.camera.w;
+	    this.h = slide.camera.h;
+	    Node.prototype.aggregate.call( this );
+	},
+
 	update: function( tick ) {
 	    slide.update_cnt = 0;
 
+	    // Updawte for camera size.
 	    this.w = slide.camera.w;
 	    this.h = slide.camera.h;
+
+	    this.step( tick );
 	    Node.prototype.update.call( this, tick );
 	    this.flatten( this );
 
@@ -502,6 +586,11 @@ function get_default( obj, name, def ) {
                 ++ii;
             if( ii == 100 )
                 throw new Error( 'Failed to prepare slides.' );
+
+	    // Initialise before running any updates.
+	    this.step( 0 );
+	    this.aggregate();
+	    this.flatten();
         }
     });
 
@@ -570,10 +659,13 @@ function get_default( obj, name, def ) {
 	    this.font_size = get_default( opts, 'font_size', 0.03 );
         },
 
+	aggregate: function() {
+	    this._calc_size();
+	    Node.prototype.aggregate.call( this );
+	},
+
 	update: function( tick ) {
-            this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
-            this.w = this.pjs.textWidth( this.txt )*slide.camera.ppp_inv*this.scale;
-	    this.h = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
+	    this._calc_size();
 	    Node.prototype.update.call( this, tick );
 	},
 
@@ -581,14 +673,20 @@ function get_default( obj, name, def ) {
 	    this.pjs.textAlign( this.pjs.CENTER, this.pjs.CENTER );
             this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
             this.pjs.text( this.txt, 0, 0 );
-        }
+        },
+
+	_calc_size: function() {
+            this.pjs.textFont( this.font, this.font_size*slide.camera.ppp );
+            this.w = this.pjs.textWidth( this.txt )*slide.camera.ppp_inv*this.scale;
+	    this.h = (this.pjs.textAscent() + this.pjs.textDescent())*slide.camera.ppp_inv*this.scale;
+	}
     });
 
     var Pause = Node.extend({
 
         create: function( tp ) {
             Node.prototype.create.call( this, 0, 1, [tp, 1] );
-            this.triggered = false;
+            this.triggered = slide.disable_pause;
 	    this._angle = 0;
 	    this.alpha = 150;
         },
@@ -603,8 +701,11 @@ function get_default( obj, name, def ) {
         },
 
 	render: function() {
+	    this.pjs.resetMatrix();
+	    slide.scene.transform();
 	    this.pjs.rectMode( this.pjs.CORNER );
 	    var ppp = slide.camera.ppp;
+
 	    var x = 0.87*0.5*slide.camera.w, y = 0.82*0.5*slide.camera.h
 	    var w = 0.02, h = 0.1;
 	    this.pjs.noStroke();
@@ -630,6 +731,14 @@ function get_default( obj, name, def ) {
     });
 
     var Boxed = Node.extend({
+
+	aggregate: function() {
+            if( this.parent !== undefined ) {
+                this.w = this.parent.w;
+                this.h = this.parent.h;
+            }
+	    Node.prototype.aggregate.call( this );
+	},
 
         update: function( tick ) {
             if( this.parent !== undefined ) {
@@ -688,6 +797,14 @@ function get_default( obj, name, def ) {
 	    this.margin = (margin !== undefined) ? margin : 0;
         },
 
+	aggregate: function() {
+	    Boxed.prototype.aggregate.call( this );
+
+	    // Need to do this here too to handle cases where the 'gx' and 'gy'
+	    // values are needed right at the beginning.
+            this.x = -0.5*(this.w - this.children.w) + this.margin;
+	},
+
         update: function( tick ) {
             Boxed.prototype.update.call( this, tick );
 
@@ -722,6 +839,25 @@ function get_default( obj, name, def ) {
 	return new Text( txt, font, opts );
     }
 
+    var pause = function( tp ) {
+	return new Pause( tp );
+    }
+
+    Node.prototype.pause = function( rel ) {
+	var tp;
+	if( rel === undefined )
+	    rel = 0;
+	if( rel.constructor === Array )
+	    tp = rel;
+	else {
+	    tp = this.get_last_child();
+	    if( tp !== undefined )
+		tp = tp.c;
+	    tp = [tp, rel];
+	}
+	return this.add_child( slide.pause( tp ) );
+    }
+
     slide.Entity = Entity;
     slide.Timeline = Timeline;
     slide.Transition = Transition;
@@ -744,5 +880,6 @@ function get_default( obj, name, def ) {
     slide.rect = rect;
     slide.shape = shape;
     slide.text = text;
+    slide.pause = pause;
 
 }( window.slide = window.slide || {} ));
