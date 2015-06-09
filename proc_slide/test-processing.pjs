@@ -3,9 +3,14 @@
 PShape server_sh = loadShape( "server.svg" );
 PShape conch = loadShape( "nautilus.svg" );
 PShape user_sh = loadShape( "person.svg" );
+PShape group_sh = loadShape( "group.svg" );
+PShape other_sh = loadShape( "other.svg" );
 PShape tux_sh    = loadShape( "tux.svg" );
 PShape mac_sh = loadShape( "mac.svg" );
 PShape win_sh = loadShape( "win.svg" );
+PShape file_sh = loadShape( "file.svg" );
+PShape check_sh = loadShape( "check.svg" );
+PShape cross_sh = loadShape( "cross.svg" );
 PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
 PFont  extend = loadFont( "FuturaExtended.ttf" );
 PFont  term_fnt = loadFont( "UbuntuMono.ttf" );
@@ -23,6 +28,7 @@ void setup() {
 	base08: #AB4642,
 	base09: #DC9656,
 	base0A: #F7CA88,
+	base0B: #A1B56C,
 	base0D: #7CAFC2
     };
 
@@ -51,7 +57,12 @@ void setup() {
     // linux();
     // linux_shell();
     // ssh();
-    filesystem();
+    // filesystem();
+    // creating_deleting();
+    // pipes_filters();
+    // permissions();
+    // finding_things();
+    variables();
 
     // console.log( PFont.list() );
 
@@ -116,10 +127,12 @@ void splash() {
 }
 
 void intro() {
-    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
-    // var tp = 0;
-    var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
-    slide.scene.add_child( ctr );
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Introduction', tp );
+    slide.helpers.enter_left( hdr, tp );
 
     ctr.add_child(
     	slide.shape( conch, 0.3, [0, 0], 2.5, [tp, 100] ).add_tween(
@@ -135,17 +148,19 @@ void intro() {
 
     ctr.add_child(
 	slide.list(
-	    ['Linux Shell', 'Navigation', 'Searching', 'Processes', 'Scripting', 'Pipes/redirection'],
+	    ['Linux and the Shell', 'Files and Directories', 'Creating and Deleting', 'Pipes and Filters', 'Permissions', 'Finding Things'],
 	    extend, { warp: [ [tp, 40], 30 ], font_size: 0.1, origin: [0.2*slide.camera.w, 0] }
 	)
     );
 
-    ctr.add_child( new slide.Pause( [tp, 60] ) );
+    var pause = ctr.add_child( new slide.Pause( [tp, 60] ) );
+
+    slide.helpers.exit_left( hdr, pause.c );
 }
 
 void linux() {
-    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
-    // var tp = 0;
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
     var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
     slide.scene.add_child( ctr );
 
@@ -273,8 +288,8 @@ void linux() {
 }
 
 void linux_shell() {
-    var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
-    // var tp = 0;
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
     var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
     slide.scene.add_child( ctr );
 
@@ -312,9 +327,12 @@ void linux_shell() {
 	)
     );
 
+    var strm = slide.stream({
+	text: history, warp: [[tux.c, 10], 40],
+    });
     var term = ctr.add_child(
 	slide.terminal({
-	    text: slide.stream( history ),
+	    text: strm,
 	    origin: [0, 0.06],
 	    warp: [[tux.c, 5], undefined],
 	    radius: 0.02,
@@ -322,7 +340,7 @@ void linux_shell() {
 	    font: term_fnt,
 	    font_size: 0.07,
 	    columns: 64,
-	    rows: 23,
+	    rows: 18,
 	    height: 0.05,
 	    font_fill: slide.palette.base06
 	})
@@ -376,7 +394,7 @@ void ssh() {
     slide.helpers.move_left( srv, [undefined, 30] );
     slide.helpers.move_right( srv, [undefined, 30] );
 
-    var g2_list = slide.helpers.list( ['GPU cluster', 'CentOS Linux', 'Access via SSH'],
+    var g2_list = slide.helpers.list( ['Will be using g2', 'GPU cluster', 'CentOS Linux', 'Access via SSH'],
 				      [srv.get_tween( 1 ).b, 10] );
     slide.helpers.fade_out( g2_list, [g2_list.c, -10] );
 
@@ -415,7 +433,8 @@ void ssh() {
 	'ssh <username>@<host>\n\nssh <username>@g2.hpc.swin.edu.au\n\nssh guest01@g2.hpc.swin.edu.au\n\n',
 	[srv.get_last_tween().b, 10],
 	{
-    	    rows: 10
+    	    rows: 7,
+	    y: 0.1*slide.camera.h
 	}
     );
 
@@ -466,50 +485,691 @@ void filesystem() {
 
     var term = slide.helpers.left_terminal(
 	slide.stream({
-	    b: [hdr.b, 40], c: 1000, prompt: '[guest01@g2]$ '
+	    b: [hdr.b, 40], prompt: '[guest01@g2]$ '
 	}),
 	[hdr.get_last_tween().c, -10],
-	{ duration: 1000 }
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
     );
-    slide.helpers.tv_off( term, term.c );
 
     term.txt.pause( 20 );
+    term.txt.list_right([ '$ = ready for input', 'Shows user', 'Also hostname', 'Can be changed' ], { x: 0.4 } );
     term.txt.entry( 'whoami', { no_pause: true } );
-    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
-    term.txt.raw_entry( 'guest01' );
+    term.txt.list_right([ 'Enter commands', 'Enter to execute', 'Shell finds program', 'Runs program', 'Shows output' ], { x: 0.4 } );
+    term.txt.raw_entry( 'guest01', { no_pause: true } );
+    term.txt.list_right([ 'whoami shows user', 'New prompt' ], { x: 0.4 } );
     term.txt.entry( 'pwd', { no_pause: true } );
-    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
+    term.txt.list_right([ 'pwd shows path' ], { x: 0.4 } );
     term.txt.raw_entry( '/home/guest01', { no_pause: true } );
-    term.txt.list_right([ 'testing', 'testing', 'one', 'two', 'three', 'looooo' ], { x: 0.4 } );
-    term.txt.entry( 'ls' );
-    term.txt.raw_entry( 'bandwidthTest       lab0-vectorAdd\nlab0-vectorAdd.sol  p093_swin' );
-    term.txt.entry( 'ls -F' );
-    term.txt.raw_entry( 'bandwidthTest/       lab0-vectorAdd/\nlab0-vectorAdd.sol/  p093_swin/' );
-    term.txt.entry( 'tree' );
-    term.txt.raw_entry( '.\n\
-├── bandwidthTest\n\
-│   ├── bandwidthTest.cu\n\
-│   ├── CMakeLists.txt\n\
-│   ├── NsightEclipse.xml\n\
-│   └── readme.txt\n\
-├── lab0-vectorAdd\n\
-│   └── vectorAdd.cu\n\
-├── lab0-vectorAdd.sol\n\
-│   └── vectorAdd.cu' );
-    term.txt.entry( 'ls -F bandwidthTest' );
-    term.txt.raw_entry( 'bandwidthTest.cu  CMakeLists.txt\nNsightEclipse.xml readme.txt' );
-    term.txt.entry( 'ls -F /' );
-    term.txt.raw_entry( 'ansys_inc@  cgroup/\ninclude/    logs/\nmisc/       opt/\n...' );
+    term.txt.list_right([ 'First / = root', '"home" is a directory', '"guest01" is too', '/ separates directories' ], { x: 0.4 } );
     term.txt.entry( 'ls', { no_pause: true } );
-    term.txt.raw_entry( 'bandwidthTest       lab0-vectorAdd\nlab0-vectorAdd.sol  p093_swin' );
-    term.txt.entry( 'cd bandwidthTest' );
-    term.txt.entry( 'pwd', { no_pause: true } );
-    term.txt.raw_entry( '/home/guest01/bandwidthTest' );
-    term.txt.entry( 'ls -a' );
-    term.txt.raw_entry( '.   bandwidthTest.cu  NsightEclipse.xml\n..  CMakeLists.txt    readme.txt' );
-    term.txt.entry( 'cd ..', { no_pause: true } );
-    term.txt.entry( 'pwd', { no_pause: true } );
-    term.txt.raw_entry( '/home/guest01' );
+    term.txt.list_right([ 'ls = listing', 'Lists files/directories', 'Cryptic-ish name' ], { x: 0.4 } );
+    term.txt.raw_entry( 'base       labs       setup.sh\n\
+haiku.txt  molecules  venus', { no_pause: true } );
+    term.txt.list_right([ 'Neatly arranged', 'Alphabetical' ], { x: 0.4 } );
+    term.txt.entry( 'ls -F', { no_pause: true } );
+    term.txt.list_right([ '"-F" is a "flag"', 'Changes behavior', 'Adds more info' ], { x: 0.4 } );
+    term.txt.raw_entry( 'base/      labs/       setup.sh*\n\
+haiku.txt  molecules/  venus/' );
+    term.txt.entry( 'tree base', { no_pause: true } );
+    term.txt.list_right([ 'Shows hierarchy', 'Start in "base"', 'Good overview' ], { x: 0.4 } );
+    term.txt.raw_entry( 'base\n\
+├── data\n\
+│   ├── first.txt\n\
+│   └── econd.txt\n\
+├── notes.txt\n\
+├── thesis\n\
+└── tools\n\
+    ├── format\n\
+    ├── old\n\
+    └── stats\n\
+\n\
+4 directories, 5 files' ); // TODO: Why the $p when the "s" is added back in?
+    term.txt.list_right([ 'Something . something', 'Shows file type', 'Just convention', 'Not guaranteed' ], { x: 0.4 } );
+    term.txt.raw_entry( " ", { no_pause: true } );
 
-    slide.helpers.exit_left( hdr, [term.get_last_tween().c, 200] );
+    term.txt.entry( 'ls -F base', { no_pause: true } );
+    term.txt.list_right([ 'No slash at start', 'A relative path' ], { x: 0.4 } );
+    term.txt.raw_entry( 'data/  notes.txt  thesis/  tools/' );
+    term.txt.entry( 'ls -F /', { no_pause: true } );
+    term.txt.list_right([ 'Slash at start', 'An absolute path' ], { x: 0.4 } );
+    term.txt.raw_entry( 'ansys_inc@  cgroup/\ninclude/    logs/\nmisc/       opt/\n...', { no_pause: true } );
+    term.txt.list_right([ 'System files', 'Don\'t worry yet' ], { x: 0.4 } );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'pwd', { no_pause: true } );
+    term.txt.raw_entry( '/lustre/projects/p093_swin/test/intro_to_shell', { no_pause: true } );
+    term.txt.entry( 'ls', { no_pause: true } );
+    term.txt.raw_entry( 'base/      labs/       setup.sh*\n\
+haiku.txt  molecules/  venus/' );
+    term.txt.list_right([ 'How to move to\n"base"?' ], { x: 0.4 } );
+    term.txt.entry( 'cd base', { no_pause: true } );
+    term.txt.list_right([ 'cd = change directory', 'Changes "pwd"', 'Doesn\'t alter directory' ], { x: 0.4 } );
+    term.txt.entry( 'pwd' );
+    term.txt.raw_entry( '/lustre/projects/p093_swin/test/intro_to_shell/base' );
+    term.txt.entry( 'ls' );
+    term.txt.raw_entry( 'data  notes.txt  thesis  tools', { no_pause: true } );
+    term.txt.list_right([ 'Okay, that\s good', 'But how to get back?' ], { x: 0.4 } );
+    term.txt.entry( 'ls -a', { no_pause: true } );
+    term.txt.list_right([ '"-a" = show all', 'Are there hidden\ndirectories?' ], { x: 0.4 } );
+    term.txt.raw_entry( '.  ..  data  notes.txt  thesis  tools', { no_pause: true } );
+    term.txt.list_right([ 'Yes!', '"." = current directory', '".." = parent' ], { x: 0.4 } );
+    term.txt.entry( 'cd ..' );
+    term.txt.entry( 'pwd' );
+    term.txt.raw_entry( '/lustre/projects/p093_swin/test/intro_to_shell' );
+
+    slide.helpers.tv_off( term, term.c );
+    term.txt.c = slide.timepoint([ term.txt.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
+}
+
+void creating_deleting() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Creating and Deleting', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    ctr.pause([ hdr.b, 30 ]);
+
+    var strm = 	slide.stream({
+	b: [hdr.b, 40], prompt: '[guest01@g2]$ '
+    });
+    var term = slide.helpers.left_terminal(
+	strm,
+	[hdr.b, 40],
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
+    );
+
+    term.txt.entry( 'pwd', { b: [term.b, 40], no_pause: true } );
+    term.txt.raw_entry( '/lustre/projects/p093_swin/test/intro_to_shell' );
+    term.txt.entry( 'ls -F', { no_pause: true } );
+    term.txt.raw_entry( 'base/      labs/       setup.sh*\n\
+haiku.txt  molecules/  venus/' );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'mkdir tmp', { no_pause: true } );
+    term.txt.list_right([ 'Make directory', 'No leading slash', 'Relative path' ], { x: 0.4 } );
+    term.txt.entry( 'ls -F', { no_pause: true } );
+    term.txt.raw_entry('base/      molecules/  venus/\n\
+haiku.txt  setup.sh*\n\
+labs/      tmp/' );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'ls tmp' );
+    term.txt.raw_entry( '', { no_pause: true } );
+    term.txt.list_right([ 'No output', 'Indicates empty' ], { x: 0.4 } );
+    term.txt.entry( 'ls -a tmp' );
+    term.txt.raw_entry( '.  ..', { no_pause: true } );
+    term.txt.list_right([ '. /home/guest01/tmp', '.. /home/guest01' ], { x: 0.4 } );
+    term.txt.entry( 'cd tmp' );
+    term.txt.entry( 'nano junk', { no_pause: true } );
+    term.txt.list_right([ 'Very simple editor', 'Text only', 'Ctrl-O to save', 'Ctrl-X to quit' ], { x: 0.4 } );
+    term.txt.raw_entry( '', { no_pause: true } );
+    term.txt.list_right([ 'No output' ], { x: 0.4 } );
+    term.txt.entry( 'ls', { no_pause: true } );
+    term.txt.raw_entry( 'junk' );
+    term.txt.entry( 'ls -s', { no_pause: true } );
+    term.txt.raw_entry( 'total 4\n4 junk', { no_pause: true } );
+    term.txt.list_right([ 'Show sizes', 'Reported in disk blocks', 'Total displayed' ], { x: 0.4 } );
+    term.txt.entry( 'ls -hs', { no_pause: true } );
+    term.txt.raw_entry( 'total 4.0K\n4.0K junk', { no_pause: true } );
+    term.txt.list_right([ 'Human readable', 'K = kilobyte', 'Rounded up' ], { x: 0.4 } );
+    term.txt.entry( 'rm junk', { no_pause: true } );
+    term.txt.list_right([ 'rm = remove', 'Removes files', 'No undelete!', 'Recovery methods' ], { x: 0.4 } );
+    term.txt.entry( 'ls', { no_pause: true } );
+    term.txt.raw_entry( '' );
+    term.txt.entry( 'nano junk', { no_pause: true } );
+    term.txt.list_right([ 'Create it again', 'Practice!' ], { x: 0.4 } );
+    term.txt.entry( 'cd ..' );
+    term.txt.entry( 'rm tmp' );
+    term.txt.raw_entry( 'rm: cannot remove `tmp\': Is a directory' );
+    term.txt.entry( 'rmdir tmp', { no_pause: true } );
+    term.txt.list_right([ 'Remove directory' ], { x: 0.4 } );
+    term.txt.raw_entry( 'rmdir: failed to remove `tmp\': Directory not empty', { no_pause: true } );
+    term.txt.list_right([ 'Must be empty', 'A nice safety feature' ], { x: 0.4 } );
+    term.txt.entry( 'rm tmp/junk' );
+    term.txt.entry( 'rmdir tmp' );
+    term.txt.entry( 'mkdir tmp', { no_pause: true } );
+    term.txt.entry( 'nano tmp/junk', { no_pause: true } );
+    term.txt.list_right([ 'Once again please', 'Last time!' ], { x: 0.4 } );
+    term.txt.entry( 'ls tmp', { no_pause: true } );
+    term.txt.raw_entry( 'junk' );
+    term.txt.entry( 'mv tmp/junk tmp/quotes.txt', { no_pause: true } );
+    term.txt.list_right([ 'Move a file', 'Same for directories', 'Source first', 'Then destination', 'Used for renaming' ], { x: 0.4 } );
+    term.txt.entry( 'ls tmp', { no_pause: true } );
+    term.txt.raw_entry( 'quotes.txt' );
+    term.txt.entry( 'mv tmp/quotes.txt .', { no_pause: true } );
+    term.txt.list_right([ 'Destination is directory', 'Moves into directory' ], { x: 0.4 } );
+    term.txt.entry( 'ls tmp', { no_pause: true } );
+    term.txt.raw_entry( '' );
+    term.txt.entry( 'ls quotes.txt', { no_pause: true } );
+    term.txt.raw_entry( 'quotes.txt', { no_pause: true } );
+    term.txt.list_right([ 'List specific file' ], { x: 0.4 } );
+    term.txt.entry( 'cp quotes.txt tmp/quotations.txt', { no_pause: true } );
+    term.txt.list_right([ 'Copies files', 'Similar to move' ], { x: 0.4 } );
+    term.txt.entry( 'ls quotes.txt tmp/quotations.txt', { no_pause: true } );
+    term.txt.raw_entry( 'quotes.txt  tmp/quotations.txt' );
+    term.txt.entry( 'rm quotes.txt' );
+    term.txt.entry( 'ls quotes.txt tmp/quotations.txt' );
+    term.txt.raw_entry( 'ls: cannot access quotes.txt: No such file or directory\n\
+tmp/quotes.txt' );
+    term.txt.entry( 'cp tmp/quotations.txt .', { no_pause: true } );
+    term.txt.list_right([ 'No destination name', 'Keeps filename' ], { x: 0.4 } );
+    term.txt.entry( 'ls quotations.txt', { no_pause: true } );
+    term.txt.raw_entry( 'quotations.txt' );
+
+    slide.helpers.tv_off( term, term.c );
+    strm.c = slide.timepoint([ strm.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
+}
+
+void pipes_filters() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Pipes and Filters', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    ctr.pause([ hdr.b, 30 ]);
+
+    var strm = 	slide.stream({
+	b: [hdr.b, 40], prompt: '[guest01@g2]$ '
+    });
+    var term = slide.helpers.left_terminal(
+	strm,
+	[hdr.b, 40],
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
+    );
+
+    term.txt.entry( 'ls molecules', { b: [term.b, 40] } );
+    term.txt.raw_entry( 'cubane.pdb  methane.pdb  pentane.pdb\n\
+ethane.pdb  octane.pdb   propane.pdb', { no_pause: true } );
+    term.txt.list_right([ 'Molecule files', 'Text files' ], { x: 0.4 } );
+    term.txt.entry( 'cd molecules', { no_pause: true } );
+    term.txt.raw_entry( '' );
+    term.txt.entry( 'wc *.pdb', { no_pause: true } );
+    term.txt.list_right([ '* = wildcard', '0 or more characters', 'Does this before "wc"', 'What will it match?', 'What will the\ncommand be?' ], { x: 0.4 } );
+    term.txt.entry( 'wc cubane.pdb methane.pdb pentane.pdb ...', { no_pause: true } );
+    term.txt.list_right([ 'What will the\ncommand be?', 'Expanded wildcard...', '... into filenames' ], { x: 0.4 } );
+    term.txt.entry( 'wc *.pdb', { no_pause: true } );
+    term.txt.list_right([ 'wc = word count', 'Counts: lines, words,\ncharacters' ], { x: 0.4 } );
+    term.txt.raw_entry( '  20  156 1178 cubane.pdb\n\
+  12   84  634 ethane.pdb\n\
+   9   57  431 methane.pdb\n\
+  30  246 1858 octane.pdb\n\
+  21  165 1247 pentane.pdb\n\
+  15  111  840 propane.pdb\n\
+ 107  819 6188 total' );
+    term.txt.entry( 'wc -l *.pdb' );
+    term.txt.raw_entry( '  20 cubane.pdb\n\
+  12 ethane.pdb\n\
+   9 methane.pdb\n\
+  30 octane.pdb\n\
+  21 pentane.pdb\n\
+  15 propane.pdb\n\
+ 107 total', { no_pause: true } );
+    term.txt.list_right([ '-w for words', '-c for chars' ], { x: 0.4 } );
+    term.txt.list_right([ 'Which file is shortest?', 'Easy for 6 files', 'For 6000 files?' ], { x: 0.4 } );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'wc -l *.pdb > lengths', { no_pause: true } );
+    term.txt.list_right([ '> = redirect to file', 'Creates file', 'Overwrites existing' ], { x: 0.4 } );
+    term.txt.raw_entry( '', { no_pause: true } );
+    term.txt.list_right([ 'Nothing printed', 'All in file' ], { x: 0.4 } );
+    term.txt.entry( 'ls lengths', { no_pause: true } );
+    term.txt.raw_entry( 'lengths' );
+    term.txt.entry( 'cat lengths', { no_pause: true } );
+    term.txt.list_right([ 'cat = concatenate', 'Prints files' ], { x: 0.4 } );
+    term.txt.raw_entry( '  20 cubane.pdb\n\
+  12 ethane.pdb\n\
+   9 methane.pdb\n\
+  30 octane.pdb\n\
+  21 pentane.pdb\n\
+  15 propane.pdb\n\
+ 107 total', { no_pause: true } );
+    term.txt.list_right([ 'Only one file', 'Shows the file', 'Works for > 1' ], { x: 0.4 } );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'sort -n lengths', { no_pause: true } );
+    term.txt.list_right([ 'Sorts contents', 'Does not change file', '-n forces numerical' ], { x: 0.4 } );
+    term.txt.raw_entry( '   9 methane.pdb\n\
+  12 ethane.pdb\n\
+  15 propane.pdb\n\
+  20 cubane.pdb\n\
+  21 pentane.pdb\n\
+  30 octane.pdb\n\
+ 107 total' );
+    term.txt.entry( 'sort -n lengths > sorted-lengths' );
+    term.txt.entry( 'head -1 sorted-lengths', { no_pause: true } );
+    term.txt.list_right([ 'Get start of file', 'Default 20 lines', '-1 = only one line' ], { x: 0.4 } );
+    term.txt.raw_entry( '   9 methane.pdb', { no_pause: true } );
+    term.txt.list_right([ 'A little confusing', 'Can we do better?' ], { x: 0.4 } );
+    term.txt.entry( 'sort -n lengths | head -1', { no_pause: true } );
+    term.txt.list_right([ '| = a pipe', 'Output from first', 'Input to second' ], { x: 0.4 } );
+    term.txt.raw_entry( '   9 methane.pdb', { no_pause: true } );
+    term.txt.list_right([ 'No storage needed', 'Let\'s go one better' ], { x: 0.4 } );
+    term.txt.entry( 'wc *.pdb | sort -n lengths | head -1' );
+    term.txt.raw_entry( '   9 methane.pdb' );
+    term.txt.list_right([ 'Filters + pipes', 'Very powerful', 'Small programs', 'Chained together', 'Do one job well', 'Work well together' ], { x: 0.4 } );
+
+    term.txt.raw_entry( " ", { no_pause: true } );
+    term.txt.entry( 'cd ..' );
+
+    slide.helpers.tv_off( term, term.c );
+    strm.c = slide.timepoint([ strm.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
+}
+
+void permissions() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Permissions', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    ctr.pause([ hdr.b, 30 ]);
+
+    var intro = ctr.add_child( new slide.Boxed( 0, 1, [[hdr.b, 40], undefined] ) );
+
+    var user = intro.shape( user_sh, { origin: slide.helpers.left(), duration: intro.c } );
+    user.x += 0.15*slide.camera.w;
+    slide.helpers.pop_in( user, user.b );
+    intro.pause( user.get_last_tween().c );
+
+    var group = intro.shape( group_sh, { size: 0.4, origin: slide.helpers.center(), duration: intro.c } );
+    group.x += 0.15*slide.camera.w;
+    slide.helpers.pop_in( group, group.b );
+    intro.pause([ group.b, 20 ]);
+
+    var other = intro.shape( other_sh, { size: 0.4, origin: slide.helpers.right(), duration: intro.c } );
+    other.x += 0.15*slide.camera.w;
+    slide.helpers.pop_in( other, other.b );
+    intro.pause([ other.b, 20 ]);
+
+    slide.helpers.move_up( intro, [other.b, 20] );
+    var file = intro.shape( file_sh, { size: 0.3, origin: slide.helpers.left(), warp: [[other.b, 40], intro.c] } );
+    file.x -= 0.2*slide.camera.w;
+    file.y += 0.3*slide.camera.h;
+    slide.helpers.pop_in( file, file.b );
+
+    var read = intro.new_text( 'read', { origin: [file.x + 0.15*slide.camera.w, file.y - 0.1*slide.camera.h], warp: [file.b, intro.c] } );
+    var write = intro.new_text( 'write', { origin: [file.x + 0.15*slide.camera.w, file.y], warp: [file.b, intro.c] } );
+    var exec = intro.new_text( 'exec', { origin: [file.x + 0.15*slide.camera.w, file.y + 0.1*slide.camera.h], warp: [file.b, intro.c] } );
+    intro.pause([ file.b, 20 ]);
+
+    intro.shape( check_sh, { size: 0.15, origin: [user.x,  read.y],  warp: [[file.b, 30], intro.c] } );
+    intro.shape( check_sh, { size: 0.15, origin: [group.x, read.y],  warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [other.x, read.y],  warp: [[file.b, 30], intro.c] } );
+    intro.shape( check_sh, { size: 0.15, origin: [user.x,  write.y], warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [group.x, write.y], warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [other.x, write.y], warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [user.x,  exec.y],  warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [group.x, exec.y],  warp: [[file.b, 30], intro.c] } );
+    intro.shape( cross_sh, { size: 0.15, origin: [other.x, exec.y],  warp: [[file.b, 30], intro.c] } );
+    intro.pause([ file.b, 30 ]);
+
+    intro.add_tween(
+    	slide.tweens.back_in([ [file.b, 30], 20 ]), 'x', function( obj ) {
+    	    return [obj.x, -0.5*(slide.camera.w + obj.w)];
+    	}
+    );
+
+    var strm = slide.stream({
+	b: [intro.c, 20], prompt: '[guest01@g2]$ ',
+    });
+    var term = slide.helpers.left_terminal(
+	strm,
+	[intro.c, 20],
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
+    );
+
+    term.txt.entry( './setup.sh', { b: [term.b, 40], no_pause: true } );
+    term.txt.list_right([ 'Execute a file', 'Prepares permissions', 'Don\'t worry yet' ], { x: 0.4 } );
+    term.txt.raw_entry( " ", { no_pause: true } );
+
+    term.txt.entry( 'cd labs' );
+    term.txt.entry( 'ls', { no_pause: true } );
+    term.txt.raw_entry( 'safety.txt  setup  waiver.txt' );
+    term.txt.entry( 'ls -F', { no_pause: true } );
+    term.txt.raw_entry( 'safety.txt  setup*  waiver.txt', { no_pause: true } );
+    term.txt.list_right([ '* = executable', 'Could be colored' ], { x: 0.4 } );
+    term.txt.entry( 'ls -l', { no_pause: true } );
+    term.txt.list_right([ '-l = long', 'Lots of information' ], { x: 0.4 } );
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'max_chars', 40, 64 );
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'w', function( obj ) {
+    	return [obj.w, 64*obj.char_width + 2*obj.padding];
+    });
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'x', function( obj ) {
+    	return [obj.x, 0];
+    });
+    term.txt.raw_entry( 'total 0\n\
+-rw-rw-r-- 1 guest01 p093_swin 0 Jun  9 11:56 safety.txt\n\
+-rwxr-xr-x 1 guest01 p093_swin 0 Jun  9 11:56 setup\n\
+-rw-rw-r-- 1 guest01 p093_swin 0 Jun  9 11:57 waiver.txt', { b: [term.txt.get_last_child().c, 20] } );
+    term.txt.entry( 'ls -l -a' );
+    term.txt.raw_entry( 'total 0\n\
+drwxr-xr-x 2 guest01 p093_swin 68 Jun  9 11:57 .\n\
+drwxr-xr-x 4 guest01 p093_swin 45 Jun  9 11:56 ..\n\
+-rw-rw-r-- 1 guest01 p093_swin  0 Jun  9 11:56 safety.txt\n\
+-rwxr-xr-x 1 guest01 p093_swin  0 Jun  9 11:56 setup\n\
+-rw-rw-r-- 1 guest01 p093_swin  0 Jun  9 11:57 waiver.txt' );
+
+    term.txt.raw_entry( " ", { no_pause: true } );
+    term.txt.entry( 'cd ../venus' );
+    term.txt.entry( 'ls -l' );
+    term.txt.raw_entry( 'total 0\n\
+drwxr-xr-x 3 guest01 p093_swin 26 Jun  9 13:03 mars\n\
+drw-r--r-- 3 guest01 p093_swin 26 Jun  9 13:03 pluto\n\
+d-wx--x--x 3 guest01 p093_swin 26 Jun  9 13:08 saturn' );
+    term.txt.entry( 'ls mars' );
+    term.txt.raw_entry( 'notes' );
+    term.txt.entry( 'ls pluto' );
+    term.txt.raw_entry( 'ls: cannot access pluto/notes: Permission denied\n\
+notes' );
+    term.txt.entry( 'ls saturn' );
+    term.txt.raw_entry( 'ls: cannot open directory saturn: Permission denied' );
+    term.txt.entry( 'ls saturn/notes' );
+    term.txt.raw_entry( 'info.txt' );
+
+    term.txt.raw_entry( " ", { no_pause: true } );
+    term.txt.entry( 'cd mars/notes' );
+    term.txt.entry( 'ls -l', { no_pause: true } );
+    term.txt.raw_entry( 'total 0\n\
+-rwxrwxrwx 1 guest01 p093_swin 0 Jun  9 13:15 private.txt' );
+    term.txt.entry( 'chmod u=rw private.txt' );
+    term.txt.entry( 'ls -l', { no_pause: true } );
+    term.txt.raw_entry( 'total 0\n\
+-rw-rwxrwx 1 guest01 p093_swin 0 Jun  9 13:15 private.txt' );
+    term.txt.entry( 'chmod g=r private.txt; ls -l' );
+    term.txt.raw_entry( 'total 0\n\
+-rw-r--rwx 1 guest01 p093_swin 0 Jun  9 13:15 private.txt' );
+    term.txt.entry( 'chmod o= private.txt; ls -l' );
+    term.txt.raw_entry( 'total 0\n\
+-rw-r----- 1 guest01 p093_swin 0 Jun  9 13:15 private.txt' );
+
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'max_chars', 64, 40 );
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'w', function( obj ) {
+    	return [obj.w, 40*obj.char_width + 2*obj.padding];
+    });
+    term.add_tween( slide.tweens.linear([ term.txt.get_last_child().c, 20 ]), 'x', function( obj ) {
+    	return [obj.x, -0.1*slide.camera.w];
+    });
+
+    term.txt.raw_entry( " ", { no_pause: true, b: [term.txt.get_last_child().c, 20] } );
+    term.txt.entry( 'cd ../../..', { no_pause: true } );
+    term.txt.entry( 'cd molecules', { no_pause: true } );
+    term.txt.raw_entry( '' );
+    term.txt.entry( 'cat > smallest', { no_pause: true } );
+    term.txt.list_right([ 'No argument to cat', 'Read from stdin', 'stdin = keyboard' ], { x: 0.4 } );
+    term.txt.raw_entry( 'wc -l *.pdb | sort -n | head -1' );
+    term.txt.raw_entry( '', { no_pause: true } );
+    term.txt.list_right([ 'Hit enter', 'Then Ctrl+D', 'Means "end of input"' ], { x: 0.4 } );
+    term.txt.entry( 'cat smallest' );
+    term.txt.raw_entry( 'wc -l *.pdb | sort -n | head -1', { no_pause: true } );
+    term.txt.raw_entry( '' );
+    term.txt.entry( 'chmod u+x smallest', { no_pause: true } );
+    term.txt.list_right([ '+ instead of =', 'Adds permissions', 'Can use "-" too' ], { x: 0.4 } );
+    term.txt.entry( './smallest', { no_pause: true } );
+    term.txt.list_right([ 'Why use "./"?' ], { x: 0.4 } );
+    term.txt.raw_entry( '   9 methane.pdb', { no_pause: true } );
+    term.txt.list_right([ 'Your first shell script!', 'Try that with a GUI' ], { x: 0.4 } );
+
+    term.txt.raw_entry( " ", { no_pause: true } );
+    term.txt.entry( 'cd ..' );
+
+    slide.helpers.tv_off( term, term.c );
+    strm.c = slide.timepoint([ strm.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
+}
+
+void finding_things() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Finding Things', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    ctr.pause([ hdr.b, 30 ]);
+
+    var strm = slide.stream({
+	b: [ctr.get_last_child().c, 20], prompt: '[guest01@g2]$ ',
+    });
+    var term = slide.helpers.left_terminal(
+	strm,
+	ctr.get_last_child().c,
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
+    );
+
+    strm.entry( 'pwd', { b: [term.b, 40], no_pause: true } );
+    term.txt.raw_entry( '/lustre/projects/p093_swin/test/intro_to_shell' );
+    strm.entry( 'cat haiku.txt' );
+    strm.raw_entry( 'The tao that is seen\n\
+Is not the true Tao, until\n\
+You bring fresh toner.\n\
+\n\
+With searching comes loss\n\
+and the presence of absence:\n\
+"My Thesis" not found.\n\
+\n\
+Yesterday it worked\n\
+Today it is not working\n\
+Software is like that.', { no_pause: true } );
+    strm.list_right([ '3 haikus', 'From Salon magazine' ], { x: 0.4 } );
+    strm.raw_entry( " ", { no_pause: true } );
+
+    strm.entry( 'grep not haiku.txt', { no_pause: true } );
+    strm.list_right([ 'Global', 'Regular expression', 'Print' ], { x: 0.4 } );
+    strm.list_right([ 'Reads file', 'Matches patterns\nin lines', 'Prints lines' ], { x: 0.4 } );
+    strm.list_right([ 'not = pattern', 'haiku.txt = file', 'Can be many files' ], { x: 0.4 } );
+    strm.raw_entry( 'Is not the true Tao, until\n\
+"My Thesis" not found.\n\
+Today it is not working' );
+    strm.entry( 'grep day haiku.txt' );
+    strm.raw_entry( 'Yesterday it worked\n\
+Today it is not working' );
+    strm.entry( 'grep -w day haiku.txt', { no_pause: true } );
+    strm.list_right([ '-w = match whole\nword boundaries' ], { x: 0.4 } );
+    strm.raw_entry( '' );
+    strm.entry( 'grep -n it haiku.txt', { no_pause: true } );
+    strm.list_right([ '-n = line numbers' ], { x: 0.4 } );
+    strm.raw_entry( '5:With searching comes loss\n\
+9:Yesterday it worked\n\
+10:Today it is not working' );
+    strm.entry( 'grep -w -n it haiku.txt' );
+    strm.raw_entry( '9:Yesterday it worked\n\
+10:Today it is not working' );
+    strm.entry( 'grep -i -v it haiku.txt', { no_pause: true } );
+    strm.list_right([ '-i = case-insensitive', '-v = inversion' ], { x: 0.4 } );
+    strm.raw_entry( 'The tao that is seen\n\
+Is not the true Tao, until\n\
+You bring fresh toner.\n\
+\n\
+and the presence of absence:\n\
+"My Thesis" not found.\n\
+\n\
+Software is like that.' );
+    strm.entry( 'man grep', { no_pause: true } );
+    strm.list_right([ 'Grep has many options', 'man = manual', 'Extremely useful' ], { x: 0.4 } );
+    strm.list_right([ 'Patterns can be REs', 'Too complex for now', 'Very powerful' ], { x: 0.4 } );
+    strm.raw_entry( " ", { no_pause: true } );
+
+    strm.entry( 'man find', { no_pause: true } );
+    strm.list_right([ '"find" for files', 'Also many options' ], { x: 0.4 } );
+    strm.entry( 'tree -F base' );
+    strm.raw_entry( 'base\n\
+├── data/\n\
+│   ├── first.txt\n\
+│   └── econd.txt\n\
+├── notes.txt\n\
+├── thesis/\n\
+└── tools/\n\
+    ├── format*\n\
+    ├── old/\n\
+    └── stats*\n\
+\n\
+4 directories, 5 files', { no_pause: true } );
+    strm.list_right([ 'Similar to ls', '/ = directory', '* = executable' ], { x: 0.4 } );
+    strm.entry( 'find base -type d', { no_pause: true } );
+    strm.list_right([ '"base" = start path', '"-type d" = look for\ndirectories' ], { x: 0.4 } );
+    strm.raw_entry( 'base\n\
+base/data\n\
+base/thesis\n\
+base/tools\n\
+base/tools/old' );
+    strm.entry( 'find base -type f' );
+    strm.raw_entry( 'base/data/first.txt\n\
+base/data/econd.txt\n\
+base/tools/format\n\
+base/tools/stats\n\
+base/notes.txt' );
+    strm.entry( 'find base -maxdepth 1 -type f' );
+    strm.raw_entry( 'base/notes.txt' );
+    strm.entry( 'find base -mindepth 2 -type f' );
+    strm.raw_entry( 'base/data/first.txt\n\
+base/data/econd.txt\n\
+base/tools/format\n\
+base/tools/stats' );
+    strm.entry( 'find base -empty' );
+    strm.raw_entry( 'base/thesis\n\
+base/tools/old' );
+    strm.entry( 'find base -perm -u=x' );
+    strm.raw_entry( 'base\n\
+base/data\n\
+base/thesis\n\
+base/tools\n\
+base/tools/format\n\
+base/tools/stats\n\
+base/tools/old' );
+    strm.entry( 'find base -perm -u=x -type f' );
+    strm.raw_entry( 'base/tools/format\n\
+base/tools/stats' );
+    strm.raw_entry( " ", { no_pause: true } );
+
+    strm.entry( 'find base -name *.txt', { no_pause: true } );
+    strm.list_right([ 'Find "txt" extension', 'But something\'s wrong', 'Can you see it?' ], { x: 0.4 } );
+    strm.raw_entry( '', { no_pause: true } );
+    strm.list_right([ 'Why nothing?', 'Remeber "*" expansion', 'Happens before running', 'No ".txt" files in pwd' ], { x: 0.4 } );
+    strm.entry( 'find base -name \'\'' );
+    strm.entry( 'find base -name \'*.txt\'', { no_pause: true } );
+    strm.list_right([ 'Use single quotes', 'Prevent expansion', 'Passes pattern as is' ], { x: 0.4 } );
+    strm.raw_entry( 'base/data/first.txt\n\
+base/data/econd.txt\n\
+base/notes.txt' );
+    strm.entry( 'wc -l `find base -name \'*.txt\'`', { no_pause: true } );
+    strm.list_right([ 'Why back ticks?', 'Replaces with output', 'Like expansion' ], { x: 0.4 } );
+    strm.raw_entry( ' 1 base/data/first.txt\n\
+ 1 base/data/econd.txt\n\
+ 1 base/notes.txt\n\
+ 3 total' );
+    strm.raw_entry( " ", { no_pause: true } );
+    strm.list_right([ 'What next?', 'Combining things...' ], { x: 0.4 } );
+
+    strm.entry( 'cd molecules', { no_pause: true } );
+    strm.raw_entry( '' );
+    strm.entry( 'grep BR `find . -name \'*.pdb\'`' );
+    strm.raw_entry( './human/typurple.pdb:ATOM     29  BR          1      -6.747   2.106   0.006  1.00  0.00\n\
+./human/typurple.pdb:ATOM     30  BR          1       6.747  -2.112   0.082  1.00  0.00' );
+
+    strm.raw_entry( " ", { no_pause: true } );
+    strm.entry( 'cd ..' );
+
+    slide.helpers.tv_off( term, term.c );
+    strm.c = slide.timepoint([ strm.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
+}
+
+void variables() {
+    // var tp = slide.scene.children.entities[slide.scene.children.entities.length - 1].c;
+    var tp = 0;
+    var ctr = slide.helpers.container( tp );
+
+    var hdr = slide.helpers.heading( 'Variables', tp );
+    slide.helpers.enter_left( hdr, tp );
+
+    ctr.pause([ hdr.b, 30 ]);
+
+    var strm = slide.stream({
+	b: [ctr.get_last_child().c, 20], prompt: '[guest01@g2]$ ',
+    });
+    var term = slide.helpers.left_terminal(
+	strm,
+	ctr.get_last_child().c,
+	{
+	    highlighter: new slide.Highlighter([
+		['.*\\$ (.+)(?=_| |\n)', slide.palette.base0B]
+	    ])
+	}
+    );
+
+    strm.entry( '', { b: [term.b, 40], no_pause: true } );
+    strm.list_right([ 'Shell is a program', 'It has variables', 'Changing variables...', '... changes behavior' ], { x: 0.4 } );
+    strm.entry( 'set', { no_pause: true } );
+    strm.list_right([ '"set" to show?', 'No arguments...', '... might as well show' ], { x: 0.4 } );
+    strm.raw_entry( ['LDPWD=/lustre/projects/p093_swin/test/intro_to_shell/labs',
+		     'OPTERR=1',
+		     'OPTIND=1',
+		     'OSTYPE=linux-gnu',
+		     'PATH=/usr/lib64/qt-3.3/bin:/bin:/usr/bin:/usr/X11R6/bin:/opt/torque/bin:/opt/moab/bin:/opt/sgi/sgimc/bin:/home/guest01/bin',
+		     'PIPESTATUS=([0]="0")',
+		     'PLATFORM=amd64',
+		     'PPID=1432'].join( "\n" ), { no_pause: true } );
+    strm.list_right([ 'Just a sample', 'Lots of variables!', 'Uppercase names', 'String values', 'Can be lists' ], { x: 0.4 } );
+    strm.list_right([ 'Let\'s focus on PATH' ], { x: 0.4 } );
+    strm.raw_entry( " " );
+    strm.entry( "touch ls", { no_pause: true } );
+    strm.list_right([ '"touch" = new file', 'Starts empty', 'Updates modify time' ], { x: 0.4 } );
+    strm.entry( "chmod u+x ls", { no_pause: true } );
+    strm.list_right([ 'Now have two "ls"s', '/bin/ls', './ls', 'Which one?' ], { x: 0.4 } );
+    strm.entry( "ls", { no_pause: true } );
+    strm.raw_entry( ['base       labs       setup.sh  venus',
+		     'haiku.txt  molecules  tmp'].join( '\n' ) );
+    strm.entry( './ls', { no_pause: true } );
+    strm.raw_entry( '', { no_pause: true } );
+    strm.list_right([ 'Uses /bin/ls', 'Why?', 'Answer is PATH' ], { x: 0.4 } );
+    strm.entry( 'echo $PATH', { no_pause: true } );
+    strm.list_right([ '"echo" = show string', 'Notice the $', 'Asks to expand' ], { x: 0.4 } );
+    strm.raw_entry( '/usr/lib64/qt-3.3/bin:/bin:/usr/bin:/usr/X11R6/bin:/opt/torque/bin:/opt/moab/bin:/opt/sgi/sgimc/bin:/home/guest01/bin', { no_pause: true } );
+    strm.list_right([ 'A bit confusing', 'Can we make it pretty?' ], { x: 0.4 } );
+    strm.entry( 'echo $PATH | tr \':\' \'\\n\'', { no_pause: true } );
+    strm.list_right([ '"tr" = translate', 'Replaces characters', 'First source', 'Then target' ], { x: 0.4 } );
+    strm.raw_entry( ['/usr/lib64/qt-3.3/bin',
+		     '/bin',
+		     '/usr/bin',
+		     '/usr/X11R6/bin',
+		     '/opt/torque/bin',
+		     '/opt/moab/bin',
+		     '/opt/sgi/sgimc/bin',
+		     '/home/guest01/bin'].join( '\n' ) );
+    strm.list_right([ 'Executable search order', 'Can\'t see our ls' ], { x: 0.4 } );
+    strm.raw_entry( " ", { no_pause: true } );
+
+    
+
+    slide.helpers.tv_off( term, term.c );
+    strm.c = slide.timepoint([ strm.get_last_child().c, 40 ]);
+    slide.helpers.exit_left( hdr, term.get_last_tween().c );
 }

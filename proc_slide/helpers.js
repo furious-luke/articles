@@ -14,6 +14,10 @@
 	return [0.21*slide.camera.w, 0.02*slide.camera.h];
     }
 
+    slide.helpers.upper = function() {
+	return [0, -0.19*slide.camera.h];
+    }
+
     slide.helpers.container = function( tp ) {
 	var ctr = new slide.Boxed( 0, 1, [tp, undefined] );
 	slide.scene.add_child( ctr );
@@ -81,6 +85,16 @@
 	);
     }
 
+    slide.helpers.move_up = function( node, tp, opts ) {
+	opts = opts || {};
+	node.add_tween(
+	    slide.tweens.quartic([ tp, 20 ]),
+	    'y', function( obj ) {
+		return [obj.y, slide.helpers.upper()[1]];
+	    }
+	);
+    }
+
     slide.helpers.list = function( items, tp, opts ) {
 	opts = opts || {};
 	var node = slide.helpers._ctr.add_child(
@@ -112,17 +126,18 @@
 	var term = slide.helpers._ctr.add_child(
     	    slide.terminal({
     		text: txt,
-    		origin: [get_default( opts, 'x', 0 ), 0.035*slide.camera.h],
+    		origin: [get_default( opts, 'x', 0 ), get_default( opts, 'y', 0.035*slide.camera.h )],
 		warp: [tp, opts.duration],
     		radius: 0.02,
     		fill: slide.palette.base03,
     		font: get_default( opts, 'font', slide.default_mono_font ),
     		font_size: 0.07,
     		columns: get_default( opts, 'columns', 64 ),
-    		rows: get_default( opts, 'rows', 20 ),
+    		rows: get_default( opts, 'rows', 19 ),
     		height: 0.03*slide.camera.h,
     		font_fill: slide.palette.base06,
-		use_prompt: false
+		use_prompt: false,
+		highlighter: opts.highlighter
     	    })
 	);
 	term.add_tween(

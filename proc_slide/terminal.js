@@ -19,6 +19,7 @@
             this.txt = get_default( opts, 'text', '');
 	    this.font_fill = opts.font_fill;
 	    this.use_prompt = opts.use_prompt;
+	    this.highlighter = opts.highlighter;
 
 	    // If we were given a stream, add it as a child.
 	    if( this.txt.stream !== undefined )
@@ -40,6 +41,9 @@
 		txt = this.txt.stream;
 	    else
 		txt = this.txt;
+
+	    // Run the highlighter.
+	    var colors = this.highlighter ? this.highlighter.apply( txt ) : [];
 
 	    var y = this.y + 0.5*this.h - this.padding - 0.5*this.line_height, pos = txt.length;
 	    var first = true;
@@ -75,10 +79,13 @@
 
 		// Begin by rendering the remainder.
 	    	x = this.x - 0.5*this.w + this.padding;
-		for( var ii = pos - remainder; ii < pos; ++ii ) {
+		if( remainder )
+		    x += (remainder - 1)*this.char_width;
+		for( var ii = pos - 1; ii >= pos - remainder; --ii ) {
 	    	    var ch = txt[ii];
+		    this._set_text_color( ii, colors );
 	    	    this.pjs.text( ch, x*ppp, y*ppp );
-	    	    x += this.char_width;
+	    	    x -= this.char_width;
 		}
 
 		// Only add this extra line if we just printed some remainder,
@@ -91,11 +98,13 @@
 		    if( y - 0.5*this.line_height < this.y - 0.5*this.h + 0.95*this.padding )
 			break;
 	    	    x = this.x - 0.5*this.w + this.padding;
+		    x += (this.max_chars - 1)*this.char_width;
 		    var term = pos - remainder - ii*this.max_chars
-		    for( var jj = term - this.max_chars; jj < term; ++jj ) {
+		    for( var jj = term - 1; jj >= term - this.max_chars; --jj ) {
 	    		var ch = txt[jj];
+			this._set_text_color( jj, colors );
 	    		this.pjs.text( ch, x*ppp, y*ppp );
-	    		x += this.char_width;
+	    		x -= this.char_width;
 		    }
 		    y -= this.line_height;
 		}
@@ -103,6 +112,22 @@
 		pos = start - 1;
 	    }
     	},
+
+	_set_text_color: function( pos, colors ) {
+	    if( colors.length == 0 )
+	    	return;
+	    var ii = colors.length - 1;
+	    if( colors[ii][1] - 1 == pos ) {
+	    	this.pjs.fill( colors[ii][2] );
+	    }
+	    else if( colors[ii][0] - 1 == pos ) {
+		if( this.font_fill )
+		    this.pjs.fill( this.font_fill );
+		else
+	    	    this.pjs.fill( this.default_fill );
+	    	colors.pop();
+	    }
+	},
 
 	_start_line: function() {
 
@@ -172,7 +197,7 @@
 
     var StreamEntry = slide.Entity.extend({
 
-	create: function( strm, txt, tp ) {
+	create: function( strm, txt, tp, opts ) {
 	    slide.Entity.prototype.create.call( this, [tp, 0] );
 	    this.stream = strm;
 	    this.text = txt;
@@ -209,9 +234,10 @@
 		tp = this.get_last_child().c;
 	    else
 		tp = opts.b;
-	    var entry = this.add_child( new StreamEntry( this, txt, tp ) );
+	    var entry = this.add_child( new StreamEntry( this, txt, tp, opts ) );
 	    if( !opts.no_pause )
 		this.pause( get_default( opts, 'pause_delay', 10 ) );
+	    return entry;
 	},
 
 	raw_entry: function( txt, opts ) {
@@ -249,16 +275,17 @@
 			this._delay = line;
 			if( ++this.line >= this.lines.length )
 			    this._done = true;
-
-			// TODO: Fix this.
-			this._pause_help += 'slide.helpers.pause([ term.get_child( 0 ).b, ' + (tick + 0.5*this._delay - this.b.value) + ' ]);\n';
-			console.log( this._pause_help );
 		    }
 
 		    // Check for a raw block.
 		    else if( typeof line === 'object' ) {
-			this._stream = this._history + line.txt + '\n' + this.prompt;
-			this._history += line.txt + '\n';
+			this._stream = this._history + line.txt;
+			this._history += line.txt;
+			if( line.txt.length > 0 ) {
+			    this._stream += '\n';
+			    this._history += '\n';
+			}
+			this._stream += this.prompt;
 			if( ++this.line >= this.lines.length )
 			    this._done = true;
 			this.col = 0;
@@ -281,7 +308,43 @@
 		--this._delay;
 		this._delay_tick = tick;
 	    }
-	    this.stream = this._stream + ((this.pjs.frameCount%20 < 10) ? this.caret : '');
+	    this.stream = this._stream + ((this.pjs.frameCount%20 < 10) ? this.caret : ' ');
+	}
+    });
+
+    var Highlighter = Class({
+
+	create: function( syntax ) {
+	    this.syntax = syntax;
+	    this.update();
+	},
+
+	update: function() {
+	    var kws = [];
+	    for( var ii = 0; ii < this.syntax.length; ++ii ) {
+		var kw = this.syntax[ii][0];
+		kws.push( kw );
+	    }
+	    var expr = kws.join( '|' );
+	    this.prog = new RegExp( expr, 'g' );
+	},
+
+	apply: function( txt ) {
+	    var words = [];
+	    this.prog.lastIndex = 0;
+	    do {
+		var match = this.prog.exec( txt );
+		if( match ) {
+		    var ii = 1;
+		    for( ; ii < this.syntax.length; ++ii ) {
+			if( match[ii] )
+			    break;
+		    }
+		    var val = [this.prog.lastIndex - match[ii].length, this.prog.lastIndex, this.syntax[ii - 1][1]];
+		    words.push( val );
+		}
+	    } while( match );
+	    return words;
 	}
     });
 
@@ -296,6 +359,8 @@
     stream.raw = function( txt ) {
 	return { txt: txt };
     }
+
+    slide.Highlighter = Highlighter;
 
     slide.terminal = terminal;
     slide.stream = stream;

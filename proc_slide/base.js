@@ -847,7 +847,7 @@ function get_default( obj, name, def ) {
 	var tp;
 	if( rel === undefined )
 	    rel = 0;
-	if( rel.constructor === Array )
+	if( rel.constructor === Array || typeof rel === 'object' )
 	    tp = rel;
 	else {
 	    tp = this.get_last_child();
@@ -856,6 +856,57 @@ function get_default( obj, name, def ) {
 	    tp = [tp, rel];
 	}
 	return this.add_child( slide.pause( tp ) );
+    }
+
+    Node.prototype.shape = function( sh, opts ) {
+	opts = opts || {};
+
+	var warp;
+	if( opts.warp !== undefined )
+	    warp = opts.warp;
+	else {
+	    var lc = this.get_last_child();
+	    if( lc !== undefined )
+		lc = lc.c;
+	    warp = [lc, opts.duration];
+	}
+
+	opts.scale = get_default( opts, 'scale', 1 );
+	opts.size = get_default( opts, 'size', 0.5 );
+	var origin;
+	if( opts.origin !== undefined )
+	    origin = opts.origin;
+	else
+	    origin = [opts.x, opts.y];
+	var node = this.add_child( slide.shape( sh, opts.size, origin, opts.scale, warp ) );
+	return node;
+    }
+
+    Node.prototype.new_text = function( txt, opts ) {
+	opts = opts || {};
+
+	var warp;
+	if( opts.warp !== undefined )
+	    warp = opts.warp;
+	else {
+	    var lc = this.get_last_child();
+	    if( lc !== undefined )
+		lc = lc.c;
+	    warp = [lc, opts.duration];
+	}
+
+	var origin;
+	if( opts.origin !== undefined )
+	    origin = opts.origin;
+	else
+	    origin = [opts.x, opts.y];
+
+	font = get_default( opts, 'font', slide.default_font );
+
+	opts.font_size = get_default( opts, 'font_size', 0.1 );
+
+	var node = this.add_child( slide.text( txt, font, opts ) );
+	return node;
     }
 
     slide.Entity = Entity;

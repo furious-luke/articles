@@ -44,8 +44,9 @@
 
         update: function( t ) {
             this.calc_t( t );
-            for( var ii = 0; ii < this.transitions.length; ++ii )
+            for( var ii = 0; ii < this.transitions.length; ++ii ) {
                 this.transitions[ii].update( this.interp );
+	    }
         },
 
         calc_t: function( t ) {
