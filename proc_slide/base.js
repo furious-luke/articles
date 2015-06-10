@@ -43,7 +43,16 @@ function get_default( obj, name, def ) {
         _key_listeners.push( listener );
     }
 
-    var key_typed = function() {
+    var key_typed = function( key, keyCode ) {
+
+        // Check for an ESC.
+        var pjs = Processing.getInstanceById( 'sketch' );
+        if( key == pjs.ESC ) {
+            var sk = document.getElementById( 'sketch' );
+            sk.blur();
+            return;
+        }
+
         var jj = 0;
         for( var ii = 0; ii < _key_listeners.length; ++ii ) {
             if( _key_listeners[ii].key_typed() != true ) {

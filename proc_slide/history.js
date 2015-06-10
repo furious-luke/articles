@@ -1,4 +1,4 @@
-var history = 'mkdir another\n\
+var terminal_history = 'mkdir another\n\
 cd another/\n\
 module load iraf/x86_64/gnu/2.16\n\
 cl\n\

@@ -79,7 +79,10 @@ void draw() {
 }
 
 void keyTyped() {
-    slide.key_typed();
+    if( key == CODED )
+        slide.key_typed( undefined, keyCode );
+    else
+        slide.key_typed( key, undefined );
 }
 
 void splash() {
@@ -330,7 +333,7 @@ void linux_shell() {
     );
 
     var strm = slide.stream({
-	text: history, warp: [[tux.c, 10], 40],
+	text: terminal_history, warp: [[tux.c, 10], 40],
     });
     var term = ctr.add_child(
 	slide.terminal({
