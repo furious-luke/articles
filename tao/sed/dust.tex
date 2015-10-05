@@ -1,0 +1,58 @@
+\title{Dust}
+\author{
+  Luke Hodkinson \\
+  Center for Astrophysics and Supercomputing \\
+  Swinburne University of Technology \\
+  Melbourne, Hawthorn 32000, \underline{Australia}
+}
+\date{\today}
+
+\documentclass[12pt]{scrartcl}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[scientific-notation=true]{siunitx}
+\usepackage{listings}
+\usepackage{hyperref}
+%% \usepackage[scaled]{beramono}
+%% \renewcommand*\familydefault{\ttdefault}
+%% \usepackage[Tl]{fontenc}
+
+\newcommand{\deriv}[2]{\ensuremath{\frac{\mathrm{d}#1}{\mathrm{d}#2}}}
+\newcommand{\sderiv}[2]{\ensuremath{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}}
+\newcommand{\dx}[1]{\ensuremath{\,\mathrm{d}#1}}
+
+%% \lstset{
+%%   language=Python,
+%%   showstringspaces=false,
+%%   formfeed=\newpage,
+%%   tabsize=4,
+%%   basicstyle=\small\ttfamily,
+%%   commentstyle=\color{BrickRed}\itshape,
+%%   keywordstyle=\color{blue},
+%%   stringstyle=\color{OliveGreen},
+%%   morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+%%    zip, with, open}
+%% }
+
+\begin{document}
+\maketitle
+
+\section{Tonini}
+
+\begin{eqnarray*}
+  \hat{f}_\lambda &=& f_\lambda E \\
+  E &=& 10^{-0.4ka/r} \\
+  r &=& 3.675 \\
+  a &=& \frac{r}{\left(e^3 - e^{-2}\right)}\left(\frac{S}{1.479}\right)^{0.4} - \frac{1}{\left(e^3 - e^{-2}\right)e^2} + 0.06 \\
+    &=& \frac{r}{\left(e^3 - e^{-2}\right)}\left(\frac{S}{1.479}\right)^{0.4} - \frac{1}{\left(e^5 - 1\right)} + 0.06 \\
+  k &=& 
+  \begin{cases}
+    2.659\left(-2.156 + \frac{\num{1.5098e4}}{\lambda} - \frac{\num{0.198e8}}{\lambda^2} + \frac{\num{0.011e12}}{\lambda^3}\right) + r,& \text{if } \lambda \le 6300 \\
+    2.659\left(-1.857 + \frac{1.040e4}{\lambda}\right) + r, & \text{otherwise}
+  \end{cases}
+\end{eqnarray*}
+
+\end{document}

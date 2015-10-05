@@ -1,0 +1,201 @@
+\documentclass{beamer}
+
+\usepackage{listings,tikz,hyperref}
+\usetikzlibrary{calc,arrows,decorations.markings,positioning}
+\usetikzlibrary{shapes.arrows,shapes}
+
+% Setup epigraph.
+\usepackage{epigraph,etoolbox}
+\setlength\epigraphwidth{10cm}
+\setlength\epigraphrule{0.5pt}
+\makeatletter
+\patchcmd{\epigraph}{\@epitext{#1}}{\itshape\@epitext{#1}}{}{}
+\makeatother
+
+\tikzset{
+  class/.style={
+    rectangle,draw=Base02,text centered,anchor=north west,text=Base02,minimum width=3cm,shading=axis,bottom color=Base03!80,top color=Base06,shading angle=45,rectangle split,rectangle split parts=2
+  },
+  nrm/.style={
+    draw=none,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base02,
+    ultra thick,
+    minimum width=5cm,
+    text=Base04
+  },
+  nrm2/.style={
+    draw=none,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base02,
+    ultra thick,
+    text=Base04
+  },
+  short/.style={
+    minimum width=3.2cm,
+    text depth=0.07cm
+  },
+  long/.style={
+    minimum width=6.8cm,
+    text depth=0.07cm
+  },
+  tiny/.style={
+    minimum width=1.5cm,
+    minimum height=0.75cm,
+    inner sep=2mm
+  },
+  lit/.style={
+    draw=Base0D,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base0D,
+    ultra thick,
+    minimum width=5cm,
+    text=Base07
+  },
+  bad/.style={
+    draw=Base08,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base08,
+    ultra thick,
+    minimum width=5cm,
+    text=Base07
+  },
+  exp/.style={
+    draw=Base0D,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=Base02,
+    ultra thick,
+    text width=4cm,
+    text=Base07,
+    text depth=4.7cm
+  },
+  bkg/.style={
+    draw=Base03,
+    rectangle,
+    rounded corners=2mm,
+    inner sep=3mm,
+    fill=none,
+    ultra thick,
+    text=Base03,
+    dashed
+  },
+  arr/.style={
+    draw=Base0D,
+    fill=Base0D,
+    line width=2pt,
+    dashed
+    %% decoration={markings,mark=at position 1 with {\arrow[scale=2,thin,Base0D]{triangle 45}}},
+    %% shorten >= 8pt,
+    %% preaction={decorate},
+    %% postaction={draw,line width=5pt}
+  },
+  bb/.style={
+    rectangle,
+    draw=none,
+    fill=Base00,
+    inner sep=3mm,
+    ultra thick,
+    rounded corners=1mm,
+    text width=3cm,
+    text=Base04,
+    align=center
+  },
+  wb/.style={
+    rectangle,
+    draw=none,
+    fill=Base06,
+    inner sep=3mm,
+    ultra thick,
+    rounded corners=1mm,
+    text width=3cm,
+    text=Base02,
+    align=center
+  },
+  gb/.style={
+    rectangle,
+    draw=none,
+    fill=Base03,
+    inner sep=3mm,
+    ultra thick,
+    rounded corners=1mm,
+    text width=3cm,
+    text=Base06,
+    align=center
+  }
+}
+
+%% \lstset{
+\lstdefinestyle{C}{
+  language=C++,
+  %% numbers=left,
+  showstringspaces=false,
+  formfeed=\newpage,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{Base08}\itshape,
+  keywordstyle=\color{Base0D},
+  stringstyle=\color{Base0B},
+  morekeywords={std, thrust, include, ifndef, define, endif}
+  %% morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+  %%  zip, with, open}
+}
+%% \lstset{
+\lstdefinestyle{Py}{
+  language=Python,
+  %% numbers=left,
+  showstringspaces=false,
+  formfeed=\newpage,
+  tabsize=4,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\color{Base08}\itshape,
+  keywordstyle=\color{Base0D},
+  stringstyle=\color{Base0B},
+  morekeywords={assert}
+  %% morekeywords={models, lambda, forms, dict, list, str, import, dir, help,
+  %%  zip, with, open}
+}
+%% \lstdefinestyle{C}{language=C}
+%% \lstdefinestyle{Py}{language=Python}
+
+\mode<presentation>{\usetheme{Median16}}
+\title[Software Testing for Researchers]{Software Testing for Researchers}
+\author{Luke Hodkinson}
+\institute{\hfill Center for Astrophysics and Supercomputing \\
+  \hfill Swinburne University of Technology \\
+  \hfill Melbourne, Hawthorn 3122, \underline{Australia} }
+
+\date{\today}
+\titlegraphic{
+  \begin{tikzpicture}[overlay]
+    \node[anchor=south west,inner sep=0pt] at ($(current page.south west)+(7cm,2cm)$) {
+      \includegraphics[width=3cm]{swinburne.png}
+    };
+  \end{tikzpicture}
+  \vspace{-\baselineskip}
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\input{motivation.tex}
+\input{testing_methods.tex}
+\input{static_analysis.tex}
+\input{assert.tex}
+\input{testing_levels.tex}
+\input{automation.tex}
+\input{code_coverage.tex}
+\input{tdd.tex}
+\input{summary.tex}
+
+\end{document}

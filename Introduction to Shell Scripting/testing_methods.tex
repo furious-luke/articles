@@ -1,0 +1,185 @@
+\begin{frame}
+  \frametitle{Testing Methods}
+  \begin{tikzpicture}[overlay]
+
+    \node[bkg,anchor=north west,text width=3.2cm,text depth=6cm,label=above:{\color{Base04}Static}] at (-0.5,2.3) {};
+    \node[bkg,anchor=north west,text width=6.8cm,text depth=6cm,label=above:{\color{Base04}Dynamic}] at (3.8,2.3) {};
+
+    \visible<2->{
+
+    \node[nrm2,short,anchor=north west] at (-0.2,1.9) {Reviews};
+    \node[nrm2,short,anchor=north west] at (-0.2,0.7) {Walkthroughs};
+    \node[nrm2,short,anchor=north west] at (-0.2,-0.5) {Inspections};
+    \node[nrm2,short,anchor=north west] at (-0.2,-1.7) {IDE (syntax)};
+
+    }
+
+    \visible<2-4>{
+      \node[nrm2,short,anchor=north west] at (-0.2,-2.9) {Analysis};
+    }
+
+    \visible<3->{
+
+    \node[nrm2,long,anchor=north west] (F) at (4.1,1.9) {Functional};
+    \node[nrm2,long,anchor=north west] (N) at (4.1,-1.6) {Non-functional};
+
+    }
+
+    \coordinate (o) at (6,0.7);
+    \coordinate (p) at (6,-2.8);
+    \coordinate (g) at (7.52,-3);
+
+    \visible<4>{
+
+      \node[nrm2,tiny,anchor=north west] (a) at (4.1,0.5)  {Unit};
+      \node[nrm2,tiny,anchor=north west] (b) at (5.1,-0.4) {Integration};
+      \node[nrm2,tiny,anchor=north west] (c) at (6.72,0.5)  {System};
+      \node[nrm2,tiny,anchor=north west] (d) at (7.8,-0.4) {Regression};
+
+    }
+
+    \visible<5>{
+
+    \node[lit,tiny,anchor=north west] (a) at (4.1,0.5)  {Unit};
+    \node[lit,tiny,anchor=north west] (b) at (5.1,-0.4) {Integration};
+    \node[lit,tiny,anchor=north west] (c) at (6.72,0.5)  {System};
+    \node[lit,tiny,anchor=north west] (d) at (7.8,-0.4) {Regression};
+    \node[lit,short,anchor=north west] at (-0.2,-2.9) {Analysis};
+    \node[lit,tiny,anchor=north west] (e) at (9.4,0.5)  {Sanity};
+
+    }
+
+    \visible<4>{
+      \node[nrm2,tiny,anchor=north west] (e) at (9.4,0.5)  {Sanity};
+    }
+
+    \visible<4->{
+
+    \node[nrm2,tiny,anchor=north west] (f) at (4.1,-3)  {Performance};
+    \node[nrm2,tiny,anchor=north west]     at (6.95,-3) {Usability};
+    \node[nrm2,tiny,anchor=north west] (h) at (9.18,-3)  {Security};
+
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (a);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (b);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (c);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (d);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (e);
+
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (f);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (g);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (h);
+
+    }
+
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The ``Box'' Approach}
+  Used in tandem with testing methods.
+  \vspace{0.5cm}
+  \begin{itemize}
+  \item Describes the point-of-view of the tester.
+  \vspace{0.2cm}
+  \item Black-box testing.
+  \vspace{0.2cm}
+  \item White-box testing.
+  \vspace{0.2cm}
+  \item Grey-box testing.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Black-box Testing}
+  We don't know anything about internals, only
+  the interfaces.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-9,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (-4,-1) {\textbf{Implementation}\nodepart{second}?};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Black-box Testing}
+  \begin{block}{Function definition}
+    \begin{lstlisting}[style=C]
+  // Perform Newton-Raphson solve.
+  // Solution is bounded by [x1,x2].
+  // Initial value is x.
+  // Solve tolerance is tol, maximum iterations are
+  // max_its.
+  template< class FuncT, class T >
+  T newton( FuncT func, T x1, T x2, T x,
+            T tol, int max_its );
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Black-box Testing}
+  \begin{block}{Potential tests}
+    \begin{itemize}
+    \item Check known functions work ($x$, $x^2$, etc).
+    \item Check variation of lower/upper bounds.
+    \item Check variation of initial x.
+    \item Check variation of tolerance.
+    \item Check variation of maximum iterations.
+    \end{itemize}
+  \end{block}
+  \pause
+  \vspace{1cm}
+  {\LARGE\color{Base0A} Can we do better?}
+\end{frame}
+
+\begin{frame}
+  \frametitle{White-box Testing}
+  Have access to application internals.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-5,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (0,-1) {\textbf{Implementation}\nodepart{second}defined};
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{White-box Testing}
+  \begin{block}{Function implementation}
+    \begin{lstlisting}[style=C]
+  template< class FuncT, class T >
+  T newton( FuncT func, T x1, T x2, T x,
+            T tol, int max_its ) {
+    ...
+    // Use a scaling to make sure we don't
+    // converge simply because x is very small.
+    T scale;
+    if( x > 0.0 )
+      scale = 1.0/x;
+    else
+      scale = 1.0;
+    ...
+  }
+    \end{lstlisting}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{White-box Testing}
+  \begin{block}{More thorough tests}
+    \begin{itemize}
+    \item Check systems with small scales converge correctly.
+    \item Check systems with large scales converge correctly.
+    \item Check initial value of 0 works as expected.
+    \end{itemize}
+  \end{block}
+  \pause
+  \vspace{1cm}
+  {\LARGE\color{Base0A} Perhaps too much effort?}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Grey-box Testing}
+  At the level of black-box testing with some awareness of internals.
+  \begin{tikzpicture}[overlay]
+    \node[class] (A) at (-9.5,-1) {\textbf{Interface}\nodepart{second}defined};
+    \node[class] (B) at (-4.5,-1) {\textbf{Implementation}\nodepart{second}aware of};
+  \end{tikzpicture}
+\end{frame}

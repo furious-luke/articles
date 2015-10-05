@@ -1,0 +1,131 @@
+\RequirePackage{tikz, datetime, textpos, xcolor}
+\DeclareOption{beteckna}{
+  \setsansfont[
+    Ligatures=TeX, 
+    Extension=.ttf,
+    BoldFont=*Bold,
+    ItalicFont=*Italic
+  ]{BetecknaLowerCase}
+}
+\ProcessOptions
+\yyyymmdddate \renewcommand{\dateseparator}{.}
+
+\definecolor{Base00}{HTML}{151515}
+\definecolor{Base01}{HTML}{202020}
+\definecolor{Base02}{HTML}{303030}
+\definecolor{Base03}{HTML}{505050}
+\definecolor{Base04}{HTML}{B0B0B0}
+\definecolor{Base05}{HTML}{D0D0D0}
+\definecolor{Base06}{HTML}{E0E0E0}
+\definecolor{Base07}{HTML}{F5F5F5}
+\definecolor{Base08}{HTML}{AC4142}
+\definecolor{Base09}{HTML}{D28445}
+\definecolor{Base0A}{HTML}{F4BF75}
+\definecolor{Base0B}{HTML}{90A959}
+\definecolor{Base0C}{HTML}{75B5AA}
+\definecolor{Base0D}{HTML}{6A9FB5}
+\definecolor{Base0E}{HTML}{AA759F}
+\definecolor{Base0F}{HTML}{8F5536}
+
+%% \definecolor{MedianBrown}{HTML}{119,95,85}
+%% \definecolor{MedianLightBrown}{RGB}{235,221,195}
+%% \definecolor{MedianLightBlue}{RGB}{148,182,210}
+%% \definecolor{MedianOrange}{RGB}{221,128,71}
+%% \definecolor{MedianLightOrange}{RGB}{216,178,92}
+%% \definecolor{MedianUltraLightOrange}{RGB}{245,236,215}
+\colorlet{MedianBrown}{Base01}
+\colorlet{MedianLightBrown}{Base0B}
+\colorlet{MedianLightBlue}{Base0D}
+\colorlet{MedianOrange}{Base09}
+\colorlet{MedianLightOrange}{Base08}
+\colorlet{MedianUltraLightOrange}{Base0A}
+
+\setbeamercolor*{title page header}{fg=Base06}
+\setbeamercolor*{title}{fg=MedianLightBrown}
+\setbeamercolor*{institute}{fg=Base04}
+\setbeamercolor*{author}{fg=Base06}
+\setbeamercolor*{date}{fg=Base06}
+\setbeamercolor*{item}{fg=MedianOrange}
+\setbeamercolor*{frametitle}{fg=Base06}
+\setbeamercolor*{block title}{fg=Base06, bg=Base0D}
+\setbeamercolor*{block title example}{fg=Base06, bg=Base0B}
+\setbeamercolor*{block body}{bg=Base02}
+\setbeamercolor*{block body example}{bg=Base02}
+\setbeamercolor*{section in toc}{fg=black}
+\setbeamercolor*{section page}{fg=Base06}
+\setbeamercolor*{normal text}{fg=Base06, bg=Base01}
+
+\setbeamerfont{section page}{size=\LARGE}
+\setbeamerfont{title}{size=\LARGE}
+\setbeamerfont{author}{size=\Large}
+\setbeamerfont{date}{size=\Large}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[square]
+\setbeamertemplate{itemize item}{\tikz{\fill[color=MedianOrange, semithick] rectangle(.2,.2);}}
+\setbeamertemplate{itemize subitem}{\tikz{\fill[color=MedianLightBlue, ultra thick] rectangle(.2,.2);}}
+\setbeamertemplate{sections/subsections in toc}[square]
+
+\newenvironment{xplainframe}{\bgroup\setbeamertemplate{background}{}\begin{frame}[plain]}{\end{frame}\egroup}
+
+\setbeamertemplate{background}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+  \ifnum\thepage>1\relax% Not the title page
+            %% \fill[color=Base03]          (0,7.9) rectangle(\the\paperwidth,8.4);
+	    \fill[color=MedianOrange]    (0,8) rectangle(0.8,8.3);
+	    \fill[color=MedianLightBlue] (0.9,8) rectangle(\the\paperwidth, 8.3);
+  \else% Title page
+	  \fill[color=MedianBrown]     (0,1.2)   rectangle(\the\paperwidth,\the\paperheight);
+          %% \fill[color=Base06]          (0,0)     rectangle(\the\paperwidth,1.2);
+	  \fill[color=MedianOrange]    (0,0.1)   rectangle(3.15,1.1);
+	  \fill[color=MedianLightBlue] (3.3,0.1) rectangle(\the\paperwidth,1.1); 
+  \fi
+  \end{tikzpicture}
+}
+\setbeamertemplate{title page}{
+  {\inserttitlegraphic}
+  \begin{textblock*}{12cm}(2.5cm,1.5cm)
+    \begin{beamercolorbox}[wd=8cm]{title page header}
+      \usebeamerfont{title}\usebeamercolor{title}\inserttitle
+    \end{beamercolorbox}
+  \end{textblock*}
+  \begin{textblock*}{6.2cm}(4cm,2.5cm)
+    \begin{beamercolorbox}{institute}
+      \usebeamerfont{institute}\insertinstitute
+    \end{beamercolorbox}
+  \end{textblock*}
+  \begin{textblock*}{9cm}(-0.5cm,5cm)
+    \begin{beamercolorbox}{date}
+      \usebeamerfont{date}\insertdate
+    \end{beamercolorbox}
+  \end{textblock*}
+  \begin{textblock*}{9cm}(2.5cm,5cm)
+    \begin{beamercolorbox}{author}
+      \usebeamerfont{author}\insertauthor
+    \end{beamercolorbox}
+  \end{textblock*}
+}
+\newcommand{\sectionframe}{{
+    \setbeamertemplate{background}{
+      \begin{tikzpicture}
+	\useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+	\fill[color=MedianOrange] (0,6) rectangle (1.5, 7);
+	\fill[color=MedianLightBlue] (1.6, 6) rectangle (\the\paperwidth, 7);
+      \end{tikzpicture}
+    }
+    \frame{\sectionpage}
+}}
+\setbeamertemplate{section page}{
+  \begin{textblock*}{12cm}(0.8cm,-0.9cm)
+    \begin{beamercolorbox}{section page}
+      \insertsectionhead
+    \end{beamercolorbox}
+  \end{textblock*}
+}
+\setbeamertemplate{frametitle}{
+  \vspace{0.3cm}
+  \begin{beamercolorbox}{frametitle}
+    \insertframetitle
+  \end{beamercolorbox}
+}

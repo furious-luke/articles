@@ -1,0 +1,118 @@
+\begin{frame}
+  \frametitle{Static Analysis}
+  \begin{tikzpicture}[overlay]
+
+    \node[bkg,anchor=north west,text width=3.2cm,text depth=6cm,label=above:{\color{Base04}Static}] at (-0.5,2.3) {};
+    \node[bkg,anchor=north west,text width=6.8cm,text depth=6cm,label=above:{\color{Base04}Dynamic}] at (3.8,2.3) {};
+
+    \node[nrm2,short,anchor=north west] at (-0.2,1.9) {Reviews};
+    \node[nrm2,short,anchor=north west] at (-0.2,0.7) {Walkthroughs};
+    \node[nrm2,short,anchor=north west] at (-0.2,-0.5) {Inspections};
+    \node[nrm2,short,anchor=north west] at (-0.2,-1.7) {IDE (syntax)};
+    \node[nrm2,long,anchor=north west] (F) at (4.1,1.9) {Functional};
+    \node[nrm2,long,anchor=north west] (N) at (4.1,-1.6) {Non-functional};
+
+    \coordinate (o) at (6,0.7);
+    \coordinate (p) at (6,-2.8);
+    \coordinate (g) at (7.52,-3);
+
+    \node[nrm2,tiny,anchor=north west] (a) at (4.1,0.5)  {Unit};
+    \node[nrm2,tiny,anchor=north west] (b) at (5.1,-0.4) {Integration};
+    \node[nrm2,tiny,anchor=north west] (c) at (6.72,0.5)  {System};
+    \node[nrm2,tiny,anchor=north west] (d) at (7.8,-0.4) {Regression};
+    \node[nrm2,tiny,anchor=north west] (e) at (9.4,0.5)  {Sanity};
+
+    \node[lit,short,anchor=north west] at (-0.2,-2.9) {Analysis};
+
+    \node[nrm2,tiny,anchor=north west] (f) at (4.1,-3)  {Performance};
+    \node[nrm2,tiny,anchor=north west]     at (6.95,-3) {Usability};
+    \node[nrm2,tiny,anchor=north west] (h) at (9.18,-3)  {Security};
+
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (a);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (b);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (c);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (d);
+    \path[draw,color=Base06,-latex] (F) |- (o) -| (e);
+
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (f);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (g);
+    \path[draw,color=Base06,-latex] (N) |- (p) -| (h);
+
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Static Analysis}
+  \begin{block}{Compiler errors}
+    \begin{itemize}
+    \item Parse errors.
+    \item Syntax errors.
+    \item Missing headers/libraries/symbols.
+    \item Fundamental numerical errors.
+    \end{itemize}
+  \end{block}
+  \begin{block}{Static analysis errors}
+    \begin{itemize}
+    \item Invalid array access.
+    \item Scope variable expiration.
+    \item Dereferencing null pointer.
+    \item Many other logical errors.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Static Analysis}
+  cppcheck --- {\color{Base0D}\url{http://cppcheck.sourceforge.net}}
+  \begin{itemize}
+  \item Out of bounds checking.
+  \item Check the code for each class.
+  \item Checking exception safety.
+  \item Memory leaks checking.
+  \item Warn if obsolete functions are used.
+  \item Check for invalid usage of STL.
+  \item Check for uninitialized variables and unused functions.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Static Analysis}
+  \begin{example}
+    \begin{lstlisting}[style=C]
+  // Convert an integer to a string.
+  char* scope_var( int val ) {
+    char buf[3];
+    sprintf( buf, "val=%d", val );
+    return buf;
+  }
+
+  // Print the integer "10".
+  int main() {
+    printf( "%s", scope_var( 10 ) );
+    return 0;
+  }
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Static Analysis}
+  \begin{example}
+    \begin{verbatim}
+  cppcheck --enable=all static.c
+
+  [static.c:7]: (error) Pointer to local
+    array variable returned.
+  [static.c:6]: (error) Buffer is accessed
+    out of bounds.
+    \end{verbatim}
+  \end{example}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Static Analysis}
+  {\Large\color{Base09}What about Python?}
+
+  \vspace{1cm}
+  pylint    --- {\color{Base0D}\url{http://www.pylint.org}}
+\end{frame}
