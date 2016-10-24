@@ -739,6 +739,8 @@ function get_default( obj, name, def ) {
         }
     });
 
+
+    // Sets dimensions to that of parent.
     var Boxed = Node.extend({
 
 	aggregate: function() {

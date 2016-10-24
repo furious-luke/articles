@@ -1,37 +1,65 @@
 /* @pjs font="FuturaKoyu.ttf,FuturaExtended.ttf,UbuntuMono.ttf"; */
 
-PShape server_sh = loadShape( "server.svg" );
-PShape conch = loadShape( "nautilus.svg" );
-PShape user_sh = loadShape( "person.svg" );
-PShape group_sh = loadShape( "group.svg" );
-PShape other_sh = loadShape( "other.svg" );
-PShape tux_sh    = loadShape( "tux.svg" );
-PShape mac_sh = loadShape( "mac.svg" );
-PShape win_sh = loadShape( "win.svg" );
-PShape file_sh = loadShape( "file.svg" );
-PShape check_sh = loadShape( "check.svg" );
-PShape cross_sh = loadShape( "cross.svg" );
+var tmp;
+
+// PShape server_sh = loadShape( "server.svg" );
+// PShape conch = loadShape( "nautilus.svg" );
+// PShape user_sh = loadShape( "person.svg" );
+// PShape group_sh = loadShape( "group.svg" );
+// PShape other_sh = loadShape( "other.svg" );
+// PShape tux_sh    = loadShape( "tux.svg" );
+// PShape mac_sh = loadShape( "mac.svg" );
+// PShape win_sh = loadShape( "win.svg" );
+// PShape file_sh = loadShape( "file.svg" );
+// PShape check_sh = loadShape( "check.svg" );
+// PShape cross_sh = loadShape( "cross.svg" );
 PFont  koyu   = loadFont( "FuturaKoyu.ttf" );
 PFont  extend = loadFont( "FuturaExtended.ttf" );
 PFont  term_fnt = loadFont( "UbuntuMono.ttf" );
 
 void setup() {
+    // slide.palette = {
+    //     base00: #181818,
+    //     base01: #282828,
+    //     base02: #383838,
+    //     base03: #585858,
+    //     base04: #B8B8B8,
+    //     base05: #D8D8D8,
+    //     base06: #E8E8E8,
+    //     base07: #F8F8F8,
+    //     base08: #AB4642,
+    //     base09: #DC9656,
+    //     base0A: #F7CA88,
+    //     base0B: #A1B56C,
+    //     base0D: #7CAFC2,
+    //     base0E: #BA8BAF
+    // };
+
+    // slide.palette = {
+    //     aoi: #69D2E7,
+    //     clean: #17DBD8,
+    //     beach: #E0E4CC,
+    //     giant: #F38630,
+    //     unreal: #FA6900
+    // };
+
+    // slide.palette = {
+    //     some: #ECD078,
+    //     brick: #D95B43,
+    //     less: #C02942,
+    //     were: #542437,
+    //     less2: #53777A
+    // };
+
     slide.palette = {
-	base00: #181818,
-	base01: #282828,
-	base02: #383838,
-	base03: #585858,
-	base04: #B8B8B8,
-	base05: #D8D8D8,
-	base06: #E8E8E8,
-	base07: #F8F8F8,
-	base08: #AB4642,
-	base09: #DC9656,
-	base0A: #F7CA88,
-	base0B: #A1B56C,
-	base0D: #7CAFC2,
-	base0E: #BA8BAF
+        light: #E7E8EA,
+        green: #2FB24A,
+        orange: #FBB144,
+        back1: #536275,
+        back2: #435466,
+        font: #223A44
     };
+    
 
     slide.setup();
     slide.camera.initialise( 800, 600 ); // Remove 800, 600 for fullscreen?
@@ -46,36 +74,38 @@ void setup() {
     frameRate( 30 );
     smooth();
     shapeMode( CENTER );
-    stroke( slide.palette.base03 );
-    fill( slide.palette.base03 );
+    stroke( slide.palette.font );
+    fill( slide.palette.font );
 
-    slide.default_stroke = slide.palette.base03;
-    slide.default_fill = slide.palette.base03;
+    slide.default_stroke = slide.palette.font;
+    slide.default_fill = slide.palette.font;
     slide.default_font = koyu;
     slide.default_list_font = extend;
     slide.default_mono_font = term_fnt;
 
     splash();
-    intro();
-    linux();
-    linux_shell();
-    ssh();
-    filesystem();
-    creating_deleting();
-    pipes_filters();
-    permissions();
-    finding_things();
-    variables();
-    finish();
+    // intro();
+    // linux();
+    // linux_shell();
+    // ssh();
+    // filesystem();
+    // creating_deleting();
+    // pipes_filters();
+    // permissions();
+    // finding_things();
+    // variables();
+    // finish();
 
     // console.log( PFont.list() );
 
     slide.scene.prepare();
+
+    console.log( tmp.b, tmp.c );
 }
 
 void draw() {
     slide.scene.update( slide.ticker.i );
-    background( slide.palette.base05 );
+    background( slide.palette.light );
     slide.scene.display();
     slide.ticker.update();
 }
@@ -91,45 +121,44 @@ void splash() {
     var ctr = new slide.Boxed( 0, 1, [0, undefined] );
     slide.scene.add_child( ctr );
 
-    ctr.add_child(
-	slide.text( 'Introduction to Shell Scripting', koyu, { origin: [0, -0.6], scale: 4.5 } ).add_tween(
-	    slide.tweens.back([ 10, 20 ]), 'x',
-	    function( obj ) {
-		return [obj.x, -0.5*(slide.camera.w + obj.w) - obj.gx];
-	    }
-	)
-    );
-    ctr.add_child(
-	slide.shape( conch, 0.3, [0, -0.25] ).add_tween(
-	    slide.tweens.linear([ 15, 80 ]), 'scale', 1, 2.5
-	).add_tween(
-	    slide.tweens.linear([ 15, 80 ]), 'y', -0.25, 0
-	)
+    var top_line = ctr.add_child( slide.rect( 1.5, 0.01, { origin: [0, -0.37], fill: slide.palette.green } ));
+    var heading = ctr.add_child( slide.text( 'Channels, Heroku, and CQ', koyu, { origin: [0, -0.6], scale: 4.5 } ));
+    var bottom_line = ctr.add_child( slide.rect( 1.5, 0.01, { origin: [0, -0.22], fill: slide.palette.green } ));
+    slide.helpers.exit_left( top_line, 10 );
+    slide.helpers.exit_left( heading, [top_line.get_last_tween().b, 5] );
+    slide.helpers.exit_left( bottom_line, [heading.get_last_tween().b, 5] );
+    tmp = bottom_line;
+    // ctr.add_child(
+    //     slide.shape( conch, 0.3, [0, -0.25] ).add_tween(
+    //         slide.tweens.linear([ 15, 80 ]), 'scale', 1, 2.5
+    //     ).add_tween(
+    //         slide.tweens.linear([ 15, 80 ]), 'y', -0.25, 0
+    //     )
+    // );
+    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
+        slide.text( 'Luke Hodkinson', extend, { origin: [0, 0.1], scale: 3 } ).add_tween(
+            slide.tweens.back([ 15, 10 ]), 'x',
+            function( obj ) {
+        	return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+            }
+        )
     );
     ctr.add_child( slide.ralign( 0.1 ) ).add_child(
-	slide.text( 'Luke Hodkinson', extend, { origin: [0, 0.1], scale: 3 } ).add_tween(
-	    slide.tweens.back([ 15, 10 ]), 'x',
-	    function( obj ) {
-		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-	    }
-	)
+        slide.text( 'aBAS', extend, { origin: [0, 0.25], scale: 3 } ).add_tween(
+            slide.tweens.back([ 18, 10 ]), 'x',
+            function( obj ) {
+        	return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+            }
+        )
     );
-    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
-	slide.text( 'CAS eResearch', extend, { origin: [0, 0.25], scale: 3 } ).add_tween(
-	    slide.tweens.back([ 18, 10 ]), 'x',
-	    function( obj ) {
-		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-	    }
-	)
-    );
-    ctr.add_child( slide.ralign( 0.1 ) ).add_child(
-	slide.text( 'Swinburne University', extend, { origin: [0, 0.4], scale: 3 } ).add_tween(
-	    slide.tweens.back([ 21, 10 ]), 'x',
-	    function( obj ) {
-		return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
-	    }
-	)
-    );
+    // ctr.add_child( slide.ralign( 0.1 ) ).add_child(
+    //     slide.text( 'Swinburne University', extend, { origin: [0, 0.4], scale: 3 } ).add_tween(
+    //         slide.tweens.back([ 21, 10 ]), 'x',
+    //         function( obj ) {
+    //     	return [obj.x, 0.5*(slide.camera.w + obj.w) - obj.gx];
+    //         }
+    //     )
+    // );
     ctr.add_child( new slide.Pause( 9 ) );
 }
 
