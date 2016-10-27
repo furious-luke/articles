@@ -1,0 +1,264 @@
+/**
+ * Black theme for reveal.js. This is the opposite of the 'white' theme.
+ *
+ * By Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(../../lib/font/source-sans-pro/source-sans-pro.css);
+
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #222;
+
+$mainColor: #fff;
+$headingColor: #fff;
+
+$mainFontSize: 38px;
+$mainFont: 'hero_lightlight';;
+//'Source Sans Pro', Helvetica, sans-serif;
+$headingFont: 'hero_lightlight';
+// 'Source Sans Pro', Helvetica, sans-serif;
+$headingTextShadow: none;
+$headingLetterSpacing: normal;
+$headingTextTransform: none;
+$headingFontWeight: 600;
+$linkColor: #42affa;
+$linkColorHover: lighten( $linkColor, 15% );
+$selectionBackgroundColor: lighten( $linkColor, 25% );
+
+$heading1Size: 2.5em;
+$heading2Size: 1.6em;
+$heading3Size: 1.3em;
+$heading4Size: 1.0em;
+
+section.has-light-background {
+        &, h1, h2, h3, h4, h5, h6 {
+                color: #222;
+        }
+}
+
+$django2: #0C4B33;
+$orange: #FBB144;
+$heroku: #9072B4;
+$django: #51BE95;
+$light: #E7E8EA;
+$red: #AB4642;
+$abas: #C12F3C;
+$postgres: #0093C4;
+$nginx: #009900;
+
+.small {
+  font-size: 0.6em !important;
+}
+
+.green {
+  color: #2FB24A !important;
+}
+.orange {
+  color: $orange !important;
+}
+.red {
+  color: red !important;
+}
+.back1 {
+  color: #536275 !important;
+}
+.back2 {
+  color: #435466 !important;
+}
+.heroku {
+  color: $heroku !important;
+}
+.django {
+  color: $django !important;
+}
+.django2 {
+  color: $django2 !important;
+}
+.abas {
+  color: $abas !important;
+}
+.white {
+  color: #fff !important;
+}
+.postgres {
+  color: $postgres !important;
+}
+.nginx {
+  color: $nginx !important;
+}
+
+.landing {
+  text-align: left;
+  font-family: "hero_lightlight" !important;
+  font-size: 2em !important;
+}
+.landing {
+  text-align: left;
+  font-family: "hero_lightlight" !important;
+  font-size: 1em !important;
+}
+
+.align-top {
+  vertical-align: top !important;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.box {
+  font-weight: 900 !important;
+  display: inline-block;
+  // border: 0.1em solid #fff !important;
+  border-radius: 0.2em;
+  padding: 0.2em 0.5em 0.2em 0.5em !important;
+  margin: 0.2em !important;
+}
+.heroku-box {
+  @extend .box;
+  background-color: $heroku;
+}
+.django-box {
+  @extend .box;
+  background-color: $django;
+}
+.django2-box {
+  @extend .box;
+  background-color: $django2;
+}
+.orange-box {
+  @extend .box;
+  background-color: $orange;
+}
+.abas-box {
+  @extend .box;
+  background-color: $abas;
+}
+.postgres-box {
+  @extend .box;
+  background-color: $postgres;
+}
+.nginx-box {
+  @extend .box;
+  background-color: $nginx;
+}
+
+.circle {
+  font-weight: 900 !important;
+  display: inline-block;
+  border: 0.1em solid #fff !important;
+  line-height: 0em;
+  border-radius: 50%;
+}
+.heroku-circle {
+  @extend .circle;
+  background-color: $heroku;
+}
+
+.group {
+  display: inline-block;
+  border: 0.1em dashed !important;
+  border-radius: 0.2em;
+  padding: 0.5em 0.5em 0.5em 0.5em !important;
+  margin: 0.3em !important;
+}
+.heroku-group {
+  @extend .group;
+  border-color: $heroku !important;
+}
+.orange-group {
+  @extend .group;
+  border-color: $orange !important;
+}
+.abas-group {
+  @extend .group;
+  border-color: $red !important;
+}
+
+img {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+}
+
+.server {
+  width: 4em !important;
+}
+
+.container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.rows {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-content: space-around;
+  justify-content: space-around;
+}
+
+.rows-left {
+  @extend .rows;
+  align-items: left;
+  text-align: left;
+}
+
+.vcenter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.columns {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  // justify-content: center;
+  /* align-items: center; */
+  /* align-content: space-around; */
+}
+
+.fill-row {
+  flex-grow: 1;
+}
+
+.fill {
+  flex-grow: 1;
+}
+
+.row {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sep {
+  border-top: 0.05em solid !important;
+}
+
+section pre {
+  box-shadow: none !important;
+}
+
+section {
+  width: 90%;
+  height: 90%;
+}
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------

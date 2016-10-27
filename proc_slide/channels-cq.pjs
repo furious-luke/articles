@@ -57,7 +57,10 @@ void setup() {
         orange: #FBB144,
         back1: #536275,
         back2: #435466,
-        font: #223A44
+        font: #223A44,
+        dark: #222222,
+        heroku: #9072B4,
+        django: #51BE95
     };
     
 
@@ -74,11 +77,11 @@ void setup() {
     frameRate( 30 );
     smooth();
     shapeMode( CENTER );
-    stroke( slide.palette.font );
-    fill( slide.palette.font );
+    stroke( slide.palette.white );
+    fill( slide.palette.white );
 
-    slide.default_stroke = slide.palette.font;
-    slide.default_fill = slide.palette.font;
+    slide.default_stroke = slide.palette.white;
+    slide.default_fill = slide.palette.white;
     slide.default_font = koyu;
     slide.default_list_font = extend;
     slide.default_mono_font = term_fnt;
@@ -105,7 +108,7 @@ void setup() {
 
 void draw() {
     slide.scene.update( slide.ticker.i );
-    background( slide.palette.light );
+    background( slide.palette.dark );
     slide.scene.display();
     slide.ticker.update();
 }

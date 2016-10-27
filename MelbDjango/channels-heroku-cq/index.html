@@ -1,0 +1,1540 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>reveal.js – The HTML Presentation Framework</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/theme/channels.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+	<script src="lib/js/html5shiv.js"></script>
+	<![endif]-->
+  </head>
+
+  <body> 
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+
+        <!-- Landing -->
+
+	<section class="landing">
+	  <h1><span class="django">Django</span> Channels,</h1>
+	  <h1><span class="heroku">Heroku<span>,</h1>
+          <h3>and</h3>
+	  <h2>background tasks with <span class="orange">CQ</span></h2>
+	  <p>
+            <div>
+              <!-- <div class="inline align-top" style="margin-right: 20px;"> -->
+	      <!--   <small>Presented by </small> -->
+              <!-- </div> -->
+              <div class="inline" style="margin-top: 2em">
+                <div><small>Luke Hodkinson</small></div>
+                <div><small><strong><span class="abas">a</span><span class="white">BAS</span></strong></small></div>
+              </div>
+            </div>
+	  </p>
+
+          <aside class="notes">
+            <p>
+              Hello everyone, and thanks to MelbDjango for having me again, it's a pleasure.
+            </p>
+            <p>
+              The last time I spoke here I described my efforts to migrate one of our products at aBAS from
+              a good old fashioned WSGI gunicorn based system, to a sleek, new, futuristic Django
+              Channels implementation.
+            </p>
+            <p>
+              Since then I've iced that partially completed cake, and sent it out into the harsh
+              realities of our production environment.
+            </p>
+            <p>
+              So today I'm going to talk you through how I went about deploying our
+              Django Channels enabled application to Heroku, and also about a new Django
+              package to leverage Channels as a background task queue.
+            </p>
+          </aside>
+	</section>
+
+        <!-- Define channels -->
+
+	<section>
+          <div class="container vcenter">
+	    <h2><span class="django">Django</span> Channels</h2>
+            <a  href="http://github.com/django/channels">http://github.com/django/channels</a>
+            <a href="http://channels.readthedocs.io/en/stable/">http://channels.readthedocs.io/en/stable/</a>
+            <a href="http://github.com/andrewgodwin">http://github.com/andrewgodwin</a>
+          </div>
+
+          <aside class="notes">
+            <p>
+              I won't go in to detail explaining Django Channels as a matter of expedience.
+              I assume most people already know about it.
+            </p>
+            <p>
+              But, to put it succinctly, Django Channels is a recent effort to make a WebSocket
+              capable extension to Django, attempting to do so in a manner that won't
+              have you pulling out your own hair.
+            </p>
+            <p>
+              Channels is maintained by a gentlemen by the name of Andrew Godwin, who's done a stand-up
+              job of it, making what I would happily say is a most excellent package.
+            </p>
+            <p>
+              Go take a look if you're so inclined.
+            </p>
+          </aside>
+	</section>
+
+        <!-- Define Heroku -->
+
+	<section>
+          <div class="container vcenter">
+	    <h2><span class="heroku">Heroku</span></h2>
+            <a href="http://www.heroku.com/about">http://www.heroku.com/about</a>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Similarly, I"m going to assume everyone knows about Heroku, too.
+            </p>
+            <p>
+              In short, Heroku successfully hides the horror of dev ops, for which we are all infinitely greatful.
+            </p>
+          </aside>
+	</section>
+
+        <!-- aBAS servers -->
+
+	<section>
+          <div class="container vcenter">
+            <h2><span class="abas">a</span>BAS Servers</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              In order to show you the outcome of transitioning to channels, I'll
+              show you how we first had our servers configured.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              I don't think any of this will be surprising to anyone, it's a stock
+              standard setup.
+            </p>
+            <p>
+              The purple dashed boxes represent Heroku dynos, which are virtualised
+              images on virtual hardware somewhere, somewhere on Amazon. It's virtualisation
+              all the way down.
+            </p>
+            <p>
+              The heavy-lifters here are the gunicorn/django app combinations on the
+              left. They process all our Django views, making them the champions of
+              this setup.
+            </p>
+            <p>
+              The worker on the right handles the our long running jobs.
+            </p>
+            <p>
+              Redis is there in the middle, acting as both cache for the Django app,
+              and transport protocol for the background worker.
+            </p>
+            <p>
+              Also, I elected to not include the database in these diagrams, as it
+              doesn't have any effect on the Channels deployment.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="orange-group fill-row vcenter">
+              <div>Client</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <span>request &#x27F6;</span>
+              </div>
+              <div class="row">
+                <span>&#x27F5; response</span>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">gunicorn</div>
+                <div class="django-box">django app</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              So as requests come in, they're processed on any of our web dynos and
+              responses are sent back directly.
+            </p>
+            <p>
+              The important point here is there is no imperative to do any communication
+              with Redis, nor the worker.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">django app</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">django app</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              As a part of processing views, or perhaps in response to a
+              signal, we can fire off a background worker to perform some task,
+              as is needed.
+            </p>
+            <p>
+              As I say, all very standard, and I'm sure you've all seen it before.
+              So let's look at how we went about moving to a Channels compatible setup.
+            </p>
+          </aside>
+	</section>
+
+        <section>
+          <div class="rows-left container">
+	    <h2 class="fill-row"><span class="heroku">Heroku</span> dyno layout</h2>
+            <h2 class="fill-row"><span class="heroku">Heroku</span> Procfile</h2>
+            <h2 class="fill-row"><span class="django">ASGI</span> script</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              There are three things we need to do to convert our existing
+              deployment to run Channels.
+            </p>
+            <p>
+              ASGI is the asynchronous version of WSGI. It handles all the usual
+              WSGI communications, but adds some magic to help with WebSockets
+              and HTTP2.
+            </p>
+          </aside>
+        </section>
+
+	<section id="channels-layout">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Let's start with the dyno layout. It's similar, but there are some
+              key changes.
+            </p>
+            <p>
+              On the left, we've done away with gunicorn in favor of Channels'
+              all new Daphne server.
+            </p>
+            <p>
+              Daphne is an ASGI capable HTTP server. It doesn't actually process any
+              views, though. It acts more like a relay between the client and the
+              channels workers.
+            </p>
+            <p>
+              Speaking of, On the right, we still have our original background worker, but now
+              we have two extra channels workers. These actually perform the work
+              of handling our Django views.
+            </p>
+            <p>
+              Let's take a look at the request flow to get a better idea of how
+              this setup works.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="orange-group fill-row vcenter">
+              <div>Client</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <span>request &#x27F6;</span>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              When a request comes in from the client, and is picked up by
+              Daphne, there is no immediate response.
+            </p>
+            <p>
+              Daphne caches the message and begins relaying it to the workers.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Daphne uses Redis as a message layer, and hands off all the hard
+              work to the channels workers.
+            </p>
+            <p>
+              The channels workers are where all our views get processed now, all
+              asynchronously.
+            </p>
+            <p>
+              Any WebSocket requests that come in are managed by Daphne, but again,
+              the hard work is all done asynchronously by the channels workers.
+            </p>
+          </aside>
+	</section>
+
+	<section>
+          <div class="columns">
+            <div class="orange-group fill-row vcenter">
+              <div>Client</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <span>&#x27F5; response</span>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Once the worker has a response ready, it sends back through Redis, then
+              on to Daphne, which knows where to send the response.
+            </p>
+            <p>
+              It's a little more complicated, but really, the overall structure of
+              the deployment is basically the same.
+            </p>
+            <p>
+              It's a fairly clever way of handling things, I think, which lends itself
+              quite nicely to horizontal scaling.
+            </p>
+          </aside>
+	</section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="heroku">Heroku</span> procfile</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="bash" data-trim data-noescope style="padding: 1em">
+web: daphne abas.asgi:channel_layer -b 0.0.0.0 -p $PORT
+worker: python manage.py rqworker
+channelsworker: python manage.py runworker
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              With the dyno layout out of the way, we need to update our Heroku
+              procfile to run Daphne instead of gunicorn.
+            </p>
+            <p>
+              There's an extra line at the bottom there that fires up our channels worker
+              dynos in addition to our background worker.
+            <p>
+              You can see in there that Daphne needs an ASGI channel layer as
+              the entry point. Let's see what that is.
+            </p>
+          </aside>
+        </section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="django">ASGI</span> script</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="python" data-trim data-noescope style="padding: 1em">
+from channels.asgi import get_channel_layer
+channel_layer = get_channel_layer()
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              This replaces the wsgi script we're all used to. Fortunately, it's
+              super simple.
+            </p>
+            <p>
+              It can be this simple because it doesn't really care about the underlying
+              Django app, only about where to send incoming requests to get them
+              handled.
+            </p>
+            <p>
+              And with that, we were able to deploy our app to Heroku.
+            </p>
+            <p>
+              Heroku's routing system already supports WebSockets, so no extra work on
+              that side of things is required.
+            </p>
+          </aside>
+        </section>
+
+        <section id="summary-0">
+          <div class="rows-left container">
+	    <h2 class="fill-row">reform <span class="heroku">Heroku</span> dynos</h2>
+            <h2 class="fill-row">update <span class="heroku">Heroku</span> Procfile</h2>
+            <h2 class="fill-row">write <span class="django">ASGI</span> script</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              And with that, we were able to deploy our app to Heroku.
+            </p>
+            <p>
+              Heroku's routing system already supports WebSockets, so no extra work on
+              that side of things is required.
+            </p>
+          </aside>
+        </section>
+
+        <!-- Efficiency -->
+
+        <section>
+          <div class="container vcenter">
+	    <h1 style="font-size: 4em"><span class="django">$</span></h1>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Okay, so, this section is supposed to be about efficiency.
+            </p>
+            <p>
+              But, really, it's about money.
+            </p>
+            <p>
+              I'm a scrooge. I don't like to spend money, as much as Heroku would
+              prefer otherwise.
+            </p>
+            <p>
+              So, let's look at our dyno formation again.
+            </p>
+          </aside>
+        </section>
+
+	<section>
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+              <div class="heroku-group">
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="row">
+                <div>&#x27f7;</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django2-box">channels worker</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              This is all good and well, but we're bumped up the number of dynos we need
+              to get the job done.
+            </p>
+            <p>
+              Of course, this is the way Heroku preferrs us to do it, spend more to run
+              more processes.
+            </p>
+            <p>
+              In addition, with more powerful dynos there is no way we'll be either
+              saturating the network, nor utilising CPU or memory resources effectively by
+              keeping each process in its own dyno.
+            </p>
+            <p>
+              What would be nice, is a way of convincing Heroku to run some of these
+              processes together.
+            </p>
+          </aside>
+	</section>
+
+        <section id="efficiency-supervisor">
+          <div class="container vcenter">
+	    <h2><span class="abas">Supervisor</span></h2>
+            <a href="http://supervisord.org">http://supervisord.org</a>
+          </div>
+
+          <aside class="notes">
+            <p>
+              And, of course, there are many ways to do this.
+            </p>
+            <p>
+              I used Python's supervisor, which is a fully featured process control
+              system.
+            </p>
+            <p>
+              It's very easy to use via simple configuration scripts, and fits in
+              nicely with our Python ecosystem.
+            </p>
+            <p>
+              Okay, so let's take a look at our new dyno configuration.
+            </p>
+          </aside>
+        </section>
+
+	<section id="efficiency-layout">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="abas-group">
+                  <div class="nginx-box">nginx</div>
+                </div>
+                <div class="abas-group">
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                </div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-group">
+                  <div class="django2-box">channels worker</div>
+                  <div class="django2-box">channels worker</div>
+                </div>
+                <div class="abas-group">
+                  <div class="django-box">worker</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Great, now only three dynos.
+            </p>
+            <p>
+              The red lines there indicate Supervisor process configurations.
+            </p>
+            <p>
+              Also, I've snuck in a cheeky Nginx over there on the left. For any who don't know
+              what that is, it's a light-weight HTTP and reverse proxy server.
+            </p>
+            <p>
+              We need Nginx in this configuration to map Heroku's provided web port
+              to each of our Daphne processes.
+            </p>
+            <p>
+              I should say that this is a particularly
+              aggressive configuration. Normally we would use another dyno or two for
+              the workers, at least.
+            </p>
+            <p>
+              It's also worth noting that this configuration does not affect our ability
+              to scale horizontally. We can still throw more resources at it as is
+              necessary.
+            </p>
+          </aside>
+	</section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="heroku">Heroku</span> procfile</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="bash" data-trim data-noescope style="padding: 1em">
+web: supervisord -c scripts/web.conf
+worker: supervisord -c scripts/worker.conf
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Of course, we'll need to update our Procfile.
+            </p>
+            <p>
+              This is easy though, we remove the channels worker entry and have both
+              remaining entries launch supervisor.
+            </p>
+            <p>
+              Let's take a look at the supervisor scripts.
+            </p>
+          </aside>
+        </section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2>worker <span class="abas">supervisor</span> script</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="ini" data-trim data-noescope style="padding: 1em">
+[program:channelsworker]
+command=python3 manage.py runworker
+process_name=%(program_name)s-%(process_num)d
+numprocs=%(ENV_CHANNELSWORKER_PROCESSES)s
+
+[program:worker]
+command=python3 manage.py rqworker
+process_name=%(program_name)s-%(process_num)d
+numprocs=%(ENV_WORKER_PROCESSES)s
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Okay. Let's try and untangle this failure in syntax highlighting.
+            </p>
+            <p>
+              This is the worker supervisor script, so it fires up our channels worker
+              and our standard background worker, as can be seen by the "command"
+              argument.
+            </p>
+            <p>
+              The numprocs argument gives the number of processes to run. We source these
+              from the environment for maximum flexibility.
+            </p>
+          </aside>
+        </section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2>web <span class="abas">supervisor</span> script</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="ini" data-trim data-noescope style="padding: 1em">
+[program:nginx]
+command=scripts/nginx.sh
+
+[program:daphne]
+command=daphne abas.asgi:channel_layer -b 0.0.0.0 \\
+  -p 80%(process_num)02d
+process_name=%(program_name)s-%(process_num)d
+numprocs=%(ENV_WEB_PROCESSES)s
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Now, this is the web supervisor script.
+            </p>
+            <p>
+              It's fairly similar, but there's a little trick going on in the Daphne command argument.
+            </p>
+            <p>
+              Basically, we want to be able to automatically designate ports. To do this, I'm generating
+              ports in the 8000 range based on the process number.
+            </p>
+            <p>
+              So, with 3 web processes, we will use 8000, 8001, and 8002.
+            </p>
+            <p>
+              Now, we need some way of communicating this to Nginx, which is where that nginx launcher
+              shell script you can see there comes in.
+            </p>
+            <p>
+              You see, only Nginx plus, the paid version, comes with dynamic upstream
+              application server configuration. And we all know how I feel about spending money.
+            </p>
+            <p>
+              However, as with all things, this can be solved with a little bash magic.
+            </p>
+          </aside>
+        </section>
+
+        <!-- <section id="magic" data-background-image="magic.gif"> -->
+        <!-- </section> -->
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="nginx">Nginx</span> launcher</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="bash" data-trim data-noescope style="padding: 1em">
+# Generate our upstream string.
+UPSTREAM=
+for ii in $(seq 0 $(($WEB_PROCESSES - 1))); do
+    x=$(printf "80%02d" $ii)
+    UPSTREAM="$UPSTREAM server 0.0.0.0:$x;"
+done
+export UPSTREAM
+
+# Substitute into templated nginx configuration.
+envsubst '$UPSTREAM $PORT' < /app/tmpl/nginx.conf > \\
+   /app/nginx.conf && exec nginx -g 'daemon off; /app/nginx.conf'
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              While this is not true dynamic configuration, it let's us specify the number
+              of web instances we want through Heroku configurations nicely enough.
+            </p>
+            <p>
+              So, based on the number of web processes we specify in the environment, this
+              script will produce the appropriate number of server lines, along with the 
+              correct ports.
+            </p>
+            <p>
+              Then, at the very bottom, we use envsubst to do a string replacement in
+              the nginx template configuration.
+            </p>
+            <p>
+              Let's take a look at that nginx configuration template.
+            </p>
+          </aside>
+        </section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="nginx">Nginx</span> configuration</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="nginx" data-trim data-noescope style="padding: 1em">
+http {
+  upstream app_servers {
+    $UPSTREAM
+  }
+
+  server {
+    listen $PORT;
+
+    location / {
+      proxy_pass http://app_servers;
+    }
+  }
+}
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              This is a stripped down version of the Nginx configuration we use.
+            </p>
+            <p>
+              There are a metric tonne of options, so I'm only showing the major ones;
+              in particular, where the UPSTREAM and PORT variables get used.
+            </p>
+            <p>
+              PORT is passed in through Heroku, and is what Nginx translates from.
+            </p>
+            <p>
+              UPSTREAM is the string we produced from our little bash script earlier.
+            </p>
+          </aside>
+        </section>
+
+        <section>
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="heroku">Heroku</span> configuration</h2>
+            </div>
+            <pre class="fill vcenter">
+              <code class="bash" data-trim data-noescope style="padding: 1em">
+heroku config:set WEB_PROCESSES=3 \
+                  CHANNELSWORKER_PROCESSES=2 \
+                  WORKER_PROCESSES=1 
+              </code>
+            </pre>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Finally, we need to be sure we set the appropriate environment on our
+              Heroku app.
+            </p>
+            <p>
+              This configuration would give us three instances of Daphne on each web
+              dyno, and two channels workers and one background worker on each
+              worker dyno.
+            </p>
+            <p>
+              And there we have it, deployed fairly efficiently to Heroku, with only a
+              smattering of shell-script black magic.
+            </p>
+          </aside>
+        </section>
+
+        <section id="summary-1">
+          <div class="rows-left container">
+            <h2 class="fill-row">install <span class="abas">supervisor</span></h2>
+            <h2 class="fill-row">install <span class="nginx">Nginx</span></h2>
+            <h2 class="fill-row">write <span class="abas">supervisor</span> scripts</h2>
+	    <h2 class="fill-row">write <span class="nginx">Nginx</span> configuration</h2>
+	    <h2 class="fill-row">write <span class="nginx">Nginx</span> launcher</h2>
+            <h2 class="fill-row">update <span class="heroku">Heroku</span> configuration</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              The more efficient setup is a bit more complicated, but hey, savings
+              are savings.
+            </p>
+          </aside>
+        </section>
+
+        <!-- <\!-- Issues -\-> -->
+
+        <!-- <section> -->
+        <!--   <ul> -->
+        <!--     <li>Daphne is about 1/2 as fast</li> -->
+        <!--     <li>Hard to know what workers are up to</li> -->
+        <!--     <li>Daphne is not SSL capable</li> -->
+        <!--   </ul> -->
+        <!-- </section> -->
+
+        <!-- CQ Introduction -->
+
+	<section>
+          <div class="container vcenter">
+	    <h2>background tasks (<span class="orange">CQ</span>)</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Now I'll move briskly along and cover something of a bug-bear for me over the past
+              few months.
+            </p>
+            <p>
+              In a fit of frustration, to some extent, I've gone and made another
+              background task system based on Django channels.
+            </p>
+            <p>
+              It's called CQ, for Channels Queue.
+            </p>
+            <p>
+              I won't go in to many details about how to use it, but will talk
+              about why I've been foolish enough to want to do this.
+            </p>
+          </aside>
+	</section>
+
+        <section>
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="abas-group">
+                  <div class="nginx-box">nginx</div>
+                </div>
+                <div class="abas-group">
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                </div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-group">
+                  <div class="django2-box">channels worker</div>
+                  <div class="django2-box">channels worker</div>
+                </div>
+                <div class="abas-group">
+                  <div class="django-box">worker</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              It's pretty obvious that the architecture of Channels lends itself directly to background tasks.
+            </p>
+            <p>
+              In many ways, Django Channels is functionally a background task system tailored
+              for WebSockets.
+            </p>
+            <p>
+              It's a shame to use a system that provides all the machinery for background
+              tasks, and then also use a second framework, sucha as RQ, to acheive the same thing, just
+              with a few more syntactic bells and whistles.
+            </p>
+            <p>
+              Wouldn't it be nice if we could change the right-hand side of this, into this...
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-case-from-channels">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="abas-group">
+                  <div class="nginx-box">nginx</div>
+                </div>
+                <div class="abas-group">
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                  <div class="django-box">daphne</div>
+                </div>
+              </div>
+            </div>
+            <div class="heroku-group fill-row vcenter">
+              <div class="abas-box">redis</div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-group">
+                  <div class="django-box">worker</div>
+                  <div class="django-box">worker</div>
+                  <div class="django-box">worker</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              This way, workers could be used to service HTTP view requests, WebSockets,
+              and background tasks as the need arises.
+            </p>
+            <p>
+              Of course, we would need ways to make sure there are enough workers available
+              to service HTTP requests as a priority.
+            </p>
+            <p>
+              Also, horizontal scaling is a litte easier to handle because we just have the one
+              kind of worker to worry about.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-case-from-rq">
+          <div class="rows container">
+	    <h2>but there's already <span class="abas">RQ</span></h2>
+	    <h2 class="fragment">and it's pretty good</h2>
+	    <h2 class="fragment">except it's not fault tolerant</h2>
+	    <h2 class="fragment">and its scheduler makes me cry</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Now, what do I mean by fault tolerant.
+            </p>
+            <p>
+              There are occasions where a worker will go down mid way through
+              a background task. A fault tolerant system should be able to at least
+              identify and report that this has happened.
+            </p>
+            <p>
+              Worse still, there are occasions where the message queue will go down,
+              potentially losing knowledge of many queued tasks.
+            </p>
+            <p>
+              For a lot of tasks this may not be too important. But we have just as
+              many tasks that need to be run, or at least we need to know they didn't.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-case-from-celery">
+          <div class="rows container">
+	    <h2>no probs, <span class="django">Celery</span></h2>
+	    <h2 class="fragment">it's almost fault tolerant...</h2>
+	    <h2 class="fragment">... but still falls short</h2>
+	    <h2 class="fragment">and its scheduler makes me cry</h2>
+          </div>
+        </section>
+
+        <section id="cq-define">
+          <div class="rows container">
+	    <h2><span class="orange">CQ</span></h2>
+	    <h2>leverages <span class="django">Django</span> Channels</h2>
+	    <h2>fault tolerant</h2>
+	    <h2>complex task workflows</h2>
+	    <h2>robust scheduler</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Okay, so these are the things that make CQ a worthwhile alternative
+              to RQ and Celery, in my opinion.
+            </p>
+            <p>
+              I'm going to talk a bit about fault tolerance and the robust scheduler in
+              particular, as I think they're the most important.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-fault-tolerance-intro">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="django-box">daphne</div>
+                <div class="django-box">daphne</div>
+                <div class="django-box">daphne</div>
+              </div>
+            </div>
+            <div class="fill-row vcenter">
+              <div class="heroku-group fill-row vcenter fragment">
+                <div class="postgres-box">DB</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-box">redis</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              So, how do we stop haemoraging background tasks into the void every
+              time Redis falls down?
+            </p>
+            <p>
+              CQ maintains a persistent record of all tasks, and can identify
+              tasks that are lost while in the queue, or lost while on a worker.
+            </p>
+            <p>
+              So, instead of just caching task details on the message queue, we
+              also keep entries in the database.
+          </aside>
+        </section>
+
+        <section id="cq-fault-tolerance-celery">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="django-box">current worker</div>
+              </div>
+            </div>
+            <div class="rows" style="flex-shrink: 1.2">
+              <div>
+                <div class="fragment current-visible" data-fragment-index="1">&#x27F6;</div>
+              </div>
+              <div></div>
+              <div>
+                <div class="fragment current-visible" data-fragment-index="2">&#x27F6;</div>
+              </div>
+            </div>
+            <div class="fill-row vcenter">
+              <div class="heroku-group fill-row vcenter">
+                <div class="postgres-box">DB</div>
+                <div class="small fragment" data-fragment-index="1">writing record</div>
+                <div class="small fragment" data-fragment-index="4" style="margin-top: 0.6em">read fails</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-box">redis</div>
+              </div>
+            </div>
+            <div class="rows" style="flex-shrink: 1.2">
+              <div>
+                <div class="fragment current-visible" data-fragment-index="4">&#x27F6;</div>
+              </div>
+              <div></div>
+              <div>
+                <div class="fragment current-visible" data-fragment-index="3">&#x27F6;</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Now, I said celery can almost detect lost tasks. Almost.
+            </p>
+            <p>
+              But, there was a problem. In order to push a record that a job was about
+              to be submitted to the queue to the database, there is a hook that
+              can be overridden. Unfortunately, due to database latency, the record in
+              the database was not available to the workers when they started.
+            </p>
+            <p>
+              Let's look at the workflow.
+            </p>
+            <p>
+              time.sleep you say, well, unfortunately the hook
+              is run in an atomic block inside Celery, so no amount of delaying in the hook
+              will help with the commit.
+            </p>
+            <p>
+              We could probably prefix all of our Celery jobs with a time.sleep. But is this
+              really okay? Is this what we've become? No, we're better than that.
+            </p>
+            <p>
+              Of course, I'm sure a sufficiently determined developer could fix this
+              issue in Celery. But to be honest, I'll leave the messing around in
+              Celery's source code to the mavericks and lunatics alike.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-fault-tolerance-cq">
+          <div class="columns">
+            <div class="rows">
+              <div class="heroku-group fill vcenter">
+                <div class="django-box">current worker</div>
+              </div>
+            </div>
+            <div class="rows" style="flex-shrink: 1.2">
+              <div>
+                <div class="fragment current-visible" data-fragment-index="1">&#x27F6;</div>
+                <div class="fragment current-visible" data-fragment-index="2">&#x27F5;</div>
+              </div>
+              <div></div>
+              <div>
+                <div class="fragment current-visible" data-fragment-index="3">&#x27F6;</div>
+              </div>
+            </div>
+            <div class="fill-row vcenter">
+              <div class="heroku-group fill-row vcenter">
+                <div class="postgres-box">DB</div>
+                <div class="small fragment current-visible" data-fragment-index="1">writing record</div>
+                <div class="small fragment current-visible" data-fragment-index="2">complete</div>
+                <div class="small fragment current-visible" data-fragment-index="5">read</div>
+              </div>
+              <div class="heroku-group fill-row vcenter">
+                <div class="abas-box">redis</div>
+              </div>
+            </div>
+            <div class="rows" style="flex-shrink: 1.2">
+              <div>
+                <div class="fragment current-visible" data-fragment-index="5">&#x27F6;</div>
+              </div>
+              <div></div>
+              <div>
+                <div class="fragment current-visible" data-fragment-index="4">&#x27F6;</div>
+              </div>
+            </div>
+            <div class="rows">
+              <div class="heroku-group fill-row vcenter">
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+                <div class="django-box">worker</div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              CQ avoids this by launching tasks using Django's on_commit feature. Simple,
+              and effective.
+            </p>
+            <p>
+              This way we can be sure that the database has the information about the
+              task before the task tries to run.
+            </p>
+            <p>
+              This is important as it allows us to be totally sure we have a record
+              of every task we run before we hand it over to the message queue.
+            </p>
+            <p>
+              Then, using various algorithms we can determine when a task has been
+              lost, either due to the Redis server imploding, or a worker giving up
+              and going home.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-scheduler-0">
+          <div class="rows container">
+	    <h2><span class="abas">RQ</span> scheduler</h2>
+            <h2><span class="django">Celery</span> Beat</h2>
+            <h2>APScheduler</h2>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Now, the scheduler. This had a tendency to drive me mad.
+            </p>
+            <p>
+              There are plenty of great schedulers out there, but they all have issues.
+            </p>
+            <p>
+              APScheduler is brilliant, but does not lend itself to using Django's ORM
+              as a schedule backend, and it is not distributed by nature.
+            </p>
+            <p>
+              RQ scheduler and Celery Beat make use of the background task queue, but they're
+              not so fully featured when it comes to things like coalescing missed tasks.
+            </p>
+            <p>
+              And, they're all terrible at redendancy. If you launch more than
+              one scheduler, you'll get duplicate tasks being run.
+            </p>
+            <p>
+              Well, just don't launch multiple schedulers, right? Tell that to Heroku. When redeploying
+              code Heroku there seems to be a period of time where both the old and the new
+              containers co-exist, meaning we have two schedulers running.
+            </p>
+            <p>
+              Finally, because we can only have one scheduler running, we need to be certain it
+              doesn't stop working, because we have no fail-over.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-scheduler-1">
+          <div class="columns">
+            <div class="rows">
+              <div class="django-box">worker</div>
+              <div class="django-box">worker</div>
+              <div class="django-box">worker</div>
+            </div>
+            <div class="rows">
+              <h1 class="abas fragment" style="font-size: 4em; font-weight: 900">VS</h1>
+            </div>
+            <div class="rows">
+              <div class="django-box">worker</div>
+              <div class="django-box">worker</div>
+              <div class="django-box">worker</div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              CQ adopts the approach of turning every worker into a scheduler automatically.
+              Everyone's a scheduler!
+            </p>
+            <p>
+              Scheduling is then broken into rounds, by default each round is one minute.
+            </p>
+            <p>
+              At the start of a round Each scheduler instance fights to become the current rounds' champion.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-scheduler-2">
+          <div class="columns">
+            <div class="rows">
+              <div class="django-box" style="opacity: 0.3">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+            </div>
+            <div class="rows">
+              <div class="postgres" style="font-weight: 900">winner</div>
+            </div>
+            <div class="rows">
+              <div class="django-box" style="opacity: 0.3">worker</div>
+              <div class="django-box">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              The particular instance that wins then checks for tasks to run.
+            </p>
+            <p>
+              This is robust; if one worker goes down the others will continue to schedule tasks.
+            </p>
+            <p>
+              Co-existence of Heroku containers is no problem, only one scheduler will win each
+              round, regardless of where it's running.
+            </p>
+            <p>
+              And while it's true that if there are no workers there will be no scheduling
+              done, if there are no workers to run your tasks then there is no need to
+              do any scheduling. At least, not until a worker comes online.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-scheduler-3">
+          <div class="columns">
+            <div class="rows">
+              <div class="django-box">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+            </div>
+            <div class="rows">
+              <div class="postgres" style="font-weight: 900">too many winners...</div>
+            </div>
+            <div class="rows">
+              <div class="django-box" style="opacity: 0.3">worker</div>
+              <div class="django-box">worker</div>
+              <div class="django-box" style="opacity: 0.3">worker</div>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Furthermore, if for some reason two or more schedulers think they're champions
+              in the same round, there are locks in place to ensure no task is launched multiple
+              times.
+            </p>
+          </aside>
+        </section>
+
+        <section id="cq-usage">
+          <div class="rows container">
+            <div class="fill vcenter">
+	      <h2><span class="orange">django-cq</span></h2>
+            </div>
+            <div class="fill vcenter">
+              <a  href="http://github.com/django/channels">http://github.com/furious-luke/django-cq</a>
+            </div>
+          </div>
+
+          <aside class="notes">
+            <p>
+              Okay, I've talked briefly about the reasons for creating a new background task queue, but
+              haven't spoken at all about how to use it.
+            </p>
+            <p>
+              Instead, I'll just direct you to the github page, please feel free to take a look,
+              use it, provide feedback, or even contribute.
+            </p>
+          </aside>
+        </section>
+
+      </div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'socket.io/socket.io.js', async: true },
+          { src: 'plugin/notes-server/client.js', async: true }
+        ]
+      });
+
+    </script>
+
+  </body>
+</html>
