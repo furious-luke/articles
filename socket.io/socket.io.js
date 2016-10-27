@@ -2533,7 +2533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  opts = opts || {};
 
-	  opts.path = opts.path || 'articles/socket.io';
+	  opts.path = opts.path || '/articles/socket.io';
 	  this.nsps = {};
 	  this.subs = [];
 	  this.opts = opts;

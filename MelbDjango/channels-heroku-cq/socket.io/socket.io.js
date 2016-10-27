@@ -65,7 +65,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var url = __webpack_require__(1);
 	var parser = __webpack_require__(6);
 	var Manager = __webpack_require__(13);
-	var debug = __webpack_require__(3)('socket.io-client');
+	var debug = __webpack_require__(3)('socket.io');
 
 	/**
 	 * Module exports.
@@ -177,7 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	var parseuri = __webpack_require__(2);
-	var debug = __webpack_require__(3)('socket.io-client:url');
+	var debug = __webpack_require__(3)('socket.io:url');
 
 	/**
 	 * Module exports.
@@ -2501,7 +2501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var parser = __webpack_require__(6);
 	var on = __webpack_require__(43);
 	var bind = __webpack_require__(44);
-	var debug = __webpack_require__(3)('socket.io-client:manager');
+	var debug = __webpack_require__(3)('socket.io:manager');
 	var indexOf = __webpack_require__(38);
 	var Backoff = __webpack_require__(46);
 
@@ -2533,7 +2533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  opts = opts || {};
 
-	  opts.path = opts.path || 'articles/socket.io';
+	  opts.path = opts.path || '/articles/socket.io';
 	  this.nsps = {};
 	  this.subs = [];
 	  this.opts = opts;
