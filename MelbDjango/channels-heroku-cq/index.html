@@ -203,7 +203,7 @@
 	<section>
           <div class="columns">
             <div class="orange-group fill-row vcenter">
-              <div>Client</div>
+              <div>client</div>
             </div>
             <div class="rows">
               <div class="row">
@@ -365,7 +365,7 @@
 	<section>
           <div class="columns">
             <div class="orange-group fill-row vcenter">
-              <div>Client</div>
+              <div>client</div>
             </div>
             <div class="rows">
               <div class="row">
@@ -454,7 +454,7 @@
 	<section>
           <div class="columns">
             <div class="orange-group fill-row vcenter">
-              <div>Client</div>
+              <div>client</div>
             </div>
             <div class="rows">
               <div class="row">
@@ -493,7 +493,7 @@
         <section>
           <div class="rows container">
             <div class="fill vcenter">
-	      <h2><span class="heroku">Heroku</span> procfile</h2>
+	      <h2><span class="heroku">Heroku</span> Procfile</h2>
             </div>
             <pre class="fill vcenter">
               <code class="bash" data-trim data-noescope style="padding: 1em">
@@ -554,9 +554,9 @@ channel_layer = get_channel_layer()
 
         <section id="summary-0">
           <div class="rows-left container">
-	    <h2 class="fill-row">reform <span class="heroku">Heroku</span> dynos</h2>
-            <h2 class="fill-row">update <span class="heroku">Heroku</span> Procfile</h2>
-            <h2 class="fill-row">write <span class="django">ASGI</span> script</h2>
+	    <h2 class="fill-row">Reform <span class="heroku">Heroku</span> dynos,</h2>
+            <h2 class="fill-row">update <span class="heroku">Heroku</span> Procfile, and</h2>
+            <h2 class="fill-row">write <span class="django">ASGI</span> script.</h2>
           </div>
 
           <aside class="notes">
@@ -739,7 +739,7 @@ channel_layer = get_channel_layer()
         <section>
           <div class="rows container">
             <div class="fill vcenter">
-	      <h2><span class="heroku">Heroku</span> procfile</h2>
+	      <h2><span class="heroku">Heroku</span> Procfile</h2>
             </div>
             <pre class="fill vcenter">
               <code class="bash" data-trim data-noescope style="padding: 1em">
@@ -766,7 +766,7 @@ worker: supervisord -c scripts/worker.conf
         <section>
           <div class="rows container">
             <div class="fill vcenter">
-	      <h2>worker <span class="abas">supervisor</span> script</h2>
+	      <h2>Worker <span class="abas">Supervisor</span> script</h2>
             </div>
             <pre class="fill vcenter">
               <code class="ini" data-trim data-noescope style="padding: 1em">
@@ -802,7 +802,7 @@ numprocs=%(ENV_WORKER_PROCESSES)s
         <section>
           <div class="rows container">
             <div class="fill vcenter">
-	      <h2>web <span class="abas">supervisor</span> script</h2>
+	      <h2>Web <span class="abas">Supervisor</span> script</h2>
             </div>
             <pre class="fill vcenter">
               <code class="ini" data-trim data-noescope style="padding: 1em">
@@ -965,18 +965,33 @@ heroku config:set WEB_PROCESSES=3 \
 
         <section id="summary-1">
           <div class="rows-left container">
-            <h2 class="fill-row">install <span class="abas">supervisor</span></h2>
-            <h2 class="fill-row">install <span class="nginx">Nginx</span></h2>
-            <h2 class="fill-row">write <span class="abas">supervisor</span> scripts</h2>
-	    <h2 class="fill-row">write <span class="nginx">Nginx</span> configuration</h2>
-	    <h2 class="fill-row">write <span class="nginx">Nginx</span> launcher</h2>
-            <h2 class="fill-row">update <span class="heroku">Heroku</span> configuration</h2>
+            <h2 class="fill-row">Install <span class="abas">supervisor</span>,</h2>
+            <h2 class="fill-row">install <span class="nginx">Nginx</span>,</h2>
+            <h2 class="fill-row">write <span class="abas">supervisor</span> scripts,</h2>
+	    <h2 class="fill-row">write <span class="nginx">Nginx</span> configuration,</h2>
+	    <h2 class="fill-row">write <span class="nginx">Nginx</span> launcher, </h2>
+            <h2 class="fill-row">update <span class="heroku">Heroku</span> Procfile, and</h2>
+            <h2 class="fill-row">update <span class="heroku">Heroku</span> configuration.</h2>
           </div>
 
           <aside class="notes">
             <p>
               The more efficient setup is a bit more complicated, but hey, savings
               are savings.
+            </p>
+            <p>
+              I should also say a word on installing supervisor and Nginx.
+            </p>
+            <p>
+              Supervisor is easy, just use your Python requirements file for that.
+            </p>
+            <p>
+              Nginx can be installed using Heroku buildpacks, there's an APT installer
+              buildpack available.
+            </p>
+            <p>
+              Alternatively you can capitalise on Heroku's new container deployments
+              and push up a Docker container with all of this installed.
             </p>
           </aside>
         </section>
@@ -995,7 +1010,7 @@ heroku config:set WEB_PROCESSES=3 \
 
 	<section>
           <div class="container vcenter">
-	    <h2>background tasks (<span class="orange">CQ</span>)</h2>
+	    <h2>Background tasks (<span class="orange">CQ</span>)</h2>
           </div>
 
           <aside class="notes">
@@ -1112,10 +1127,10 @@ heroku config:set WEB_PROCESSES=3 \
 
         <section id="cq-case-from-rq">
           <div class="rows container">
-	    <h2>but there's already <span class="abas">RQ</span></h2>
-	    <h2 class="fragment">and it's pretty good</h2>
-	    <h2 class="fragment">except it's not fault tolerant</h2>
-	    <h2 class="fragment">and its scheduler makes me cry</h2>
+	    <h2>But there's already <span class="abas">RQ,</span></h2>
+	    <h2 class="fragment">and it's pretty good,</h2>
+	    <h2 class="fragment">except it's not fault tolerant,</h2>
+	    <h2 class="fragment">and its scheduler makes me cry.</h2>
           </div>
 
           <aside class="notes">
@@ -1140,20 +1155,20 @@ heroku config:set WEB_PROCESSES=3 \
 
         <section id="cq-case-from-celery">
           <div class="rows container">
-	    <h2>no probs, <span class="django">Celery</span></h2>
+	    <h2>No probs, <span class="django">Celery,</span></h2>
 	    <h2 class="fragment">it's almost fault tolerant...</h2>
-	    <h2 class="fragment">... but still falls short</h2>
-	    <h2 class="fragment">and its scheduler makes me cry</h2>
+	    <h2 class="fragment">... but still falls short,</h2>
+	    <h2 class="fragment">and its scheduler makes me cry.</h2>
           </div>
         </section>
 
         <section id="cq-define">
           <div class="rows container">
 	    <h2><span class="orange">CQ</span></h2>
-	    <h2>leverages <span class="django">Django</span> Channels</h2>
-	    <h2>fault tolerant</h2>
-	    <h2>complex task workflows</h2>
-	    <h2>robust scheduler</h2>
+	    <h2>Leverages <span class="django">Django</span> Channels,</h2>
+	    <h2>fault tolerant,</h2>
+	    <h2>complex task workflows, and</h2>
+	    <h2>robust scheduler.</h2>
           </div>
 
           <aside class="notes">
