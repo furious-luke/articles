@@ -2533,7 +2533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  opts = opts || {};
 
-	  opts.path = opts.path || '/socket.io';
+	  opts.path = opts.path || 'articles/socket.io';
 	  this.nsps = {};
 	  this.subs = [];
 	  this.opts = opts;
@@ -6871,7 +6871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var toArray = __webpack_require__(42);
 	var on = __webpack_require__(43);
 	var bind = __webpack_require__(44);
-	var debug = __webpack_require__(3)('socket.io-client:socket');
+	var debug = __webpack_require__(3)('socket.io:socket');
 	var hasBin = __webpack_require__(45);
 
 	/**
