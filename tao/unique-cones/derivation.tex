@@ -1,0 +1,128 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{gensymb}
+\usepackage{standalone}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.pathreplacing}
+\begin{document}
+
+\section{Basic cone}
+
+Below is a 2D representation of a light-cone. The mapping used is
+to flatten the declination, showing the right-ascension ($\theta$):
+
+\resizebox{\textwidth}{!}{\input{basic-cone}}
+
+In generating unique cones, we want to place the cone entirely within
+a single box in such a way that we can fit as many cones as possible,
+while ensuring that no part of the cone overlaps any other part. Here is
+what the cone looks like with no alterations:
+
+\resizebox{\textwidth}{!}{\input{overlap-0}}
+
+Clearly the cone is in overlap with itself. In order to avoid this
+overlap, we rotate the cone using an additional angle:
+
+\resizebox{\textwidth}{!}{\input{overlap-10}}
+
+While closer, there is still overlap. Again, with a larger angle:
+
+\resizebox{\textwidth}{!}{\input{overlap-14}}
+
+This is an acceptable solution. However, it's not optimal. We could have
+chosen a smaller angle, which would allow more cones to fit in the domain
+(potentially). So, the question to be answered is, what angle should we
+choose to give the optimal solution? If we examine the optimal solution
+visually we might get some idea of a sufficient condition:
+
+\resizebox{\textwidth}{!}{\input{overlap-12}}
+
+It looks like the optimal angle is such that the lower point on the
+cones arc touches the top of the cone precisely one box length back. Why
+must it be one box length back? Consider the following diagram:
+
+\resizebox{\textwidth}{!}{\input{walkback}}
+
+The point in red is the intersection of the lower end of the cone's arc,
+and the next highest part of the top edge of the cone. To reach that point
+we must move through the two line segments $A$ and $B$. From the diagram it's clear
+that $A + B = b$.
+
+\resizebox{\textwidth}{!}{\input{basic-diagram}}
+
+The condition that needs to be met for the optimal angle is $h_0 = h_1$.
+Begin with definitions for each:
+
+\begin{equation}
+h_0 = d_1 sin(\alpha)
+\end{equation}
+
+\begin{equation}
+h_1 = \left( d_1 cos(\alpha) - b \right) tan(\alpha + \theta)
+\end{equation}
+
+With those definitions, we seek a definition of $\alpha$ by equating
+$h_0$ and $h_1$. This is a little complicated to find an analytical
+solution, so Ridder's method is used to find a numerical solution. This
+is based on $h_0 - h_1 = 0$, which gives:
+
+\begin{equation}
+b - d_1 \left( cos(\alpha) - \frac{sin(\alpha)}{tan(\alpha + \theta)} \right) = 0
+\end{equation}
+
+\section{Deep cone}
+
+In the case where $z_{min} > 0$ we must take into consideration a cone that
+looks something like this:
+
+\resizebox{\textwidth}{!}{\input{deep-cone}}
+
+This actually behaves identically to the basic cone case, but requires an
+offset to be applied to the origin to bring the cone back to the first
+box.
+
+\resizebox{\textwidth}{!}{\input{deep-diagram}}
+
+The values for $o_x$ and $o_y$ are easily calculated:
+
+\begin{equation}
+o_x = d_0 cos(\theta + \alpha)
+\end{equation}
+
+\begin{equation}
+o_y = d_0 sin(\alpha)
+\end{equation}
+
+\section{Example: Real values}
+
+The first example is a real world basic cone with parameters:
+
+\begin{equation}
+\begin{split}
+b &= 500 \\
+\theta &= 8\degree \\
+d_0 &= 0 \\
+d_1 &= 0.45
+\end{split}
+\end{equation}
+
+\resizebox{\textwidth}{!}{\input{actual-basic}}
+
+The second example is the same as the first, but with a minimum
+distance for the cone:
+
+\begin{equation}
+\begin{split}
+b &= 500 \\
+\theta &= 8\degree \\
+d_0 &= 0.2 \\
+d_1 &= 0.45
+\end{split}
+\end{equation}
+
+\resizebox{\textwidth}{!}{\input{actual-deep}}
+
+\end{document}
