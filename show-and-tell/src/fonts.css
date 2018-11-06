@@ -1,0 +1,8 @@
+@font-face {
+  font-family: "Futura Koyu";
+  src: url("../FuturaKoyu.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Hero";
+  src: url("../hero_light-webfont.woff") format("woff");
+}

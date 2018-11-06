@@ -1,6 +1,6 @@
 import {isFunc} from './utils'
 
-class Transition {
+export default class Transition {
   constructor(span, object, name) {
     this.span = span
     this.objects = []
@@ -35,5 +35,3 @@ class Transition {
     })
   }
 }
-
-export default Transition

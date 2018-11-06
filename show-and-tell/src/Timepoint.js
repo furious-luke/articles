@@ -1,14 +1,21 @@
-import {isNil} from './utils'
+import {isNil, isInt} from './utils'
 
-export default class Timepoint {
+class Timepoint {
   static isTimepoint(value) {
     return value instanceof Timepoint
   }
 
+  static globalIndex = 0
+
   constructor(anchor = null, offset = 0) {
+    this.index = Timepoint.globalIndex++;
+    if (isInt(anchor)) {
+      offset += anchor
+      anchor = null
+    }
     this.anchor = anchor
     this.offset = offset
-    this.tick = null
+    this.time = null
   }
 
   hasAnchor() {
@@ -20,41 +27,49 @@ export default class Timepoint {
   }
 
   resolve() {
-    if (this.tick !== null) {
-      return this.tick
+    if (this.time !== null) {
+      return this.time
     }
     if (this._resolving) {
       throw new Error('Cyclic timepoints.')
     }
     this._resolving = true
     if (Timepoint.isTimepoint(this.anchor)) {
-      this.tick = this.anchor.resolve()
+      this.time = this.anchor.resolve()
     } else if (this.anchor === null) {
-      this.tick = 0
+      this.time = 0
     } else {
-      this.tick = this.anchor
+      this.time = this.anchor
     }
-    this.tick += this.offset
+    this.time += this.offset
     delete this._resolving
-    return this.tick
-  }
-
-  add(duration) {
-    return new Timepoint(this, duration)
+    return this.time
   }
 
   copy() {
     return new Timepoint(this)
   }
 
+  add(duration) {
+    return new Timepoint(this, duration)
+  }
+
   repr() {
-    let r = ''
-    if (this.hasAnchor()) {
-      r = 'T'
+    let r = `T${this.index}:`
+    if (Timepoint.isTimepoint(this.anchor)) {
+      r += `T${this.anchor.index}`
+    } else if (this.anchor === null) {
+      r += '?'
+    } else {
+      r += `T${this.anchor}`
     }
-    if (!!this.offset) {
-      r += ` ${this.offset}`
+    if (this.offset >= 0) {
+      r += `+${this.offset}`
+    } else {
+      r += `${this.offset}`
     }
     return r
   }
 }
+
+export default Timepoint

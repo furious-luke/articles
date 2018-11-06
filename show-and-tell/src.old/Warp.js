@@ -1,22 +1,18 @@
 import Timepoint from './Timepoint'
-import {isNil, isArray, repr} from './utils'
+import {isNil, isArray} from './utils'
 
-class Warp {
+export default class Warp {
   static isWarp(value) {
     return value instanceof Warp
-  }
-
-  static get(value) {
-    if (!Warp.isWarp(value)) {
-      value = new Warp(value)
-    }
-    return value
   }
 
   constructor(start, finish) {
     if (isArray(start)) {
       this.start = start[0]
       this.finish = start[1]
+    } else if (finish === undefined) {
+      this.start = null
+      this.finish = start
     } else {
       this.start = start
       this.finish = finish
@@ -48,26 +44,15 @@ class Warp {
     this.b = this.finish.resolve()
   }
 
-  done(time) {
-    return time > this.b + 0.05 // TODO: Yuck.
+  done(tick) {
+    return tick > this.b + 0.05 // TODO: Yuck.
   }
 
   repr() {
-    let r = '('
-    if (isNil(this.a)) {
-      r += repr(this.start)
+    if (isNil(this.a) && isNil(this.b)) {
+      return `(${this.start.repr()}, ${this.finish.repr()})`
     } else {
-      r += `${this.a}`
+      return `(${this.a}, ${this.b})`
     }
-    r += ','
-    if (isNil(this.b)) {
-      r += repr(this.finish)
-    } else {
-      r += `${this.b}`
-    }
-    r += ')'
-    return r
   }
 }
-
-export default Warp

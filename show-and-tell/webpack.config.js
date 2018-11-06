@@ -39,6 +39,16 @@ function configure(env) {
           }
         },
         {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader']
+        },
+        {
+          test: /\.svg$/,
+          use: {
+            loader: 'svg-inline-loader'
+          }
+        },
+        {
           test: /\.(ttf|eot|woff|woff2)(\?=\d+)?$/,
           use: {
             loader: 'file-loader',

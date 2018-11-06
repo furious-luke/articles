@@ -1,19 +1,8 @@
 import Entity from './Entity'
-import {repr} from './utils'
 
-class Tween extends Entity {
-  static registry = {
-  }
-
-  static get(value) {
-    if (!Tween.isTween(value)) {
-      value = new Tween.registry[value]()
-    }
-    return value
-  }
-
+export default class Tween extends Entity {
   constructor(options) {
-    super(options)
+    super(options.show, options.warp)
     this.t = null
     this.interp = null
     this.transitions = options.transitions || []
@@ -23,36 +12,33 @@ class Tween extends Entity {
     this.transitions.push(transition)
   }
 
-  resolve() {
-    super.resolve()
+  resolveTimepoints() {
+    super.resolveTimepoints()
     this.w = this.warp.b - this.warp.a
   }
 
 	enter() {
-    console.log('Enter: ', repr(this))
 	  // Tweens often need some setup to handle taking the
 	  // starting point of transisions. Call all the transitions
 	  // to set themselves up.
     this.transitions.forEach(t => t.enter(this))
 	}
 
-  update(ticker) {
-    this.calculate(ticker.time)
+  update(tick) {
+    this.calc_t(tick)
     this.transitions.forEach(t => t.update(this.interp))
   }
 
-  calculate(time) {
-    if (time <= this.warp.a) {
+  calc_t(tick) {
+    if (tick <= this.warp.a) {
       this.t = 0.0
       this.interp = 0.0
-    } else if (time >= this.warp.b) {
+    } else if (tick >= this.warp.b) {
       this.t = 1.0
       this.interp = 1.0
     } else {
-      this.t = (time - this.warp.a) / this.w
-      this.interp = this.calcInterpolant(this.t)
+      this.t = (tick - this.warp.a) / this.w
+      this.interp = this.calc_interp(this.t)
     }
   }
 }
-
-export default Tween

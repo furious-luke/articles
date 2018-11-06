@@ -1,4 +1,4 @@
-class Ticker {
+export default class Ticker {
   constructor() {
     this.time = 0
     this.tick = 0
@@ -14,5 +14,3 @@ class Ticker {
     }
   }
 }
-
-export default Ticker

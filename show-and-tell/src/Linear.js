@@ -1,10 +1,13 @@
 import Tween from './Tween'
-import Entity from './Entity'
 
-export default class Linear extends Tween {
-  calc_interp(t) {
+class Linear extends Tween {
+  type = 'linear'
+
+  calcInterpolant(t) {
     return t
   }
 }
 
-Entity.tweens.linear = Linear
+Tween.registry.linear = Linear
+
+export default Linear

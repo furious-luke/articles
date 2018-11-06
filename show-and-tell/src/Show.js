@@ -1,88 +1,57 @@
+import paper from 'paper'
+
+import Node from './Node'
 import Ticker from './Ticker'
 import Camera from './Camera'
-// import TwoRenderer from './TwoRenderer'
-import ProcessingRenderer from './ProcessingRenderer'
-// import PaperRenderer from './PaperRenderer'
 
-class Show {
-  constructor() {
-    this.scenes = []
-    this.index = 0
-    this.currentScene = null
-    this.keyListeners = []
-    this.palette = {
-	    base00: '#181818',
-	    base01: '#282828',
-	    base02: '#383838',
-	    base03: '#585858',
-	    base04: '#B8B8B8',
-	    base05: '#D8D8D8',
-	    base06: '#E8E8E8',
-	    base07: '#F8F8F8',
-	    base08: '#AB4642',
-	    base09: '#DC9656',
-	    base0A: '#F7CA88',
-	    base0B: '#A1B56C',
-	    base0D: '#7CAFC2',
-	    base0E: '#BA8BAF'
-    }
-    this.disable_pause = false
-    this.defaultFont = 'FuturaKoyu.ttf'
-    this.defaultFontSize = 0.1
-    this.defaultStrokeWeight = 10
-    this.defaultStroke = this.palette.base03
-    this.defaultFill = this.palette.base03
-  }
-
-  setup(createScenes) {
+class Show extends Node {
+  constructor(options = {}) {
+    super({
+      ...options,
+      centerOrigin: true
+    })
+    this.show = this
     this.ticker = new Ticker()
     this.camera = new Camera()
-    this.renderer = new ProcessingRenderer(this, renderer => {
-      this.renderer = renderer
-      createScenes()
-      if (this.scenes.length) {
-        this.currentScene = this.scenes[0]
-        this.renderer.applyDefaults(this.currentScene)
-        this.currentScene.setup()
-        this.currentScene.enter()
-      }
-      this.prepare()
+    this.w = this.camera.w
+    this.h = this.camera.h
+    this.slides = []
+    this.currentSlide = null
+    this.theme = {
+      background: '#f7f7f7',
+      primary: '#00a19c',
+      disabled: '#9b9b9b',
+      active: '#056dff',
+      text: '#4b4b4b'
+    }
+    this.theme.fill = this.theme.background
+    this.font = 'Hero'
+  }
+
+  enter() {
+    this.ref = new paper.Shape.Rectangle({
+      point: [0, 0],
+      size: paper.view.size,
+      fillColor: this.theme.fill
     })
+    super.enter(this.ticker)
   }
 
-  addScene(scene) {
-    this.scenes.push(scene)
+  update() {
+    this.ticker.update()
+    if (this.currentSlide) {
+      this.currentSlide.update(this.ticker)
+    }
   }
 
-  prepare() {
-    this.currentScene.prepare()
+  render() {
+    this.children.entities.forEach(c => c.render())
   }
 
-  update(time) {
-    this.currentScene.update(time)
-  }
-
-  display(renderer) {
-    this.currentScene.display(renderer)
-  }
-
-  play() {
-    this.renderer.play()
-  }
-
-  addKeyListener(listener) {
-    this.keyListeners.push(listener)
-  }
-
-  removeKeyListener(listener) {
-    this.keyListeners = this.keyListeners.filter(l => l !== listener)
-  }
-
-  keyTyped(key, keyCode) {
-    this.keyListeners.forEach(l => l.keyTyped(key, keyCode))
+  resize() {
+    // TODO
+    super.resize()
   }
 }
 
-const show = new Show()
-
-export default show
+export default Show

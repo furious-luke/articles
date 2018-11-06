@@ -1,17 +1,29 @@
-import Node from './Node'
-import Entity from './Entity'
+import paper from 'paper'
 
-export default class Rectangle extends Node {
+import Node from './Node'
+
+class Rectangle extends Node {
   constructor(options = {}) {
     super(options)
-	  this.w = options.w || 0
-	  this.h = options.h || 0
-	  this.radius = options.radius || 0
-	}
+    this.x = options.x || 0
+    this.y = options.y || 0
+    this.w = options.w || 1
+    this.h = options.h || 1
+    this.fill = options.fill || 'red'
+    if (options.enter) {
+      this.enter()
+    }
+  }
 
-	render(renderer) {
-    renderer.rectangle(this, this.x, this.y, this.w, this.h, this.radius)
-	}
+  enter(ticker) {
+    const ppp = this.show.camera.ppp
+    this.ref = new paper.Path.Rectangle({
+      point: [-0.5 * this.w * ppp, -0.5 * this.h * ppp],
+      size: this.makeSize(),
+      fillColor: this.fill
+    })
+    super.enter(ticker)
+  }
 }
 
-Entity.nodes.rectangle = Rectangle
+export default Rectangle

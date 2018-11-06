@@ -1,6 +1,6 @@
 import {isNil} from './utils'
 
-class Camera {
+export default class Camera {
   constructor(width, height) {
     this.initialise(width, height)
   }
@@ -27,5 +27,3 @@ class Camera {
     this.y = this.pyoffs
   }
 }
-
-export default Camera
