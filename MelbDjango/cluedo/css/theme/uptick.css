@@ -1,0 +1,90 @@
+.splith {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+}
+
+div.card {
+  display: inline-block;
+  border: black solid 0.5rem;
+  border-radius: 1rem;
+  width: 7rem;
+  height: 12rem;
+}
+div.card > div {
+  height: 40%;
+  font-size: 1.3rem;
+  font-weight: 800;
+  padding-top: 1rem;
+}
+
+.center {
+  display: inline-flex;
+  align-items: center;
+}
+
+.spacedv > *:not(:last-child) {
+  margin-bottom: 1rem;
+}
+.spacedv-5 > *:not(:last-child) {
+  margin-bottom: 5rem;
+}
+.spacedh-10 > *:not(:last-child) {
+  margin-right: 10rem;
+}
+
+.grid {
+  stroke: #ccc;
+  stroke-dasharray: 4 4;
+  stroke-width: 1;
+}
+.labels {
+  font-size: 13px;
+}
+.label-title {
+  font-weight: bold;
+  font-size: 12px;
+  fill: black;
+}
+
+div.costs {
+  width: 30rem;
+  border: black solid 0.1rem;
+  color: white;
+  padding: 0;
+  margin: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    #606dbc,
+    #606dbc 10px,
+    #465298 10px,
+    #465298 20px
+  );
+}
+div.costs > * {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+div.costs > *:not(:last-child) {
+  border-bottom: black solid 0.1rem;
+}
+div.misc {
+  height: 6rem;
+}
+div.suspect-1 {
+  height: 6rem;
+}
+div.suspect-2 {
+  height: 10rem;
+}
+div.suspect-3 {
+  height: 15rem;
+}
+
+div.phases > * {
+  border: black solid 0.1rem;
+  border-radius: 0.5rem;
+}
