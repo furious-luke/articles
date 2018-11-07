@@ -3,13 +3,59 @@
 </section>
 
 <section>
-  <p>Show highlighted and zoomed section on flamegraph</p>
+  <div class="center">
+    <div class="costs">
+      <div class="suspect-3">
+        800ms
+      </div>
+      <div class="suspect-2 lit">
+        500ms
+      </div>
+      <div class="suspect-1 done">
+        200ms
+      </div>
+    </div>
+  </div>
 </section>
 
 <section>
-  <p>Show the code</p>
+  <div class="center" style="width: 80%">
+    <img src="./media/wf-included-flamegraph.svg" />
+  </div>
 </section>
 
 <section>
-  <p>Show section on performance bar chart</p>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+from django.utils.module_loading import import_string as import_class_from_dotted_path
+
+def get_included_serializers(serializer):
+    included_serializers = copy.copy(getattr(serializer, 'included_serializers', dict()))
+
+    for name, value in six.iteritems(included_serializers):
+        if not isinstance(value, type):
+            if value == 'self':
+                included_serializers[name] = (
+                    serializer if isinstance(serializer, type) else serializer.__class__
+                )
+            else:
+                included_serializers[name] = import_class_from_dotted_path(value)
+
+    return included_serializers
+  </code></pre>
+</section>
+
+<section>
+  <div class="center">
+    <div class="costs">
+      <div class="suspect-3">
+        800ms
+      </div>
+      <div class="suspect-2 done">
+        500ms
+      </div>
+      <div class="suspect-1 done">
+        200ms
+      </div>
+    </div>
+  </div>
 </section>

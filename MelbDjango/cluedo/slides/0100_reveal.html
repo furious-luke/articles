@@ -3,19 +3,54 @@
 </section>
 
 <section>
-  <p>Big question mark</p>
-  <p>Open envelope and reveal</p>
+  <div class="center">
+    <div class="costs">
+      <div class="suspect-3 lit">
+        800ms
+      </div>
+      <div class="suspect-2 done">
+        500ms
+      </div>
+      <div class="suspect-1 done">
+        200ms
+      </div>
+    </div>
+  </div>
 </section>
 
 <section>
-  <p>Show highlighted and zoomed section on flamegraph</p>
+  <h1>?</h1>
 </section>
 
 <section>
-  <p>Show the code</p>
+  <div class="center" style="width: 80%">
+    <img src="./media/wf-inflection-flamegraph.svg" />
+  </div>
 </section>
 
 <section>
-  <p>Show section on performance bar chart</p>
-  <p>Check for a winner</p>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+def get_resource_type_from_included_serializer(self):
+    """
+    Check to see it this resource has a different resource_name when
+    included and return that name, or None
+    """
+    field_name = self.field_name or self.parent.field_name
+    parent = self.get_parent_serializer()
+    if parent is not None:
+        # accept both singular and plural versions of field_name
+        field_names = [
+            inflection.singularize(field_name),
+            inflection.pluralize(field_name)
+        ]
+        includes = get_included_serializers(parent)
+        for field in field_names:
+            if field in includes.keys():
+                return get_resource_type_from_serializer(includes[field])
+    return None
+  </code></pre>
+</section>
+
+<section>
+  <h1>Winner?</h1>
 </section>

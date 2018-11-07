@@ -8,19 +8,41 @@
 
 <section>
   <h2>What is a Flamegraph?</h2>
+  <ul>
+    <li class="fragment">A profiling representation</li>
+    <li class="fragment">Simplifies complex profiling data</li>
+    <li class="fragment">Works with standard profilers</li>
+  </ul>
+</section>
+
+<section>
+  <img src="./media/mysql-flamegraph.png" />
 </section>
 
 <section>
   <h2>PyFlame</h2>
   <a href="https://github.com/uber/pyflame">https://github.com/uber/pyflame</a>
   <ul>
-    <li>Python profiling tool</li>
-    <li>Generates flamegraphs</li>
+    <li>Python specific</li>
+    <li>Generates flamegraph-ready data</li>
     <li>No instrumentation required</li>
     <li>Very low overhead</li>
   </ul>
 </section>
 
 <section>
-  <p>Example flamegraph from our code</p>
+  <p>So, I ran our task endpoint using PyFlame...</p>
+</section>
+
+<section>
+  <div class="center" style="width: 80%; position: relative">
+    <img src="./media/wf-flamegraph.svg" />
+    <div class="fg-highlight fragment" />
+  </div>
+</section>
+
+<section>
+  <div class="center" style="width: 80%">
+    <img src="./media/wf-subset-flamegraph.svg" />
+  </div>
 </section>

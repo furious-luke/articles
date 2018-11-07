@@ -3,13 +3,68 @@
 </section>
 
 <section>
-  <p>Show highlighted and zoomed section on flamegraph</p>
+  <div class="center">
+    <div class="costs">
+      <div class="suspect-3">
+        800ms
+      </div>
+      <div class="suspect-2">
+        500ms
+      </div>
+      <div class="suspect-1 lit">
+        200ms
+      </div>
+    </div>
+  </div>
 </section>
 
 <section>
-  <p>Show the code</p>
+  <div class="center" style="width: 80%">
+    <img src="./media/wf-deepcopy-flamegraph.svg" />
+  </div>
 </section>
 
 <section>
-  <p>Show section on performance bar chart</p>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+class Serializer(BaseSerializer):
+
+    @property
+    def fields(self):
+        """
+        A dictionary of {field_name: field_instance}.
+        """
+        # `fields` is evaluated lazily. We do this to ensure that we don't
+        # have issues importing modules that use ModelSerializers as fields,
+        # even if Django's app-loading stage has not yet run.
+        if not hasattr(self, '_fields'):
+            self._fields = BindingDict(self)
+            for key, value in self.get_fields().items():
+                self._fields[key] = value
+        return self._fields
+
+    def get_fields(self):
+        """
+        Returns a dictionary of {field_name: field_instance}.
+        """
+        # Every new serializer is created with a clone of the field instances.
+        # This allows users to dynamically modify the fields on a serializer
+        # instance without affecting every other serializer instance.
+        return copy.deepcopy(self._declared_fields)
+  </code></pre>
+</section>
+
+<section>
+  <div class="center">
+    <div class="costs">
+      <div class="suspect-3">
+        800ms
+      </div>
+      <div class="suspect-2">
+        500ms
+      </div>
+      <div class="suspect-1 done">
+        200ms
+      </div>
+    </div>
+  </div>
 </section>
