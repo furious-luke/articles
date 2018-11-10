@@ -16,12 +16,62 @@
       </div>
     </div>
   </div>
+  <aside class="notes">
+    <p>
+      Okay, the next suspect, and coming in at approximately half a
+      second.
+    </p>
+  </aside>
 </section>
 
 <section>
   <div class="center" style="width: 80%">
     <img src="./media/wf-included-flamegraph.svg" />
   </div>
+  <aside class="notes">
+    <p>
+      This time we're looking at a part of the flamegraph where
+      DRF-JSONAPI is in the serializer phase.  It seems to be spending
+      a lot of time in the functions relating to looking up included
+      models and serializers. Let's focus in on one of the wider bars
+      near the top; we can see there's a method in there called
+      "get_included_serializers", but before we look there, let's take a look
+      at how we define our included serializers.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+class TaskSerializer(ModelSerializer):
+    included_serializers = {
+        'assigned_to': 'abas.apps.accounts.api.v2.serializers.UserSerializer',
+        'parent_task': 'abas.apps.tasks.api.v2.serializers.TaskSerializer',
+        'assigned_office': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'billingcard': 'abas.apps.billing.api.v2.serializers.BillingCardSerializer',
+        'branch': 'abas.apps.branches.api.v2.serializers.BranchNameSerializer',
+        'category': 'abas.apps.tasks.api.v2.serializers.TaskCategorySerializer',
+        'client': 'abas.apps.clients.api.v2.serializers.ClientSerializer',
+        'costcentre': 'abas.apps.costcentres.api.v2.serializers.CostCentreSerializer',
+        'property': 'abas.apps.properties.api.v2.serializers.PropertySerializer',
+        'round': 'abas.apps.tasks.api.serializers.RoundSerializer',
+        'tags': 'abas.apps.tasks.api.serializers.TaskTagSerializer',
+        'supporting_technicians': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'technician': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'author': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'contractor': 'abas.apps.contractors.api.serializers.ContractorSerializer',
+        'servicegroup': 'abas.apps.routines.api.v2.serializers.ServiceGroupSerializer',
+        'updated_by': 'abas.apps.accounts.api.v2.serializers.UserSerializer',
+    }
+  </code></pre>
+  <aside class="notes">
+    <p>
+      This is the beginning of the Task serializer definition. You can
+      see the list of related serializers that will be used when
+      including certain relationships in the resultant JSON when
+      querying the API. Take note that they're all defined as strings.
+    </p>
+  </aside>
 </section>
 
 <section>
@@ -42,20 +92,21 @@ def get_included_serializers(serializer):
 
     return included_serializers
   </code></pre>
-</section>
-
-<section>
-  <div class="center">
-    <div class="costs">
-      <div class="suspect-3">
-        800ms
-      </div>
-      <div class="suspect-2 done">
-        500ms
-      </div>
-      <div class="suspect-1 done">
-        200ms
-      </div>
-    </div>
-  </div>
+  <aside class="notes">
+    <p>
+      Now let's look at the DRF-JSONAPI function that looks up these
+      serializers. This is run every time a serializer is
+      constructed. Notie the call near the bottom to
+      "import_class_from_dotted_path"; that's going to be called on
+      every one of the string paths we saw just before. You'd think
+      that once a class has already been imported it would keep a
+      lookup in a table for it, but seemingly that's not the case, as
+      it's still consuming about half a second in total.
+    </p>
+    <p>
+      So how can we fix this? Well, the easiest way was to add a table
+      to the code to keep each serializer class after we've looked it
+      up once. The next time we grab it straight from the table.
+    </p>
+  </aside>
 </section>

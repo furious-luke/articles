@@ -7,9 +7,13 @@
     <li>JSON-API Specification</li>
   </ul>
   <aside class="notes">
-    Moving on to the software performance. I'll first need to explain a little
-    about the product in which we experienced the issue, and the libraries we
-    use.
+    <p>
+      So let's move away from Cluedo, briefly, to talk about the
+      pickle of a situation we found ourselves in with our
+      software. To bring you up to speed I'll talk a little about one
+      of our products at Uptick, the libraries we use, and the
+      performance issue we found.
+    </p>
   </aside>
 </section>
 
@@ -17,30 +21,41 @@
   <div class="svg"><!-- {"id": "logo2"} --></div>
   <div style="text-align: right; padding-right: 13rem">Workforce</div>
   <aside class="notes">
-    At Uptick we have a number of products, but Workforce is our oldest and
-    largest. It's designed to be used by companies that work in the fire safety
-    industry, and it keeps track of what tasks need to be carried out at a
-    commerical property in order to be safe.
+    <p>
+      At Uptick we have a number of products, but Workforce is our
+      oldest and largest. It's designed to be used by companies that
+      work in the fire safety industry, and, amongst many other
+      things, it keeps track of what operations need to be carried out
+      at a commerical property in order for the property to be
+      compliant with national fire safety standards.
+    </p>
   </aside>
 </section>
 
 <section>
-  <p>Picture of how a task connects to other things</p>
+  <img src="./media/task-web.svg" />
   <aside class="notes">
-    In Workforce we have the concept of a task, which represents a visit to a
-    property in order to carry out a set of scheduled maintenance. This is
-    pretty central to the software, and ends up having a lot of
-    interconnectedness with the rest of the system.
+    <p>
+      In Workforce there is the concept of a Task. A Task represents a
+      particular set of work that needs to be done at a certain time,
+      at a certain property. In many ways Tasks form the backbone of
+      the product. And, as such, they have a tendency to create
+      something of a web of connections across our data models.
+    </p>
   </aside>
 </section>
 
 <section data-background="./media/task-list.png" data-background-size="contain">
   <aside class="notes">
-    Our clients often want to see a list of their tasks, filtered in various
-    ways. They also like to be able to see only the fields they're interested
-    in, switched on and off on a per-user basis. This makes sense, and is a
-    reasonable request given the number and variety of connected datums. The
-    interface you see here is how we provide that functionality.
+    <p>
+      A key feature of Workforce is providing our clients with a dynamic
+      listing of all their tasks. Intrinsically this is not so
+      difficult. The trouble begins when our clients, and each of
+      their employees, wants to see a different set of columns, and
+      filter by different parameters within this Task view. We needed to build
+      our APIs  flexible enough to handle this broad set of variations in columns and
+      filters.
+    </p>
   </aside>
 </section>
 
@@ -54,25 +69,109 @@
     <a style="font-size: 0.6em" href="https://github.com/django-json-api/django-rest-framework-json-api">https://github.com/django-json-api/django-rest-framework-json-api</a>
   </div>
   <aside class="notes">
-    To support this dynamic querying from our backend, we begin by using Django
-    Rest Framework, the mainstay of writing RESTful applications in Django.
-
-    In addition to DRF, we use an extension that provides an implementation of
-    the JSON-API specification. The JSON-API specification gives us, amongst
-    other things, a standardized way to dynamically include model relationships
-    along with our queries, and this is how our task endpoints are able to
-    dynamically return complex relationships depending on the filters applied.
-
-    Now I could go into some more detail surrounding DRF and DRF-JSONAPI, but
-    it's not critical to know the inner workings for the purposes of this talk,
-    just that these packages are used, and vaguely what they do.
+    <p>
+      These two packages do most of the heavy lifting for us. The
+      first I'm sure will be very familiar to you, Django Rest
+      Framework, the ubiquitous RESTful API library for Django. The
+      second may not be so familiar. An extension to DRF, Django Rest
+      Framework Json-API implements the Json-API specification, or at
+      least something close enough to it. So what is the Json-API
+      specification?
+    </p>
   </aside>
 </section>
 
 <section>
-  <p>Bring back previous picture of connections, highlight a few of the connections and show queries for them</p>
+  <div>
+    <h3>JSON-API Specification</h3>
+    <a style="font-size: 0.6em" href="https://jsonapi.org/">https://jsonapi.org</a>
+  </div>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+{
+  "links": {
+    "self": "http://example.com/articles",
+    "next": "http://example.com/articles?page[offset]=2",
+    "last": "http://example.com/articles?page[offset]=10"
+  },
+  "data": [{
+    "type": "articles",
+    "id": "1",
+    "attributes": {
+      "title": "JSON:API paints my bikeshed!"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/author",
+          "related": "http://example.com/articles/1/author"
+        },
+        "data": { "type": "people", "id": "9" }
+      },
+      "comments": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/comments",
+          "related": "http://example.com/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": "5" },
+          { "type": "comments", "id": "12" }
+        ]
+      }
+    },
+    "links": {
+      "self": "http://example.com/articles/1"
+    }
+  }],
+  "included": [{
+    "type": "people",
+    "id": "9",
+    "attributes": {
+      "firstName": "Dan",
+      "lastName": "Gebhardt",
+      "twitter": "dgeb"
+    },
+    "links": {
+      "self": "http://example.com/people/9"
+    }
+  }, {
+    "type": "comments",
+    "id": "5",
+    "attributes": {
+      "body": "First!"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "2" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/5"
+    }
+  }, {
+    "type": "comments",
+    "id": "12",
+    "attributes": {
+      "body": "I like XML better"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "9" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/12"
+    }
+  }]
+}
+  </code></pre>
   <aside class="notes">
-    And so using DRF and DRF-JSONAPI we are able to dynamically fetch complex
-    relationships from the DB on demand.
+    <p>
+      Json-API is a standard developed to help build flexible and
+      powerful APIs. It's designed to provide enhanced relationship
+      querying, field selection, and pagination, amongst other
+      things. The relationship querying is rather pertinent to our
+      Task list, as it allows easy selection of connected models
+      dynamically.
+    </p>
   </aside>
 </section>

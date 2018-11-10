@@ -4,6 +4,14 @@
     <li>Flamegraphs</li>
     <li>The Suspects</li>
   </ul>
+  <aside class="notes">
+    <p>
+      And thus, our investigation began. In this section I'll talk a
+      little about our tool of choice for uncovering the nefarious
+      antagonist of our plot, and then we'll take a look at each of the
+      three major performance costs, unmasking them in the process.
+    </p>
+  </aside>
 </section>
 
 <section>
@@ -13,10 +21,68 @@
     <li class="fragment">Simplifies complex profiling data</li>
     <li class="fragment">Works with standard profilers</li>
   </ul>
+  <aside class="notes">
+    <p>
+      About 18 months ago I went to Dockercon in Austin Texas.
+      While I was there I was fortunate
+      enough to see a talk by Brendan Gregg, an engineer from Uber.  He spoke about
+      how Uber is able to analyse their containerised environments for
+      performance issues. And one of the tools they use leverages a visual technique
+      called a flamegraph. So what is a flamegraph?
+    </p>
+    <p>
+      A flamegraph is a representation of collected profiling data.
+    </p>
+    <p>
+      It's designed to make the interpretation of profiling data much
+      easier, presenting an intuitive view of where time is spent in the
+      code.
+    </p>
+    <p>
+      Becuase it's just a representation of the profiling data it can work
+      with many other standard profiling tools, such as Linux's "ptrace".
+    </p>
+  </aside>
 </section>
 
 <section>
   <img src="./media/mysql-flamegraph.png" />
+  <aside class="notes">
+    <p>
+      This is an example of a Flamegraph generated for a query being
+      run through MySQL. The x-axis on the graph is the increasing
+      time of execution of the program, and the y-axis represents the
+      call-stack.
+    </p>
+    <p>
+      Notice that the graph is shown as a sequence of stacked
+      bars. Each bar represents the time spent in a particular
+      function. The further up the graph a bar appears, the deeper
+      into the stack the call is.
+    </p>
+    <p>
+      So in this example, the entry function is "handle_select". The
+      bar immediately above this is called "mysql_select". Now because
+      that bar covers the entire horizontal surface of
+      "handle_select", that indicates that as soon as we enter the
+      first function we call out to the next; not much time is
+      actually spent running code in the first function.
+    </p>
+    <p>
+      This is also true for the third call in the stack.
+    </p>
+    <p>
+      But on the fourth row we can see that there are two function
+      calls that consume significant time. Here we can see that about
+      two thirds of the time spent is in sorting indices, and about
+      one third spent on executing the select.
+    </p>
+    <p>
+      In a Flamegraph, we tend to look for wide bars, as high up the
+      call stack as possible. These are excellent places to begin
+      looking deeper into the code to see what's happening.
+    </p>
+  </aside>
 </section>
 
 <section>
@@ -28,6 +94,16 @@
     <li>No instrumentation required</li>
     <li>Very low overhead</li>
   </ul>
+  <aside class="notes">
+    <p>
+      At Dockercon, Brendan Gregg demonstrated the use of PyFlame, a
+      Python based flamegraph utility. The greatest advantage of
+      PyFlame, in my opinion, is that it requires no instrumentation
+      of your source code and provides next to no overhead. This means
+      it can be used in production if necessary to analyse real-world,
+      live, problems.
+    </p>
+  </aside>
 </section>
 
 <section>
@@ -35,14 +111,38 @@
 </section>
 
 <section>
-  <div class="center" style="width: 80%; position: relative">
+  <div class="center" style="width: 70%; position: relative">
     <img src="./media/wf-flamegraph.svg" />
     <div class="fg-highlight fragment" />
   </div>
+  <aside class="notes">
+    <p>
+      It produced a lot of data, and a large graph. Let's examine a
+      smaller subset to get a feel for what's going on.
+    </p>
+  </aside>
 </section>
 
 <section>
   <div class="center" style="width: 80%">
     <img src="./media/wf-subset-flamegraph.svg" />
   </div>
+  <aside class="notes">
+    <p>
+      While still a little dense, this graph covers the bulk of the
+      database query phase, and a part of serialization.  There is a
+      fairly distinct separation between the two, with the left side
+      being the database query, and the right being in Django Rest
+      Framework.
+    </p>
+    <p>
+      Now it's a little unclear due to the size of this image, but
+      there a filenames and line numbers on each of these bars, making
+      it striaght-forward to identify where in the code we can begin
+      to examine. This is the strength of flamegraphs; they make clear
+      the specific locations in your source code, both file and
+      line-number, that are candidates for performance examination in
+      an intuitive representation.
+    </p>
+  </aside>
 </section>

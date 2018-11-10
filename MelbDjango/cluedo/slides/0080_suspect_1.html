@@ -16,12 +16,29 @@
       </div>
     </div>
   </div>
+  <aside class="notes">
+    <p>
+      This particular suspect clocks in at approximately 200ms, so
+      let's take a look at the flamegraph and see what we can see.
+    </p>
+  </aside>
 </section>
 
 <section>
   <div class="center" style="width: 80%">
     <img src="./media/wf-deepcopy-flamegraph.svg" />
   </div>
+  <aside class="notes">
+    <p>
+      Okay, this flamegraph was generated to highlight a certain
+      region of the overall operation. This shows a segment where a
+      Django Rest Framework serializer is being constructed and
+      run. There's a bit of a wide bar happening near the top there,
+      let's focus on that. It looks to be in a function named
+      "get_fields" in DRF. So, let's take a look at that code and see
+      what's going on.
+    </p>
+  </aside>
 </section>
 
 <section>
@@ -51,20 +68,22 @@ class Serializer(BaseSerializer):
         # instance without affecting every other serializer instance.
         return copy.deepcopy(self._declared_fields)
   </code></pre>
-</section>
-
-<section>
-  <div class="center">
-    <div class="costs">
-      <div class="suspect-3">
-        800ms
-      </div>
-      <div class="suspect-2">
-        500ms
-      </div>
-      <div class="suspect-1 done">
-        200ms
-      </div>
-    </div>
-  </div>
+  <aside class="notes">
+    <p>
+      This is a slightly altered snippet of code from the Serializer
+      class in DRF. The first method shown, "fields", returns a
+      dictionary of the fields on a serializer. It does this by
+      calling the second method, "get_fields". Now "get_fields" simply
+      returns the declared fields on the serializer, but in doing so
+      it creates a deep copy.
+    </p>
+    <p>
+      It turns out this deep copy is our culprit. Now we were able to
+      remove this time cost by using a shallow copy instead, however
+      this can cause problems depending on how the serializer is used
+      afterwards. If modifications are made to the fields themselves
+      it will affect other serializer instances, so modify with
+      caution.
+    </p>
+  </aside>
 </section>

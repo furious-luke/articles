@@ -25,18 +25,28 @@
       stroke-linecap="round"
     >
       <line x1="71" y1="260" x2="150" y2="260" />
-      <line x1="150" y1="260" x2="400" y2="60" class="fragment" />
+      <line x1="150" y1="260" x2="300" y2="160" class="fragment" />
+      <line x1="300" y1="160" x2="400" y2="60" class="fragment" />
     </g>
   </svg>
   <aside class="notes">
-    For quite a long time this approach served us pretty well. The queries came
-    in, and were serviced typically around the 500ms mark. This isn't fantastic,
-    but didn't warrant spending too much time being concerned about.
-
-    But over time the task model and it's connections grew larger, and more complex. This effect became noticeable, and then eventually catastrophic. If a user
-    selected enough additional column, the query could end up taking around 3 to 4 seconds to complete.
-
-    So, what were we to do? What would be our first steps?
+    <p>
+      Now, at the beginning, this use of DRF, and DRF-JSONAPI worked
+      very well indeed. Our Task endpoint performed well enough,
+      taking approximately 400ms for larger queries, but generally
+      was much faster on average.
+    </p>
+    <p>
+      However over time, as we added more connections to our Task
+      model, and we added more fields, this began to slow down, and we
+      said to ourselves, “we should look in to that one day”.
+    </p>
+    <p>
+      And then we noticed it slow down even more, and again our
+      sentiment was “one day, we'll get to that when we have time”. It
+      wasn't until some of these task queries were taking up to four
+      seconds that we decided that "that day was today".
+    </p>
   </aside>
 </section>
 
@@ -53,14 +63,16 @@
     <img style="height: 15em; display: inline-block" src="./media/ddt.png" />
   </div>
   <aside class="notes">
-    Why, DDT, of course. The ubiquitous Django performance debugging tool. DDT
-    is easily installed, and when running in debug mode provides a plethora of
-    information useful for identifying where potential issues may be. Now, given
-    the number of Django models we're hitting in our task queries, one would be
-    forgiven for thinking the issue may lay in the database layer. But looking
-    at the SQL tab in DDT we can see that only 120ms have been spent querying
-    the database. And if we examine the CPU tab, well we can see where the time
-    was spent. But what exactly is happening? The plot thickens...
+    <p>
+      So of course our first port of call was the Django Debug
+      Toolbar. The mainstay of the Django performance analyser's
+      arsenal. When we began looking in to this we entirely expected
+      the issue to be rooted in a database query explosion of some
+      kind. But that was not the explanation at all. We were spending
+      a mere 120ms in the database. And a whopping 3000 milliseconds
+      spent in CPU. What in the world could be causing this? The plot
+      was rapidly thickening.
+    </p>
   </aside>
 </section>
 
@@ -80,32 +92,115 @@
     <h1>?</h1>
   </div>
   <aside class="notes">
-    As is always the case, the real answer is a combination of different
-    factors. On the left here we see a representation of the various
-    contributing issues, and their relative contribution to our performance
-    woes. Clearly the culprit at the top is the biggest problem, and here is
-    where we bring in the Cluedo experience.
+    <p>
+      Of course answers are never so easy, and I can tell you that our
+      performance was attacked on all sides, in various ways. All up
+      there about seven key areas we found that needed to be fixed,
+      each carrying a significant performance impact. This here is a
+      representation of the top three performance costs we found. The
+      top one coming in at a whopping 800 milliseconds. In a while I'm going to
+      go through each of these top three suspects and explain what caused them.
+    </p>
   </aside>
 </section>
 
 <section>
-  <div style="width: 30rem; display: inline-block" class="spacedv phases">
-    <div>View</div>
-    <div>Model</div>
-    <div>Serialize</div>
-    <div>Render</div>
+  <h3>Let's play a game</h3>
+  <aside class="notes">
+    <p>
+      But before that, I'd like to play a little game. In the spirit
+      of Cluedo, I have an envelope in which there are three
+      cards. Each card corresponds to a fact about the location of the
+      top-most performance cost. In a moment I'm going to hand out
+      some cards and pens, and your challenge will be to guess as
+      close as possible to the contents of this envelope by writing
+      down three things on the cards.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <div class="spacedv">
+    <div>
+      <div class="card">
+        <div>Django</div>
+        <h2>?</h2>
+      </div>
+      <div class="card">
+        <div>DRF</div>
+        <h2>?</h2>
+      </div>
+      <div class="card">
+        <div>JSONAPI</div>
+        <h2>?</h2>
+      </div>
+      <div class="card">
+        <div>Uptick</div>
+        <h2>?</h2>
+      </div>
+    </div>
   </div>
   <aside class="notes">
-    A DRF query goes through, broadly speaking, a sequence of 4 phases: the
-    viewset, model, serializer, and renderer. In the viewset, the query is
-    dispatched to a handling function. Authentication and authorisation is
-    enforced. A queryset for the database is prepared, and pagination applied.
-    In the model phase the queryset is carried out and the results loaded. Then,
-    in the serilizer phase, the models are processed and converted into the
-    outgoing data. Finally, the renderer phase converts the data into the format
-    expected by the client.
+    <p>
+      The first you must choose, will be the software package in which
+      you think the greatest performance cost is located. This is in
+      one of Django, Django Rest Framework, Django Rest Framework JSON
+      API, or perhaps the issue lay in our code at Uptick.
+    </p>
+  </aside>
+</section>
 
-    So, we know that in one of these phases the issues are happening. TODO
+<section>
+  <div>
+    <div class="card">
+      <div>Parse</div>
+      <h2>?</h2>
+    </div>
+    <div class="card">
+      <div>Model</div>
+      <h2>?</h2>
+    </div>
+    <div class="card">
+      <div>Serialize</div>
+      <h2>?</h2>
+    </div>
+    <div class="card">
+      <div>Render</div>
+      <h2>?</h2>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>
+      The second thing to write is the request phase in which you
+      think the cost may be happening in. So, very broadly speaking,
+      there are four phases to each request that our API handles. The
+      "parse" phase involves taking the incoming request and parsing
+      it into useful information. The "model" phase is that of loading
+      data from the database and placing it in Django models. The
+      "serialize" phase takes those models and produces outgoing
+      data. And the "render" phase creates the final JSON data to send
+      to the client.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <div class="spacedv">
+    <div>
+      <div class="card">
+        <div></div>
+        <h2>?</h2>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>
+      Finally, you need to write specifically what you think it is
+      that has caused the performance problem. Be as specific as you
+      like here, and at the end of the talk we'll see who is the closest to the correct answer
+      and we will be giving away a copy of Cluedo which CommonCode have so
+      graciously provided, isn't that nice of them?
+    </p>
   </aside>
 </section>
 
@@ -155,5 +250,26 @@
     </div>
   </div>
   <aside class="notes">
+    <p>
+      So, you need to write down one option from each of the first two
+      rows, and then finally write down your specific guess on what
+      the cause of the performance cost might be.
+    </p>
+    <p>
+      As an example, on my card I might write down "Django", to indicate I think
+      the problem is something in Django's code, and then "serialize",
+      to indicate I think the problem is happening during
+      serialization, and then I might write something like "URL
+      reverse lookups", because I happen to think that performing URL reverses
+      can be particularly slow. Interestingly that example is actually
+      one of the other performance issues we found outside of the top three; it was taking
+      about 100ms in total to perform URL reverse lookups on each returned Django
+      model.
+    </p>
+    <p>
+      I'll give you a little time to write down your guesses and
+      return them to the front. Also, please don't forget to write
+      your name on the card.
+    </p>
   </aside>
 </section>
