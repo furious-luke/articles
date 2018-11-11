@@ -1,33 +1,33 @@
 <!doctype html>
 <html>
-        <head>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-                <title>reveal.js</title>
+    <title>reveal.js</title>
 
-                <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/reveal.css">
     <link rel="stylesheet" href="css/fonts.css">
-                <link rel="stylesheet" href="css/theme/black.css">
+    <link rel="stylesheet" href="css/theme/black.css">
 
-                <!-- Theme used for syntax highlighting of code -->
-                <link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
 
-                <!-- Printing and PDF exports -->
-                <script>
-                        var link = document.createElement( 'link' );
-                        link.rel = 'stylesheet';
-                        link.type = 'text/css';
-                        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-                        document.getElementsByTagName( 'head' )[0].appendChild( link );
-                </script>
-        </head>
-        <body>
-                <div class="reveal">
-                        <div class="slides">
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
 
         <!-- Splash -->
-                                <section data-external="slides/0010_splash.html"></section>
+        <section data-external="slides/0010_splash.html"></section>
         <section data-external="slides/0020_title.html"></section>
         <!-- <section data-external-replace="slides/0030_intro.html"></section> -->
         <section data-external-replace="slides/0040_cluedo.html"></section>
@@ -38,49 +38,49 @@
         <section data-external-replace="slides/0090_suspect_2.html"></section>
         <section data-external-replace="slides/0100_reveal.html"></section>
 
-                        </div>
-                </div>
+      </div>
+    </div>
 
-                <script src="lib/js/head.min.js"></script>
-                <script src="js/reveal.js"></script>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
 
-                <script>
-                 // More info about config & dependencies:
-                              // - https://github.com/hakimel/reveal.js#configuration
-                 // - https://github.com/hakimel/reveal.js#dependencies
-                 Reveal.initialize({
-                         dependencies: [
-                                 { src: 'plugin/markdown/marked.js' },
-                                 { src: 'plugin/markdown/markdown.js' },
-                                 { src: 'plugin/notes/notes.js', async: true },
-                                 { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-         { src: 'plugin/anything/anything.js' },
-         {
-                                         src: 'plugin/external/external.js',
-                                         condition: function() {
-                                                 return !!document.querySelector('[data-external],[data-external-replace]')
-                                         }
-                                 }
-                         ],
-       transition: 'fade',
-       anything: [
-         {
-           className: 'svg',
-           initialize: function(container, options) {
-             container.appendChild(document.getElementById(options.id))
-           }
-         }
-       ]
-                 });
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/anything/anything.js' },
+          {
+            src: 'plugin/external/external.js',
+            condition: function() {
+              return !!document.querySelector('[data-external],[data-external-replace]')
+            }
+          }
+        ],
+	transition: 'fade',
+	anything: [
+          {
+            className: 'svg',
+            initialize: function(container, options) {
+              container.appendChild(document.getElementById(options.id))
+            }
+          }
+	]
+      });
 
-     Reveal.addEventListener('ready', function(event) {
-       // Reveal.slide(20)
-     })
-                </script>
+      Reveal.addEventListener('ready', function(event) {
+	// Reveal.slide(20)
+      })
+    </script>
 
     <div style="display: none">
       <svg id="logo1" xmlns:xlink="http://www.w3.org/1999/xlink" width="578" height="171"><defs><linearGradient id="a" x1="15.29%" x2="70.11%" y1="89.46%" y2="-16.18%"><stop offset="0%" stop-color="#2BB673"/><stop offset="100%" stop-color="#00AEEF"/></linearGradient><linearGradient id="b" x1="62.3" x2="172.41" y1="148.96" y2="7.58" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="h" x1="61.86" x2="172.83" y1="147.57" y2="7.74" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="c" x1="61.49" x2="173.32" y1="148.5" y2="7.57" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="e" x1="62.3" x2="172.84" y1="148.96" y2="7.46" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="k" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="j" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="i" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="g" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="f" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/><linearGradient id="d" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a"/></defs><path fill="url(#b)" d="M172.64.58a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7zM7.71 56.09a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7zm13.21 62.85a5.5 5.5 0 0 0-5.5 5.5 5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5 5.5 5.5 0 0 0-5.5-5.5zm81.5.08a5.5 5.5 0 0 0-5.5 5.5 5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5 5.5 5.5 0 0 0-5.5-5.5zM61.7 141a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7z"/><path fill="none" stroke="url(#c)" stroke-width="3" d="M8.88 64.68l11.88 60.01"/><path fill="none" stroke="url(#d)" stroke-width="3" d="M23.05 124.53L170.14 9.76"/><path fill="none" stroke="url(#e)" stroke-width="3" d="M10.35 67.4l28.44 44.48"/><path fill="none" stroke="url(#f)" stroke-width="3" d="M42.6 117.93l19.7 31.03"/><path fill="none" stroke="url(#g)" stroke-width="3" d="M63.76 146.5L171.7 9.53"/><path fill="none" stroke="url(#h)" stroke-width="3" d="M6.39 63.74l51.97 33.14"/><path fill="none" stroke="url(#i)" stroke-width="3" d="M64.48 100.93l23.27 14.74"/><path fill="none" stroke="url(#j)" stroke-width="3" d="M93.41 119.28l11.45 7.45"/><path fill="none" stroke="url(#k)" stroke-width="3" d="M103.27 125.1l67.6-113.29"/><path fill="none" stroke="#414042" stroke-width="5" d="M143.53 99.3l-.05 45.19c.03 30.56 50.02 32.4 50.01.3l.08-56.82"/><path fill="none" stroke="#414042" stroke-width="5" d="M237.2 88.09v81.35"/><path fill="none" stroke="#414042" stroke-width="5" d="M237.2 90.65l14.37-.09c26.09-.86 27.22 37.78-.18 37.8l-14.19.09"/><path fill="none" stroke="#414042" stroke-width="5" d="M299.2 90.28l47.45.1"/><path fill="none" stroke="#414042" stroke-width="5" d="M322.9 87.9l-.04 81.64"/><path fill="none" stroke="#414042" stroke-width="5" d="M380.28 87.95v81.59"/><path fill="none" stroke="#414042" stroke-width="5" d="M487.04 101.08c-3.96-4.14-11.91-11.33-28.65-11.71-49.8 2.7-51.87 73.82-.64 79.07 10.38.05 17.26-1.84 29.1-11.08"/><path fill="none" stroke="#414042" stroke-width="5" d="M526.3 87.81v81.73"/><path fill="none" stroke="#414042" stroke-width="5" d="M571.32 87.9l-44.66 43.75"/><path fill="none" stroke="#414042" stroke-width="5" d="M533.22 128.25l40.11 40.92"/></svg>
       <svg id="logo2" xmlns:xlink="http://www.w3.org/1999/xlink" width="578" height="171"><defs><linearGradient id="a2" x1="15.29%" x2="70.11%" y1="89.46%" y2="-16.18%"><stop offset="0%" stop-color="#2BB673"/><stop offset="100%" stop-color="#00AEEF"/></linearGradient><linearGradient id="b2" x1="62.3" x2="172.41" y1="148.96" y2="7.58" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="h2" x1="61.86" x2="172.83" y1="147.57" y2="7.74" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="c2" x1="61.49" x2="173.32" y1="148.5" y2="7.57" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="e2" x1="62.3" x2="172.84" y1="148.96" y2="7.46" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="k2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="j2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="i2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="g2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="f2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/><linearGradient id="d2" x1="62.3" x2="173.02" y1="148.04" y2="7.91" gradientUnits="userSpaceOnUse" xlink:href="#a2"/></defs><path fill="url(#b2)" d="M172.64.58a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7zM7.71 56.09a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7zm13.21 62.85a5.5 5.5 0 0 0-5.5 5.5 5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5 5.5 5.5 0 0 0-5.5-5.5zm81.5.08a5.5 5.5 0 0 0-5.5 5.5 5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5 5.5 5.5 0 0 0-5.5-5.5zM61.7 141a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7z"/><path fill="none" stroke="url(#c2)" stroke-width="3" d="M8.88 64.68l11.88 60.01"/><path fill="none" stroke="url(#d2)" stroke-width="3" d="M23.05 124.53L170.14 9.76"/><path fill="none" stroke="url(#e2)" stroke-width="3" d="M10.35 67.4l28.44 44.48"/><path fill="none" stroke="url(#f2)" stroke-width="3" d="M42.6 117.93l19.7 31.03"/><path fill="none" stroke="url(#g2)" stroke-width="3" d="M63.76 146.5L171.7 9.53"/><path fill="none" stroke="url(#h2)" stroke-width="3" d="M6.39 63.74l51.97 33.14"/><path fill="none" stroke="url(#i2)" stroke-width="3" d="M64.48 100.93l23.27 14.74"/><path fill="none" stroke="url(#j2)" stroke-width="3" d="M93.41 119.28l11.45 7.45"/><path fill="none" stroke="url(#k2)" stroke-width="3" d="M103.27 125.1l67.6-113.29"/><path fill="none" stroke="#414042" stroke-width="5" d="M143.53 99.3l-.05 45.19c.03 30.56 50.02 32.4 50.01.3l.08-56.82"/><path fill="none" stroke="#414042" stroke-width="5" d="M237.2 88.09v81.35"/><path fill="none" stroke="#414042" stroke-width="5" d="M237.2 90.65l14.37-.09c26.09-.86 27.22 37.78-.18 37.8l-14.19.09"/><path fill="none" stroke="#414042" stroke-width="5" d="M299.2 90.28l47.45.1"/><path fill="none" stroke="#414042" stroke-width="5" d="M322.9 87.9l-.04 81.64"/><path fill="none" stroke="#414042" stroke-width="5" d="M380.28 87.95v81.59"/><path fill="none" stroke="#414042" stroke-width="5" d="M487.04 101.08c-3.96-4.14-11.91-11.33-28.65-11.71-49.8 2.7-51.87 73.82-.64 79.07 10.38.05 17.26-1.84 29.1-11.08"/><path fill="none" stroke="#414042" stroke-width="5" d="M526.3 87.81v81.73"/><path fill="none" stroke="#414042" stroke-width="5" d="M571.32 87.9l-44.66 43.75"/><path fill="none" stroke="#414042" stroke-width="5" d="M533.22 128.25l40.11 40.92"/></svg>
     </div>
-        </body>
+  </body>
 </html>

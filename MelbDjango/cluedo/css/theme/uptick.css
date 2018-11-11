@@ -104,3 +104,10 @@ div.fg-highlight {
     height: 10rem;
     border: blue dashed 0.2rem;
 }
+
+.primary {
+    color: #00a19c !important;
+}
+.active {
+    color: #056dff !important;
+}
