@@ -50,7 +50,7 @@
       Django Rest Framework serializer is being constructed and
       run. There's a bit of a wide bar happening near the top there,
       let's focus on that. It looks to be in a function named
-      "get_fields" in DRF. So, let's take a look at that code and see
+      "fields" in DRF. So, let's take a look at that code and see
       what's going on.
     </p>
   </aside>
@@ -93,7 +93,13 @@ class Serializer(BaseSerializer):
       it creates a deep copy.
     </p>
     <p>
-      It turns out this deep copy is our culprit. Now we were able to
+      It turns out this deep copy is our culprit. This deep copy is here to
+      ensure that any alterations to the serializer fields do not affect
+      other instances of the serializer, giving maximum flexibility to how it
+      is used.
+    </p>
+    <p>
+      Now we were able to
       remove this time cost by using a shallow copy instead, however
       this can cause problems depending on how the serializer is used
       afterwards. If modifications are made to the fields themselves
@@ -105,16 +111,16 @@ class Serializer(BaseSerializer):
 </section>
 
 <section>
-  <h2>Lesson</h2>
+  <h2>"The copycat killer": Lesson</h2>
   <p>
-    <em>Don't be so flexible as to ruin performance.</em>
+    <em>Deep copies can be a killer</em>
   </p>
   <aside class="notes">
     <p>
-      There's nothing wrong with flexibility, but sometimes too much
-      can have a major effect on performance. Now I'm not saying that DRF made a mistake
-      including such flexibility, but they could maybe have allowed a configuration option for
-      those who could use the short-circuit case.
+      Watch out for deep copies, you put yourself at the mercy of the
+      size and complexity of the objects being copied. This is, of course,
+      especially important in performance critical sections of your
+      code.
     </p>
   </aside>
 </section>

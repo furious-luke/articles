@@ -38,7 +38,7 @@
       a lot of time in the functions relating to looking up included
       models and serializers. Let's focus in on one of the wider bars
       near the top; we can see there's a method in there called
-      "get_included_serializers", but before we look there, let's look again
+      "get_included_serializers", but before we go there, let's look again
       at how we define our included serializers for the task model.
     </p>
   </aside>
@@ -112,13 +112,13 @@ def get_included_serializers(serializer):
       So how can we fix this? Well, the easiest way was to add a table
       to the code to keep each serializer class after we've looked it
       up once. The next time we grab it straight from the table. And that was it, a simple change
-      that saved us half a second.
+      that saved us half a second per request.
     </p>
   </aside>
 </section>
 
 <section>
-  <h2>Lesson</h2>
+  <h2>"Lord Import-ant": Lesson</h2>
   <p>
     <em>Python's importing library is slow.</em>
   </p>

@@ -22,7 +22,7 @@
       On it's way to taking a full second each time the endpoint was
       called, the final suspect has probably wasted days of CPU time
       for us. It must have surely been for something important, right?
-      Something worthy? Well let's open the envelope and find out, shall we?
+      Well let's open the envelope and find out, shall we?
     </p>
     <p>
       Pluralisation... adding "s"s to words. Sometimes taking an "s"
@@ -81,23 +81,24 @@ def get_resource_type_from_included_serializer(self):
     </p>
     <p>
       Again, we were able to resolve this, in its entirity, by using a good old
-      fashioned lookup table.
+      fashioned lookup table. Once we'd calculated the inflections once, we cached them, and
+      reused them as needed.
     </p>
   </aside>
 </section>
 
 <section>
-  <h2>Lesson</h2>
+  <h2>"Professor S": Lesson</h2>
   <p>
-    <em>Lookup tables?</em>
+    <em>Test your performance critical code</em>
   </p>
   <aside class="notes">
     <p>
-      I'm really not sure there's any more to say about this. I'd have
-      thought it would be pretty obvious: don't bother pluralising
-      strings in performance critical parts of your API library, and
-      yet, here we are. I suppose the lesson is don't forget the humble lookup
-      table, champion of performant code.
+      It's very easy to condemn code doing something like pluralising strings using
+      an expensive operation, in the middle of performance critical code, but it's pretty
+      clear that the author expected pluralisation to be quick, which is probably fair
+      enough. However a brief test would have highlighted that this is not the case. And if there is
+      any other lesson, I think it's that lookup tables are your best friend.
     </p>
   </aside>
 </section>

@@ -41,7 +41,8 @@
       particular set of work that needs to be done at a certain time,
       at a certain property. In many ways Tasks form the backbone of
       the product. And, as such, they have a tendency to create
-      something of a web of connections across our data models.
+      something of a web of connections across our data models. From contractors, to billing-cards,
+      the connections are many.
     </p>
   </aside>
 </section>
@@ -149,8 +150,8 @@ class TaskSerializer(ModelSerializer):
     <p>
       This is the top of our task serializer in Workforce. The
       "included_serializers" attribute is used to specify which
-      serializer should be used to handle model relationships. As is
-      evident, the task model has quite a few relationships.
+      serializer should be used to handle model relationships. Each of the connections
+      from the task model that we saw before has a corresponding serializer entry here.
     </p>
   </aside>
 </section>
