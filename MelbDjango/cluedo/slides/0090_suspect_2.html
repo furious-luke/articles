@@ -1,5 +1,6 @@
 <section>
-  <h1>The Second Suspect</h1>
+  <h2>The Second Suspect</h2>
+  <p>"Lord Import-ant"</p>
 </section>
 
 <section>
@@ -18,8 +19,7 @@
   </div>
   <aside class="notes">
     <p>
-      Okay, the next suspect, and coming in at approximately half a
-      second.
+      So, this suspect comes in at approximately half a second.
     </p>
   </aside>
 </section>
@@ -35,8 +35,9 @@
       a lot of time in the functions relating to looking up included
       models and serializers. Let's focus in on one of the wider bars
       near the top; we can see there's a method in there called
-      "get_included_serializers", but before we look there, let's take a look
-      at how we define our included serializers.
+      "get_included_serializers", but before we look there, let's look again
+      at how we define our included serializers for the task model. TODO: Add this
+      in at the JSON-API section.
     </p>
   </aside>
 </section>
@@ -66,10 +67,10 @@ class TaskSerializer(ModelSerializer):
   </code></pre>
   <aside class="notes">
     <p>
-      This is the beginning of the Task serializer definition. You can
-      see the list of related serializers that will be used when
-      including certain relationships in the resultant JSON when
-      querying the API. Take note that they're all defined as strings.
+      Again this is the beginning of the Task serializer definition. One thing to take
+      note of here is that they're all defined as strings. They could equally be defined
+      as the classes themselves, imported from the relevant files, but it's simpler and more
+      convenient to use strings.
     </p>
   </aside>
 </section>
@@ -96,9 +97,11 @@ def get_included_serializers(serializer):
     <p>
       Now let's look at the DRF-JSONAPI function that looks up these
       serializers. This is run every time a serializer is
-      constructed. Notie the call near the bottom to
+      constructed, which happens during every request made. Note the call near the bottom to
       "import_class_from_dotted_path"; that's going to be called on
-      every one of the string paths we saw just before. You'd think
+      every one of the string paths we saw just before, and also all
+      the include strings from each included serializer therein. You'd
+      think
       that once a class has already been imported it would keep a
       lookup in a table for it, but seemingly that's not the case, as
       it's still consuming about half a second in total.
@@ -106,7 +109,30 @@ def get_included_serializers(serializer):
     <p>
       So how can we fix this? Well, the easiest way was to add a table
       to the code to keep each serializer class after we've looked it
-      up once. The next time we grab it straight from the table.
+      up once. The next time we grab it straight from the table. And that was it, a simple change
+      that saved us half a second.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <h2>Solution</h2>
+  <p>
+  </p>
+</section>
+
+<section>
+  <h2>Lesson</h2>
+  <p>
+    <em>Python's importing library is slow.</em>
+  </p>
+  <aside class="notes">
+    <p>
+      It's suprising to me that Python's importing library does not
+      already cache imported files by their location. One could be
+      forgiven for assuming that might be the case. However placing
+      imports in a fairly time critical location is still probably a little silly, so we
+      should all remember to keep our imports in performance safe locations.
     </p>
   </aside>
 </section>

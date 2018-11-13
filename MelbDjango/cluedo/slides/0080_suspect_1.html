@@ -1,5 +1,17 @@
 <section>
-  <h1>The First Suspect</h1>
+  <h2>Doing Hard Time</h2>
+  <aside class="notes">
+    <p>
+      Okay, in this, the final section, I'll be covering each of our
+      suspects in order of least time consuming to the most, and
+      we'll be looking at what went wrong, how we fixed it, and lessons learned.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <h2>The First Suspect</h2>
+  <p>"The Copycat Killer"</p>
 </section>
 
 <section>
@@ -82,8 +94,30 @@ class Serializer(BaseSerializer):
       remove this time cost by using a shallow copy instead, however
       this can cause problems depending on how the serializer is used
       afterwards. If modifications are made to the fields themselves
-      it will affect other serializer instances, so modify with
-      caution.
+      it will affect other serializer instances. However, we knew that we
+      weren't dynamically altering any of our serializer fields, so we could
+      get away with a shallow copy.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <h2>Solution</h2>
+  <p>
+  </p>
+</section>
+
+<section>
+  <h2>Lesson</h2>
+  <p>
+    <em>Don't be so flexible as to ruin performance.</em>
+  </p>
+  <aside class="notes">
+    <p>
+      There's nothing wrong with flexibility, but sometimes too much
+      can have a major effect on performance. Now I'm not saying that DRF made a mistake
+      including such flexibility, but they could maybe have allowed a configuration option for
+      those who could use the short-circuit case.
     </p>
   </aside>
 </section>

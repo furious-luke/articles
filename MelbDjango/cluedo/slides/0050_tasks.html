@@ -1,18 +1,19 @@
 <section>
-  <h2>The Performance</h2>
+  <h2>The Scene of The Crime/h2>
   <ul>
-    <li>Workforce</li>
+    <li>Uptick Workforce</li>
     <li>Tasks</li>
     <li>Django Rest Framework</li>
     <li>JSON-API Specification</li>
   </ul>
   <aside class="notes">
     <p>
-      So let's move away from Cluedo, briefly, to talk about the
-      pickle of a situation we found ourselves in with our
-      software. To bring you up to speed I'll talk a little about one
-      of our products at Uptick, the libraries we use, and the
-      performance issue we found.
+      Next, the scene of the crime. Like Cluedo, there are a number of
+      locations to consider. For us, these don't come as rooms of a
+      mansion, but as Python frameworks and libraries. In this section
+      I'll talk about our main product at Uptick, some of the
+      libraries we use, and how we came to have our performance
+      problems.
     </p>
   </aside>
 </section>
@@ -71,7 +72,7 @@
   <aside class="notes">
     <p>
       Workforce is written, of course, using Django, but most of the
-      heavy lifting in our API is carreid by these two packages. The
+      heavy lifting in our API is carried out by these two packages. The
       first I'm sure will be very familiar to you, Django Rest
       Framework, the ubiquitous RESTful API library for Django. The
       second may not be so familiar. An extension to DRF, Django Rest
@@ -87,92 +88,21 @@
     <h3>JSON-API Specification</h3>
     <a style="font-size: 0.6em" href="https://jsonapi.org/">https://jsonapi.org</a>
   </div>
-  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
-{
-  "links": {
-    "self": "http://example.com/articles",
-    "next": "http://example.com/articles?page[offset]=2",
-    "last": "http://example.com/articles?page[offset]=10"
-  },
-  "data": [{
-    "type": "articles",
-    "id": "1",
-    "attributes": {
-      "title": "JSON:API paints my bikeshed!"
-    },
-    "relationships": {
-      "author": {
-        "links": {
-          "self": "http://example.com/articles/1/relationships/author",
-          "related": "http://example.com/articles/1/author"
-        },
-        "data": { "type": "people", "id": "9" }
-      },
-      "comments": {
-        "links": {
-          "self": "http://example.com/articles/1/relationships/comments",
-          "related": "http://example.com/articles/1/comments"
-        },
-        "data": [
-          { "type": "comments", "id": "5" },
-          { "type": "comments", "id": "12" }
-        ]
-      }
-    },
-    "links": {
-      "self": "http://example.com/articles/1"
-    }
-  }],
-  "included": [{
-    "type": "people",
-    "id": "9",
-    "attributes": {
-      "firstName": "Dan",
-      "lastName": "Gebhardt",
-      "twitter": "dgeb"
-    },
-    "links": {
-      "self": "http://example.com/people/9"
-    }
-  }, {
-    "type": "comments",
-    "id": "5",
-    "attributes": {
-      "body": "First!"
-    },
-    "relationships": {
-      "author": {
-        "data": { "type": "people", "id": "2" }
-      }
-    },
-    "links": {
-      "self": "http://example.com/comments/5"
-    }
-  }, {
-    "type": "comments",
-    "id": "12",
-    "attributes": {
-      "body": "I like XML better"
-    },
-    "relationships": {
-      "author": {
-        "data": { "type": "people", "id": "9" }
-      }
-    },
-    "links": {
-      "self": "http://example.com/comments/12"
-    }
-  }]
-}
-  </code></pre>
   <aside class="notes">
     <p>
       Json-API is a standard developed to help build flexible and
       powerful APIs. It's designed to provide enhanced relationship
       querying, field selection, and pagination, amongst other
-      things. The relationship querying is rather pertinent to our
+      things. The relationship querying is rather important to our
       Task list, as it allows easy selection of connected models
-      dynamically.
+      from our client-side code.
+    </p>
+    <p>
+      So, a request is made looking something like this: notice the
+      include query parameter. This indicates that we're interested in
+      fetching details not just about a task, but also about the
+      property. The response to this request will come with a set of tasks
+      and all connected properties.
     </p>
   </aside>
 </section>

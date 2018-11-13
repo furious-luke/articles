@@ -1,16 +1,16 @@
 <section>
-  <h2>The Investigation</h2>
+  <h3>Don't Bring a Knife to a Firefight</h3>
   <ul>
     <li>Flamegraphs</li>
-    <li>The Suspects</li>
   </ul>
   <aside class="notes">
     <p>
-      And thus, our investigation began. In this section I'll talk a
-      little about our tool of choice for uncovering the nefarious
-      antagonist of our plot, and then we'll take a look at each of the
-      three major performance costs, unmasking them in the process.
-    </p>
+      This section is about our investigation into our performance
+      woes. Django Debug Toolbar, as good as it is, didn't cut the
+      Mustard. We couldn’t just take a wild stab in the dark, we
+      needed to choose the right tool for the job. Here I'll talk
+      about flamegraphs, a technique that helped us track down all
+      three of our culprits.
   </aside>
 </section>
 
@@ -23,12 +23,12 @@
   </ul>
   <aside class="notes">
     <p>
-      About 18 months ago I went to Dockercon in Austin Texas.
-      While I was there I was fortunate
-      enough to see a talk by Brendan Gregg, an engineer from Uber.  He spoke about
-      how Uber is able to analyse their containerised environments for
-      performance issues. And one of the tools they use leverages a visual technique
-      called a flamegraph. So what is a flamegraph?
+      About 18 months ago I went to Dockercon in Austin Texas.  While
+      I was there I was fortunate enough to see a talk by Brendan
+      Gregg, an engineer from Uber.  He spoke about how Uber is able
+      to analyse their containerised environments for performance
+      issues. And one of the tools they use leverages a visual
+      technique called a flamegraph. So what is a flamegraph?
     </p>
     <p>
       A flamegraph is a representation of collected profiling data.
@@ -46,7 +46,14 @@
 </section>
 
 <section>
-  <img src="./media/mysql-flamegraph.png" />
+  <div style="position: relative">
+    <img src="./media/mysql-flamegraph.png" />
+    <div style="position: absolute; left: 5.36em; width: 12.15em; bottom: .65em; height: .56em" class="fg-highlight fragment fade-in-then-out"></div>
+    <div style="position: absolute; left: 5.36em; width: 12.15em; bottom: 1.06em; height: .56em" class="fg-highlight fragment fade-in-then-out"></div>
+    <div style="position: absolute; left: 5.36em; width: 12.15em; bottom: 1.5em; height: .56em" class="fg-highlight fragment fade-in-then-out"></div>
+    <div style="position: absolute; left: 5.36em; width: 12.15em; bottom: 1.93em; height: .56em" class="fg-highlight fragment fade-in-then-out"></div>
+    <div style="position: absolute; left: 6.8em; width: 4.4em; bottom: 5.78em; height: .56em" class="fg-highlight fragment fade-in-then-out"></div>
+  </div>
   <aside class="notes">
     <p>
       This is an example of a Flamegraph generated for a query being
@@ -137,11 +144,11 @@
     </p>
     <p>
       Now it's a little unclear due to the size of this image, but
-      there a filenames and line numbers on each of these bars, making
+      on each of those bars there are filenames and line numbers, making
       it striaght-forward to identify where in the code we can begin
       to examine. This is the strength of flamegraphs; they make clear
       the specific locations in your source code, both file and
-      line-number, that are candidates for performance examination in
+      line-number, that are candidates for performance examination but in
       an intuitive representation.
     </p>
   </aside>

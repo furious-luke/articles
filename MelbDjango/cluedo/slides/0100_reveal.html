@@ -1,5 +1,6 @@
 <section>
-  <h1>The Final Suspect</h1>
+  <h2>The Final Suspect</h2>
+  <p>"Professor S"</p>
 </section>
 
 <section>
@@ -21,18 +22,13 @@
       On it's way to taking a full second each time the endpoint was
       called, the final suspect has probably wasted days of CPU time
       for us. It must have surely been for something important, right?
-      Something worthy? Let's have a look, shall we.
+      Something worthy? Well let's open the envelope and find out, shall we?
     </p>
-  </aside>
-</section>
-
-<section>
-  <h1>?</h1>
-  <aside class="notes">
     <p>
       Pluralisation... adding "s"s to words. Sometimes taking an "s"
       away. Why, in the world, would JSON-API be spending almost a
-      full second doing this?
+      full second doing this? Before we check for a winner, let's look a little
+      closer at this issue.
     </p>
   </aside>
 </section>
@@ -43,9 +39,9 @@
   </div>
   <aside class="notes">
     <p>
-      Looking briefly a the flamegraph we can see the calls going out
-      to the Python inflection package at the top there. So let's have
-      a look at the source of those calls.
+      Looking briefly at the flamegraph we can see the calls going out
+      to the Python inflection package at the top there. This package is used
+      to alter strings to be in plural or singular form. Let's look at the source code.
     </p>
   </aside>
 </section>
@@ -77,16 +73,45 @@ def get_resource_type_from_included_serializer(self):
       "get_resource_type_from_included_serializer", and it appears to
       be trying to create a default name for included models on
       JSONAPI serializers. It takes the field name, and calls
-      "inflection" to prepare a singular and plural form. This costs
-      us a bucketload of time.
+      "inflection" to prepare a singular and plural form. This happens for every serializer, in every request,
+      every time.
     </p>
     <p>
-      Instead of doing that every time, I added in another good old
-      fashion lookup table and immediately resolved the problem.
+      Again, we were able to resolve this, in its entirity, by using a good old
+      fashioned lookup table.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <h2>Solution</h2>
+  <p>
+  </p>
+</section>
+
+<section>
+  <h2>Lesson</h2>
+  <p>
+    <em></em>
+  </p>
+  <aside class="notes">
+    <p>
+      I'm really not sure there's any more to say about this. I'd have
+      thought it would be pretty obvious: don't bother pluralising
+      strings in performance critical parts of your API library, and
+      yet, here we are.
     </p>
   </aside>
 </section>
 
 <section>
   <h1>Winner?</h1>
+  <aside class="notes">
+    <p>
+      So I hope you were all able to take away something useful from that talk, and that you
+      found it perhaps a little entertaining. If you'd like to dig a little deeper into those
+      performance issue, or their solutions, or especially Cluedo, then by all means come and
+      have a chat with me later.
+    </p>
+  </aside>
 </section>

@@ -33,9 +33,9 @@
   <aside class="notes">
     <p>
       Now, at the beginning, this use of DRF, and DRF-JSONAPI worked
-      very well indeed. Our Task endpoint performed well enough,
-      taking approximately 400ms for larger queries, but generally
-      was much faster on average.
+      quite well. Our Task endpoint was performant, taking
+      approximately 400ms for larger queries, but generally much
+      faster on average.
     </p>
     <p>
       However over time, as we added more connections to our Task
@@ -46,7 +46,8 @@
       And then we noticed it slow down even more, and again our
       sentiment was “one day, we'll get to that when we have time”. It
       wasn't until some of these task queries were taking up to four
-      seconds that we decided that "that day was today".
+      seconds that we decided that something had to be done sooner rather
+      than later.
     </p>
   </aside>
 </section>
@@ -71,8 +72,7 @@
       the issue to be rooted in a database query explosion of some
       kind. But that was not the explanation at all. We were spending
       a mere 120ms in the database. And a whopping 3000 milliseconds
-      spent in CPU. What in the world could be causing this? The plot
-      was rapidly thickening.
+      spent in CPU. What in the world could be causing this?
     </p>
   </aside>
 </section>
@@ -95,11 +95,11 @@
   <aside class="notes">
     <p>
       Of course answers are never so easy, and I can tell you that our
-      performance was attacked on all sides, in various ways. All up
+      performance issues were a combination of several things. All up
       there about seven key areas we found that needed to be fixed,
       each carrying a significant performance impact. This here is a
       representation of the top three performance costs we found. The
-      top one coming in at a whopping 800 milliseconds. In a while I'm going to
+      top one coming in at a whopping 800 milliseconds alone. In a while I'm going to
       go through each of these top three suspects and explain what caused them.
     </p>
   </aside>
@@ -122,6 +122,7 @@
 
 <section>
   <div class="spacedv">
+    <h3>Where: Package</h3>
     <div>
       <div class="card">
         <div>Django</div>
@@ -152,6 +153,7 @@
 </section>
 
 <section>
+  <h3>When: Phase</h3>
   <div>
     <div class="card">
       <div>Parse</div>
@@ -187,6 +189,7 @@
 
 <section>
   <div class="spacedv">
+    <h3>What</h3>
     <div>
       <div class="card">
         <div></div>
@@ -198,9 +201,7 @@
     <p>
       Finally, you need to write specifically what you think it is
       that has caused the performance problem. Be as specific as you
-      like here, and at the end of the talk we'll see who is the closest to the correct answer
-      and we will be giving away a copy of Cluedo which CommonCode have so
-      graciously provided, isn't that nice of them?
+      like here, and at the end of the talk we'll see who is the closest to the correct answer.
     </p>
   </aside>
 </section>
@@ -250,6 +251,7 @@
       </div>
     </div>
   </div>
+  <p>Add slide showing an example card.</p>
   <aside class="notes">
     <p>
       So, you need to write down one option from each of the first two
@@ -258,14 +260,14 @@
     </p>
     <p>
       As an example, on my card I might write down "Django", to indicate I think
-      the problem is something in Django's code, and then "serialize",
+      the problem is something in Django's code, and then "serializer",
       to indicate I think the problem is happening during
       serialization, and then I might write something like "URL
       reverse lookups", because I happen to think that performing URL reverses
       can be particularly slow. Interestingly that example is actually
       one of the other performance issues we found outside of the top three; it was taking
       about 100ms in total to perform URL reverse lookups on each returned Django
-      model.
+      model. The lession there, is be careful where, and how often you use URL reverses.
     </p>
     <p>
       I'll give you a little time to write down your guesses and
