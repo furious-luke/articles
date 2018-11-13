@@ -98,12 +98,19 @@ div.phases > * {
 
 div.fg-highlight {
     position: absolute;
-    left: 1.1rem;
-    bottom: 1.2rem;
-    width: 10.5rem;
-    height: 10rem;
+    /* left: 1.1rem; */
+    /* bottom: 1.2rem; */
+    /* width: 10.5rem; */
+    /* height: 10rem; */
     box-shadow: 0px 0px 0px 2000px rgba(0, 0, 0, 0.4);
     /* border: blue dashed 0.2rem; */
+    line-height: 0;
+}
+div.fg-highlight > img {
+    max-width: inherit;
+    max-height: inherit;
+    margin: 0 !important;
+    padding: 0;
 }
 
 .primary {

@@ -25,8 +25,11 @@
 </section>
 
 <section>
-  <div class="center" style="width: 80%">
+  <div style="position: relative" class="center" style="width: 80%">
     <img src="./media/wf-included-flamegraph.svg" />
+    <div style="left: 2em; top: 5em;" class="fg-highlight fragment">
+      <img src="./media/wf-included-zoom.png" />
+    </div>
   </div>
   <aside class="notes">
     <p>
@@ -36,8 +39,7 @@
       models and serializers. Let's focus in on one of the wider bars
       near the top; we can see there's a method in there called
       "get_included_serializers", but before we look there, let's look again
-      at how we define our included serializers for the task model. TODO: Add this
-      in at the JSON-API section.
+      at how we define our included serializers for the task model.
     </p>
   </aside>
 </section>
@@ -113,12 +115,6 @@ def get_included_serializers(serializer):
       that saved us half a second.
     </p>
   </aside>
-</section>
-
-<section>
-  <h2>Solution</h2>
-  <p>
-  </p>
 </section>
 
 <section>

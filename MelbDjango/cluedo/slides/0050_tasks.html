@@ -1,5 +1,5 @@
 <section>
-  <h2>The Scene of The Crime/h2>
+  <h2>The Scene of The Crime</h2>
   <ul>
     <li>Uptick Workforce</li>
     <li>Tasks</li>
@@ -8,12 +8,12 @@
   </ul>
   <aside class="notes">
     <p>
-      Next, the scene of the crime. Like Cluedo, there are a number of
-      locations to consider. For us, these don't come as rooms of a
-      mansion, but as Python frameworks and libraries. In this section
-      I'll talk about our main product at Uptick, some of the
-      libraries we use, and how we came to have our performance
-      problems.
+      Next, some background on the scene of our performance
+      crime. Like Cluedo, there are a number of locations to
+      consider. For us, these don't come as rooms of a mansion, but as
+      Python frameworks and libraries. In this section I'll talk about
+      our main product at Uptick, some of the libraries we use, and
+      how we came to have our performance problems.
     </p>
   </aside>
 </section>
@@ -103,6 +103,54 @@
       fetching details not just about a task, but also about the
       property. The response to this request will come with a set of tasks
       and all connected properties.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <div>
+    <a style="font-size: 0.6em" href="">https://workforce.onuptick.com/api/v2/tasks?include=property</a>
+  </div>
+  <aside class="notes">
+    <p>
+      So, a request is made looking something like this: notice the
+      include query parameter. This indicates that we're interested in
+      fetching details not just about a task, but also about the
+      property. The response to this request will come with a set of tasks
+      and all connected properties.
+    </p>
+  </aside>
+</section>
+
+<section>
+  <pre style="font-size: 0.8rem"><code data-trim data-noescape>
+class TaskSerializer(ModelSerializer):
+    included_serializers = {
+        'assigned_to': 'abas.apps.accounts.api.v2.serializers.UserSerializer',
+        'parent_task': 'abas.apps.tasks.api.v2.serializers.TaskSerializer',
+        'assigned_office': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'billingcard': 'abas.apps.billing.api.v2.serializers.BillingCardSerializer',
+        'branch': 'abas.apps.branches.api.v2.serializers.BranchNameSerializer',
+        'category': 'abas.apps.tasks.api.v2.serializers.TaskCategorySerializer',
+        'client': 'abas.apps.clients.api.v2.serializers.ClientSerializer',
+        'costcentre': 'abas.apps.costcentres.api.v2.serializers.CostCentreSerializer',
+        'property': 'abas.apps.properties.api.v2.serializers.PropertySerializer',
+        'round': 'abas.apps.tasks.api.serializers.RoundSerializer',
+        'tags': 'abas.apps.tasks.api.serializers.TaskTagSerializer',
+        'supporting_technicians': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'technician': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'author': 'abas.apps.accounts.api.serializers.UserSerializer',
+        'contractor': 'abas.apps.contractors.api.serializers.ContractorSerializer',
+        'servicegroup': 'abas.apps.routines.api.v2.serializers.ServiceGroupSerializer',
+        'updated_by': 'abas.apps.accounts.api.v2.serializers.UserSerializer',
+    }
+  </code></pre>
+  <aside class="notes">
+    <p>
+      This is the top of our task serializer in Workforce. The
+      "included_serializers" attribute is used to specify which
+      serializer should be used to handle model relationships. As is
+      evident, the task model has quite a few relationships.
     </p>
   </aside>
 </section>

@@ -36,10 +36,13 @@
 <Section>
   <div class="center" style="width: 80%">
     <img src="./media/wf-inflection-flamegraph.svg" />
+    <div style="left: 2.5em; top: 3em;" class="fg-highlight fragment">
+      <img src="./media/wf-inflection-zoom.png" />
+    </div>
   </div>
   <aside class="notes">
     <p>
-      Looking briefly at the flamegraph we can see the calls going out
+      Looking briefly at the flamegraph, once we zoom in we can see the calls going out
       to the Python inflection package at the top there. This package is used
       to alter strings to be in plural or singular form. Let's look at the source code.
     </p>
@@ -84,22 +87,17 @@ def get_resource_type_from_included_serializer(self):
 </section>
 
 <section>
-  <h2>Solution</h2>
-  <p>
-  </p>
-</section>
-
-<section>
   <h2>Lesson</h2>
   <p>
-    <em></em>
+    <em>Lookup tables?</em>
   </p>
   <aside class="notes">
     <p>
       I'm really not sure there's any more to say about this. I'd have
       thought it would be pretty obvious: don't bother pluralising
       strings in performance critical parts of your API library, and
-      yet, here we are.
+      yet, here we are. I suppose the lesson is don't forget the humble lookup
+      table, champion of performant code.
     </p>
   </aside>
 </section>
@@ -109,8 +107,8 @@ def get_resource_type_from_included_serializer(self):
   <aside class="notes">
     <p>
       So I hope you were all able to take away something useful from that talk, and that you
-      found it perhaps a little entertaining. If you'd like to dig a little deeper into those
-      performance issue, or their solutions, or especially Cluedo, then by all means come and
+      found it perhaps a little entertaining. If you'd like to dig deeper into those
+      performance issues, or their solutions, or especially Cluedo, then by all means come and
       have a chat with me later.
     </p>
   </aside>
