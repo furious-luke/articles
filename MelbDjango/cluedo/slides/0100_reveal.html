@@ -97,7 +97,7 @@ def get_resource_type_from_included_serializer(self):
       It's very easy to condemn code doing something like pluralising strings using
       an expensive operation, in the middle of performance critical code, but it's pretty
       clear that the author expected pluralisation to be quick, which is probably fair
-      enough. However a brief test would have highlighted that this is not the case. And if there is
+      enough. However a brief test would have highlighted that this is not the case, so remember to do some performance testing. And if there is
       any other lesson, I think it's that lookup tables are your best friend.
     </p>
   </aside>

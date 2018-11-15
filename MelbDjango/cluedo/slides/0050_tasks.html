@@ -148,8 +148,8 @@ class TaskSerializer(ModelSerializer):
   </code></pre>
   <aside class="notes">
     <p>
-      This is the top of our task serializer in Workforce. The
-      "included_serializers" attribute is used to specify which
+      This is the top of our task serializer in Workforce. In many ways it's a standard DRF serializer, but there
+      is also an "included_serializers" attribute is used to specify which
       serializer should be used to handle model relationships. Each of the connections
       from the task model that we saw before has a corresponding serializer entry here.
     </p>
