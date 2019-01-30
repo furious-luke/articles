@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- SEO -->
+    <title>Uptick: Testing</title>
+    <meta name="description" content="How we prefer to test things at Uptick.">
+
+    <!-- URL CANONICAL -->
+    <!-- <link rel="canonical" href="http://your-url.com/"> -->
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,700,700i%7CMaitree:200,300,400,600,700&amp;subset=latin-ext" rel="stylesheet">
+
+    <!-- CSS WebSlides -->
+    <link rel="stylesheet" type='text/css' media='all' href="static/css/webslides.css">
+
+    <!-- Optional - CSS SVG Icons (Font Awesome) -->
+    <link rel="stylesheet" type='text/css' media='all' href="static/css/svg-icons.css">
+
+    <!-- Prism syntax highlighting -->
+    <link rel="stylesheet" type='text/css' media='all' href="static/css/prism.css">
+
+    <!-- SOCIAL CARDS (ADD YOUR INFO) -->
+
+    <!-- FACEBOOK -->
+    <meta property="og:url" content="http://engineering.uptickhq.com/">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Uptick: Testing">
+    <meta property="og:description" content="How we prefer to test things at Uptick.">
+    <meta property="og:updated_time" content="2017-01-04T17:20:50">
+    <meta property="og:image" content="static/images/share-webslides.jpg">
+
+    <!-- TWITTER -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@uptick">
+    <meta name="twitter:creator" content="@luke">
+    <meta name="twitter:title" content="Uptick: Testing">
+    <meta name="twitter:description" content="How we prefer to test things at Uptick.">
+    <meta name="twitter:image" content="static/images/share-webslides.jpg">
+
+    <!-- FAVICONS -->
+    <link rel="shortcut icon" sizes="16x16" href="static/images/favicons/favicon.png">
+    <link rel="shortcut icon" sizes="32x32" href="static/images/favicons/favicon-32.png">
+    <link rel="apple-touch-icon icon" sizes="76x76" href="static/images/favicons/favicon-76.png">
+    <link rel="apple-touch-icon icon" sizes="120x120" href="static/images/favicons/favicon-120.png">
+    <link rel="apple-touch-icon icon" sizes="152x152" href="static/images/favicons/favicon-152.png">
+    <link rel="apple-touch-icon icon" sizes="180x180" href="static/images/favicons/favicon-180.png">
+    <link rel="apple-touch-icon icon" sizes="192x192" href="static/images/favicons/favicon-192.png">
+
+    <!-- Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#333333">
+
+  </head>
+  <body>
+    <header role="banner">
+      <nav role="navigation">
+        <p class="logo"><a href="index.html" title="Uptick: Testing">Uptick: Testing</a></p>
+        <!-- <ul> -->
+        <!--   <li class="github"> -->
+        <!--     <a rel="external" href="https://github.com/webslides/webslides" title="Github"> -->
+        <!--       <svg class="fa-github"> -->
+        <!--         <use xlink:href="#fa-github"></use> -->
+        <!--       </svg> -->
+        <!--       <em>WebSlides</em> -->
+        <!--     </a> -->
+        <!--   </li> -->
+        <!--   <li class="twitter"> -->
+        <!--     <a rel="external" href="https://twitter.com/webslides" title="Twitter"> -->
+        <!--       <svg class="fa-twitter"> -->
+        <!--         <use xlink:href="#fa-twitter"></use> -->
+        <!--       </svg> -->
+        <!--       <em>@WebSlides</em> -->
+        <!--     </a> -->
+        <!--   </li> -->
+        <!-- </ul> -->
+      </nav>
+    </header>
+
+    <main role="main">
+      <article id="webslides">
+
+	<section>
+          <div class="wrap size-50 aligncenter">
+            <h2><strong>Why WebSlides?</strong></h2>
+            <p class="text-intro"><a href="demos/why-webslides.html" title="Why WebSlides?">Presentations</a>, <a href="demos/landings.html" title="Landings">landings</a>, <a href="demos/portfolios.html" title="Portfolios">portfolios</a>, and <a href="demos/longforms.html" title="Longforms">longforms</a>.</p>
+            <div class="bg-white shadow">
+              <ul class="flexblock reasons">
+                <li>
+                  <h2>An opportunity to engage.</h2>
+                  <p>WebSlides is about good karma. This is about telling the story, and sharing it in a beautiful way. HTML and CSS as narrative elements.</p>
+                </li>
+                <li>
+                  <h2>Work better, faster.</h2>
+                  <p>Designers, marketers, and journalists can now focus on the content. Simply <a href="demos/index.html" title="WebSlides Demos">choose a demo</a> and customize it in minutes.</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+	<section class="bg-black aligncenter">
+	  <span class="background" style="background-image:url('static/images/frustration.jpg');opacity:.4"></span>
+          <div class="wrap">
+            <h1 class="text-landing text-shadow"><strong>Testing</strong></h1>
+            <p class="text-shadow">How to make our lives easier.</p>
+          </div>
+          <footer>
+            <div class="wrap">
+              <p>
+                <span class="alignleft">
+                  <img class="whitelogo" src="static/images/logos/uptick.svg" alt="Uptick">
+		</span>
+                <!-- <span class="alignright"> -->
+                <!--   <a href="#" class="badge-ios" title="iOS App">iOS app</a> -->
+                <!--   <a href="#" class="badge-android" title="Android app">Android app</a> -->
+                <!-- </span> -->
+              </p>
+            </div>
+          </footer>
+        </section>
+
+	<section class="bg-gradient-v">
+	  <span class="background" style="background-image:url('static/images/frustration.jpg');opacity:.2"></span>
+          <div class="wrap size-60">
+            <p class="text-context">WHY BOTHER</p>
+            <h2>Writing tests <strong>takes more time</strong>, and then we have to <strong>maintain the tests</strong>.</h2>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid">
+              <div class="column">
+                <svg class="fa-code large">
+                  <use xlink:href="#fa-code"></use>
+                </svg>
+                <h3><strong>Large Projects</strong></h3>
+                <p>When projects become larger, they become much more difficult to guarantee correctness. Manual testing
+		also becomes prohibitive.</p>
+              </div>
+              <div class="column">
+                <svg class="fa-user large">
+                  <use xlink:href="#fa-user"></use>
+                </svg>
+                <h3><strong>Teams</strong></h3>
+                <p>With even one more person tests immediately become more valuable.</p>
+              </div>
+              <div class="column">
+                <span>
+                  <svg class="fa-trash large">
+                    <use xlink:href="#fa-trash"></use>
+                  </svg>
+                </span>
+                <h3><strong>Refactoring</strong></h3>
+                <p>Coming back to some code after a significant time and changing parts of it can be challenging.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <div class="content-center">
+	      <h3>So what do we gain?</h3>
+              <ul class="flexblock specs">
+		<li>
+                  <div>
+                    <h2>
+		      <svg class="fa-check">
+			<use xlink:href="#fa-check"></use>
+                      </svg>
+                      Correctness
+                    </h2>
+		    guarantees, quickly.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+                      <svg class="fa-pencil">
+			<use xlink:href="#fa-pencil"></use>
+                      </svg>
+                      Alterations
+                    </h2>
+		    are much easier, especially much later on.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+                      <svg class="fa-book">
+			<use xlink:href="#fa-book"></use>
+                      </svg>
+		      Documentation
+                    </h2>
+		    surrounding expected usages of code.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+		      <svg class="fa-bug">
+			<use xlink:href="#fa-bug"></use>
+                      </svg>
+                      Debugging
+                    </h2>
+		    aide, especially in complex systems.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+		      <svg class="fa-magic">
+			<use xlink:href="#fa-magic"></use>
+                      </svg>
+                      Automation
+                    </h2>
+		    is much easier.
+                  </div>
+		</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <div class="content-center">
+	      <h3>And what are the down-sides?</h3>
+              <ul class="flexblock specs">
+		<li>
+                  <div>
+                    <h2>
+		      <svg class="fa-clock-o">
+			<use xlink:href="#fa-clock-o"></use>
+                      </svg>
+                      Initial setup
+                    </h2>
+		    can be time consuming.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+                      <svg class="fa-pencil">
+			<use xlink:href="#fa-pencil"></use>
+                      </svg>
+                      Maintenance
+                    </h2>
+		    can be an issue if not countered.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+                      <svg class="fa-check">
+			<use xlink:href="#fa-check"></use>
+                      </svg>
+		      False positives
+                    </h2>
+		    (and vice-versa).
+                  </div>
+		</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+	<section class="bg-gradient-v">
+	  <span class="background" style="background-image:url('static/images/frustration.jpg');opacity:.2"></span>
+          <div class="wrap size-60">
+            <p class="text-context">OUR GOAL</p>
+	    <h2><strong>Minimum effort</strong> in writing and maintaining, yet
+	      still able to catch the bulk of common problems.</h2>
+          </div>
+        </section>
+
+        <section class="fullscreen">
+          <div class="card-50">
+            <figure>
+              <img src="http://blog.qatestlab.com/wp-content/uploads/2011/03/fuzz-testing-steps.jpg" alt="iWatch">
+              <figcaption>
+                <a href="http://blog.qatestlab.com/2011/03/10/what-is-fuzz-testing/" title="By Crew">
+                  <svg class="fa-link">
+                    <use xlink:href="#fa-link"></use>
+                  </svg>
+		  http://blog.qatestlab.com/2011/03/10/what-is-fuzz-testing/
+                </a>
+              </figcaption>
+            </figure>
+            <div class="flex-content">
+              <h2>Fuzzing</h2>
+              <p class="text-intro">
+		Fuzz testing uses randomization to help find difficult bugs.
+		Choose a set of inputs and run the code
+		to see if it breaks or not.
+              </p>
+              <ul class="description">
+                <li><strong class="text-label">Pros:</strong> Easy, low/no-maintenance</li>
+                <li><strong class="text-label">Cons:</strong> Slow, weak tests, how to choose inputs?</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid vertical-align">
+              <div class="column">
+                <h3><strong>The most basic</strong></h3>
+                <p class="text-intro">
+		  How would it look to fuzz test something like the billing contracts model?
+		</p>
+                <p>
+		  <strong>No assertions required</strong>, just run the code and let <strong>exceptions</strong> be our checks.
+		  But how do we choose reasonable values for our inputs?
+		</p>
+              </div>
+              <div class="column">
+                <pre class="language-python"><code>
+class BillingContractTestCase(TestCase):
+   def test_get_next_due(self):
+      # TODO: Create a few billing contracts with
+      #  good test values, and for each one run ...
+      billingcontract.get_next_due()
+		</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid vertical-align">
+              <div class="column">
+                <h3><strong>A bit cleverer</strong></h3>
+                <p class="text-intro">
+		  How would it look to fuzz test something like the billing contracts model?
+		</p>
+                <p>
+		  We can use <strong>Hypothesis</strong> to help us generate inputs for our tests, greatly reducing
+		  the difficulty in writing tests. But, what is <strong>"billingcontract_strategy"</strong>?
+		</p>
+              </div>
+              <div class="column">
+                <pre class="language-python"><code>
+from hypothesis import given
+from .strategies import billingcontract_strategy
+		    
+class BillingContractTestCase(TestCase):
+   @given(billingcontract_strategy)
+   def test_get_next_due(self, billingcontract):
+      # This method will be called repeatedly with semi-
+      # random values for "billingcontract".
+      billingcontract.get_next_due()
+		</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid vertical-align">
+              <div class="column">
+                <h3><strong>Pretty smart</strong></h3>
+                <p class="text-intro">
+		  How would it look to fuzz test something like the billing contracts model?
+		</p>
+                <p>
+		  Strategies tell Hypothesis <strong>how to generate sample test data</strong>. Hypothesis ships with a
+		  Django specific helper that does this automatically for us using a Model as an input.
+		</p>
+              </div>
+              <div class="column">
+                <pre class="language-python"><code>
+from hypothesis.extra.django import from_model
+from abas.apps.properties.tests.strategies import (
+   property_strategy
+)
+from ..models import BillingContract, BillingContractType
+
+
+billingcontract_strategy = from_model(
+    BillingContract,
+    property=property_strategy,
+    type=from_model(
+        BillingContractType
+    )
+)
+		</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="fullscreen">
+          <div class="card-50">
+            <figure>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg">
+              <figcaption>
+                <a href="https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg">
+                  <svg class="fa-link">
+                    <use xlink:href="#fa-link"></use>
+                  </svg>
+		  https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg
+                </a>
+              </figcaption>
+            </figure>
+            <div class="flex-content">
+              <h2>Property Tests</h2>
+              <p class="text-intro">
+		Tests properties of the operation that are <strong>invariant under changing
+		parameters</strong>. For example, simple addition will be the same value regardless
+		of the order of arguments.
+              </p>
+              <ul class="description">
+                <li><strong class="text-label">Pros:</strong> Low maintenance, stronger tests</li>
+                <li><strong class="text-label">Cons:</strong> Slow, how to choose inputs?</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid vertical-align">
+              <div class="column">
+                <h3><strong>A solid test</strong></h3>
+                <p class="text-intro">
+		  How can we add property testing to the billing contracts fuzz test?
+		</p>
+                <p>
+		  An invariant of the function to calculate the next due date is that it will always
+		  increment the value by the the contract's period.
+		</p>
+              </div>
+              <div class="column">
+                <pre class="language-python"><code>
+from hypothesis import given
+from .strategies import billingcontract_strategy
+		    
+class BillingContractTestCase(TestCase):
+   @given(billingcontract_strategy)
+   def test_get_next_due(self, billingcontract):
+      # This method will be called repeatedly with semi-
+      # random values for "billingcontract".
+      a = billingcontract.due
+      b = billingcontract.get_next_due()
+      p = billingcontract.period
+      assert((b - a) == p)
+		</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </main>
+
+   <!-- A global footer
+
+     <footer role="contentinfo">
+      <div class="wrap">
+        <p>An <a href="https://github.com/webslides/webslides">open source solution</a>, by <a href="https://twitter.com/webslides">@webslides</a>.</p>
+      </div>
+    </footer>  -->
+
+    <!-- Required -->
+    <script src="static/js/webslides.js"></script>
+    <script>
+      window.ws = new WebSlides();
+    </script>
+
+    <!-- OPTIONAL - svg-icons.js (fontastic.me - Font Awesome as svg icons) -->
+    <script defer src="static/js/svg-icons.js"></script>
+
+    <!-- Prism syntax highlighting -->
+    <script src="static/js/prism.js"></script>
+
+  </body>
+</html>
