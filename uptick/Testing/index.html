@@ -83,30 +83,11 @@
     <main role="main">
       <article id="webslides">
 
-	<section>
-          <div class="wrap size-50 aligncenter">
-            <h2><strong>Why WebSlides?</strong></h2>
-            <p class="text-intro"><a href="demos/why-webslides.html" title="Why WebSlides?">Presentations</a>, <a href="demos/landings.html" title="Landings">landings</a>, <a href="demos/portfolios.html" title="Portfolios">portfolios</a>, and <a href="demos/longforms.html" title="Longforms">longforms</a>.</p>
-            <div class="bg-white shadow">
-              <ul class="flexblock reasons">
-                <li>
-                  <h2>An opportunity to engage.</h2>
-                  <p>WebSlides is about good karma. This is about telling the story, and sharing it in a beautiful way. HTML and CSS as narrative elements.</p>
-                </li>
-                <li>
-                  <h2>Work better, faster.</h2>
-                  <p>Designers, marketers, and journalists can now focus on the content. Simply <a href="demos/index.html" title="WebSlides Demos">choose a demo</a> and customize it in minutes.</p>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
 	<section class="bg-black aligncenter">
 	  <span class="background" style="background-image:url('static/images/frustration.jpg');opacity:.4"></span>
           <div class="wrap">
-            <h1 class="text-landing text-shadow"><strong>Testing</strong></h1>
-            <p class="text-shadow">How to make our lives easier.</p>
+            <h1 class="text-landing text-shadow"><strong>Fuzz Testing</strong></h1>
+            <p class="text-shadow">Bang for our buck.</p>
           </div>
           <footer>
             <div class="wrap">
@@ -114,10 +95,6 @@
                 <span class="alignleft">
                   <img class="whitelogo" src="static/images/logos/uptick.svg" alt="Uptick">
 		</span>
-                <!-- <span class="alignright"> -->
-                <!--   <a href="#" class="badge-ios" title="iOS App">iOS app</a> -->
-                <!--   <a href="#" class="badge-android" title="Android app">Android app</a> -->
-                <!-- </span> -->
               </p>
             </div>
           </footer>
@@ -162,10 +139,44 @@
           </div>
         </section>
 
+	<section class="bg-gradient-v">
+	  <span class="background" style="background-image:url('static/images/frustration.jpg');opacity:.2"></span>
+          <div class="wrap size-60">
+            <p class="text-context">OUR GOAL</p>
+	    <h2><strong>Minimum effort</strong> in writing and maintaining, yet
+	      still able to <strong>catch the bulk of common problems</strong>.</h2>
+          </div>
+        </section>
+
+	<section>
+          <div class="wrap">
+            <div class="grid">
+              <div class="column">
+                <svg class="fa-eye large">
+                  <use xlink:href="#fa-eye"></use>
+                </svg>
+                <h3><strong>Whitebox Testing</strong></h3>
+                <p>
+		  Tests are written with knowledge of how the internals of the system function.
+		</p>
+              </div>
+              <div class="column">
+                <svg class="fa-eye-slash large">
+                  <use xlink:href="#fa-eye-slash"></use>
+                </svg>
+                <h3><strong>Blockbox testing</strong></h3>
+                <p>
+		  Ignores internal implmentation, only considers system inputs and outputs.
+		</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section>
           <div class="wrap">
             <div class="content-center">
-	      <h3>So what do we gain?</h3>
+	      <h3>Whitebox testing</h3>
               <ul class="flexblock specs">
 		<li>
                   <div>
@@ -173,53 +184,42 @@
 		      <svg class="fa-check">
 			<use xlink:href="#fa-check"></use>
                       </svg>
-                      Correctness
+                      Thorough
                     </h2>
-		    guarantees, quickly.
+		    tests, can make strong guarantees.
                   </div>
 		</li>
 		<li>
                   <div>
                     <h2>
-                      <svg class="fa-pencil">
-			<use xlink:href="#fa-pencil"></use>
+                      <svg class="fa-check">
+			<use xlink:href="#fa-check"></use>
                       </svg>
-                      Alterations
+                      Run-time efficiency
                     </h2>
-		    are much easier, especially much later on.
+		    as we test only what we need.
                   </div>
 		</li>
 		<li>
                   <div>
                     <h2>
-                      <svg class="fa-book">
-			<use xlink:href="#fa-book"></use>
+                      <svg class="fa-times">
+			<use xlink:href="#fa-times"></use>
                       </svg>
-		      Documentation
+		      Fragile
                     </h2>
-		    surrounding expected usages of code.
+		    tests will often break when implementation changes.
                   </div>
 		</li>
 		<li>
                   <div>
                     <h2>
-		      <svg class="fa-bug">
-			<use xlink:href="#fa-bug"></use>
+		      <svg class="fa-times">
+			<use xlink:href="#fa-times"></use>
                       </svg>
-                      Debugging
+                      Maintenance
                     </h2>
-		    aide, especially in complex systems.
-                  </div>
-		</li>
-		<li>
-                  <div>
-                    <h2>
-		      <svg class="fa-magic">
-			<use xlink:href="#fa-magic"></use>
-                      </svg>
-                      Automation
-                    </h2>
-		    is much easier.
+		    is difficult, as there is a lot of code.
                   </div>
 		</li>
               </ul>
@@ -230,28 +230,17 @@
         <section>
           <div class="wrap">
             <div class="content-center">
-	      <h3>And what are the down-sides?</h3>
+	      <h3>Blackbox testing</h3>
               <ul class="flexblock specs">
 		<li>
                   <div>
                     <h2>
-		      <svg class="fa-clock-o">
-			<use xlink:href="#fa-clock-o"></use>
+		      <svg class="fa-check">
+			<use xlink:href="#fa-check"></use>
                       </svg>
-                      Initial setup
+                      Easier to write
                     </h2>
-		    can be time consuming.
-                  </div>
-		</li>
-		<li>
-                  <div>
-                    <h2>
-                      <svg class="fa-pencil">
-			<use xlink:href="#fa-pencil"></use>
-                      </svg>
-                      Maintenance
-                    </h2>
-		    can be an issue if not countered.
+		    as they focus only on inputs and outputs.
                   </div>
 		</li>
 		<li>
@@ -260,9 +249,31 @@
                       <svg class="fa-check">
 			<use xlink:href="#fa-check"></use>
                       </svg>
-		      False positives
+		      Easily maintainable
                     </h2>
-		    (and vice-versa).
+		    as they don't depend on internals.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+                      <svg class="fa-times">
+			<use xlink:href="#fa-times"></use>
+                      </svg>
+		      Not guaranteed
+                    </h2>
+		    to catch all issues.
+                  </div>
+		</li>
+		<li>
+                  <div>
+                    <h2>
+		      <svg class="fa-times">
+			<use xlink:href="#fa-times"></use>
+                      </svg>
+                      Slower
+                    </h2>
+		    run-time due to exploring parameter spaces.
                   </div>
 		</li>
               </ul>
@@ -275,35 +286,84 @@
           <div class="wrap size-60">
             <p class="text-context">OUR GOAL</p>
 	    <h2><strong>Minimum effort</strong> in writing and maintaining, yet
-	      still able to catch the bulk of common problems.</h2>
+	      still able to <strong>catch the bulk of common problems</strong>.</h2>
           </div>
         </section>
 
-        <section class="fullscreen">
-          <div class="card-50">
-            <figure>
-              <img src="http://blog.qatestlab.com/wp-content/uploads/2011/03/fuzz-testing-steps.jpg" alt="iWatch">
-              <figcaption>
-                <a href="http://blog.qatestlab.com/2011/03/10/what-is-fuzz-testing/" title="By Crew">
-                  <svg class="fa-link">
-                    <use xlink:href="#fa-link"></use>
-                  </svg>
-		  http://blog.qatestlab.com/2011/03/10/what-is-fuzz-testing/
-                </a>
-              </figcaption>
-            </figure>
-            <div class="flex-content">
-              <h2>Fuzzing</h2>
-              <p class="text-intro">
-		Fuzz testing uses randomization to help find difficult bugs.
-		Choose a set of inputs and run the code
-		to see if it breaks or not.
-              </p>
-              <ul class="description">
-                <li><strong class="text-label">Pros:</strong> Easy, low/no-maintenance</li>
-                <li><strong class="text-label">Cons:</strong> Slow, weak tests, how to choose inputs?</li>
-              </ul>
+	<section>
+          <div class="wrap">
+            <div class="grid">
+              <div class="column">
+                <svg class="fa-magic large">
+                  <use xlink:href="#fa-magic"></use>
+                </svg>
+                <h3><strong>Fuzz testing</strong></h3>
+                <p>
+		  Does the code we've written run under a variety of well chosen inputs, no
+		  assertions really necessary.
+		</p>
+              </div>
+              <div class="column">
+                <svg class="fa-circle-o large">
+                  <use xlink:href="#fa-circle-o"></use>
+                </svg>
+                <h3><strong>Property testing</strong></h3>
+                <p>
+		  With randomised inputs, what are the properties of the system that can still
+		  be tested with assertions?
+		</p>
+              </div>
             </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h3>Fuzz testing steps</h3>
+            <ul class="flexblock steps">
+              <li>
+                <span>
+                  <svg class="fa-sitemap">
+                    <use xlink:href="#fa-sitemap"></use>
+                  </svg>
+                </span>
+                <h2>01. Analyse System Inputs</h2>
+                <p>What are the distinct values? What are valid data ranges? Can we limit values based
+		on other values?</p>
+              </li>
+              <li>
+                <div class="process step-2"></div>
+                <span>
+                  <svg class="fa-magic">
+                    <use xlink:href="#fa-magic"></use>
+                  </svg>
+                </span>
+                <h2>02. Generate Fuzzed Data</h2>
+                <p>Generate a sequence of semi-randomised data that covers an intelligent
+		set of inputs.</p>
+              </li>
+              <li>
+                <div class="process step-3"></div>
+                <span>
+		  <svg class="fa-cog">
+                    <use xlink:href="#fa-cog"></use>
+                  </svg>
+                </span>
+                <h2>03. Execute</h2>
+                <p>Run a part of the system to be tested.</p>
+              </li>
+              <li>
+                <div class="process step-4"></div>
+                <span>
+                  <svg class="fa-balance-scale">
+                    <use xlink:href="#fa-balance-scale"></use>
+                  </svg>
+                </span>
+                <h2>04. Analyse Behavior</h2>
+		<p>Did the system behave as expected? This can be as simple as just checking that
+		no exceptions occurred.</p>
+              </li>
+            </ul>
           </div>
         </section>
 
@@ -394,34 +454,6 @@ billingcontract_strategy = from_model(
 )
 		</code></pre>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="fullscreen">
-          <div class="card-50">
-            <figure>
-              <img src="https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg">
-              <figcaption>
-                <a href="https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg">
-                  <svg class="fa-link">
-                    <use xlink:href="#fa-link"></use>
-                  </svg>
-		  https://upload.wikimedia.org/wikipedia/commons/f/fb/Darts_in_a_dartboard.jpg
-                </a>
-              </figcaption>
-            </figure>
-            <div class="flex-content">
-              <h2>Property Tests</h2>
-              <p class="text-intro">
-		Tests properties of the operation that are <strong>invariant under changing
-		parameters</strong>. For example, simple addition will be the same value regardless
-		of the order of arguments.
-              </p>
-              <ul class="description">
-                <li><strong class="text-label">Pros:</strong> Low maintenance, stronger tests</li>
-                <li><strong class="text-label">Cons:</strong> Slow, how to choose inputs?</li>
-              </ul>
             </div>
           </div>
         </section>

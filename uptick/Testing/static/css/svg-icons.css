@@ -74,7 +74,8 @@ svg {
 }
 
 .fa-close {
-	width: 0.7857149094343185em;
+    	width: 1.0000000596046448em;
+	/* width: 0.7857149094343185em; */
 }
 
 .fa-search-plus {
