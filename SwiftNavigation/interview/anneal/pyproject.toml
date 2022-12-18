@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "anneal"
+version = "0.1.0"
+description = ""
+authors = ["Luke Hodkinson <furious.luke@gmail.com>"]
+license = "Proprietary"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+scipy = "^1.9.3"
+
+[tool.poetry.dev-dependencies]
+black = "^22.8.0"
+
+[tool.black]
+line-length = 119
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
